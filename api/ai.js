@@ -37,6 +37,13 @@ export default async function handler(req) {
     .filter(m => (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
     .slice(-14).map(m => ({ role: m.role, content: m.content.slice(0, kind === 'json' ? 30000 : 8000) }));
   if (!messages.length || messages[0].role !== 'user') return json({ code: 'bad_request' }, 400);
+  // page images (owner only: reading scanned exams) ride along with the last user turn
+  const imgs = (kind === 'json' && Array.isArray(body.images) ? body.images : []).slice(0, 6)
+    .filter(i => i && /^image\/(jpeg|png|webp|gif)$/.test(i.media_type) && typeof i.data === 'string' && i.data.length < 5_500_000);
+  if (imgs.length) {
+    const last = messages[messages.length - 1];
+    last.content = [...imgs.map(i => ({ type: 'image', source: { type: 'base64', media_type: i.media_type, data: i.data } })), { type: 'text', text: last.content }];
+  }
 
   if (!isAdmin) {
     const ok = await fetch(`${SB}/rest/v1/rpc/bump_ai`, { method: 'POST', headers: H, body: JSON.stringify({ p_user: user.id, p_limit: LIMIT[plan] || 0 }) }).then(r => r.json());

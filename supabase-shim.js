@@ -124,10 +124,15 @@
     const s = await session();
     if (!s) throw Object.assign(new Error('Sign in first'), { code: 'not_granted' });
     const messages = typeof input === 'string' ? [{ role: 'user', content: input }] : input;
+    let images = [];
+    if (opts.images) {
+      const list = opts.images instanceof Blob ? [opts.images] : [...opts.images];
+      images = await Promise.all(list.slice(0, 6).map(b => new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res({ media_type: b.type || 'image/jpeg', data: String(fr.result).split(',')[1] }); fr.onerror = rej; fr.readAsDataURL(b); })));
+    }
     const r = await fetch(C.aiEndpoint || '/api/ai', {
       method: 'POST',
       headers: { 'content-type': 'application/json', Authorization: 'Bearer ' + s.access_token },
-      body: JSON.stringify({ messages, tier: opts.modelTier || 'quick', kind: opts._kind || 'chat' })
+      body: JSON.stringify({ messages, images, tier: opts.modelTier || 'quick', kind: opts._kind || 'chat' })
     });
     if (!r.ok) {
       const code = r.status === 429 ? 'rate_limited' : r.status === 403 || r.status === 401 ? 'not_granted' : 'unavailable';
@@ -137,6 +142,7 @@
     for (;;) { const { done, value } = await rd.read(); if (done) break; text += dec.decode(value, { stream: true }); opts.onText && opts.onText({ text }); }
     return { text };
   }
+  sample.limits = async () => ({ maxInputBytes: 65536, images: { maxCount: 3, maxBytes: 4_000_000, mediaTypes: ['image/jpeg', 'image/png', 'image/webp'] } });
   sample.json = async (prompt, opts = {}) => {
     const r = await sample(prompt + '\n\nRespond with valid JSON only. No prose, no code fences.', { ...opts, _kind: 'json' });
     const t = r.text.replace(/```json|```/g, '').trim(); const i = t.search(/[\[{]/);
