@@ -1209,6 +1209,123 @@ s.was{font-size:.42em;font-weight:600;opacity:.45;margin-right:8px;letter-spacin
 .sk-modal{margin:0;max-height:52vh}
 .sk-modal .sk-chip{padding:9px 13px;font-size:14px}
 .sk-acc{text-transform:none;letter-spacing:0;font-weight:600;color:var(--violet);margin-left:6px}
+
+/* voice v2: capsule face */
+.vz-stage{background:none;border:0;cursor:pointer;color:inherit}
+.vz-face{width:min(360px,70vw)}
+.vz-face .eye{fill:#15123B}
+.vz-face .eye-arc,.vz-face .mouth,.vz-face .brow{fill:none;stroke:#15123B;stroke-width:7;stroke-linecap:round}
+.vz-face .brow{stroke-width:6}
+.vz-face .star{fill:#FFB547;stroke:#15123B;stroke-width:3;stroke-linejoin:round;transform-box:fill-box;transform-origin:center;animation:starSpin 1.2s ease-in-out infinite alternate}
+@keyframes starSpin{to{transform:rotate(18deg) scale(1.12)}}
+.vz-face .talk{fill:#15123B;transform-box:fill-box;transform-origin:center;animation:vzTalk .22s ease-in-out infinite alternate}
+.vz-face[data-state="speaking"] .talk{animation-duration:.18s}
+.vz-face .eyes-look{animation:look 5s ease-in-out infinite}
+@keyframes look{0%,40%,100%{transform:translate(0,0)}50%,60%{transform:translate(-6px,-2px)}70%,80%{transform:translate(6px,1px)}}
+.vz-face .vz-eyes{transform-box:fill-box;transform-origin:center;animation:vzBlink 4.5s infinite}
+.vz-face[data-emo="angry"] .vz-body{animation:shake .5s ease-in-out 2}
+@keyframes shake{25%{transform:translateX(-6px) rotate(-2deg)}75%{transform:translateX(6px) rotate(2deg)}}
+.vz-face[data-emo="excited"] .vz-body,.vz-face[data-emo="happy"] .vz-body{animation:vzBounce .7s ease-in-out 2}
+.vz-face .vz-dots circle{fill:#9CA6D6;animation:pulse 1.2s infinite}
+.vz-face .vz-dots circle:nth-child(2){animation-delay:.2s}.vz-face .vz-dots circle:nth-child(3){animation-delay:.4s}
+.vz-status{display:flex;align-items:center;gap:8px;justify-content:center;color:#B7AEFF;font-size:14px;font-weight:600;padding:18px 0 34px;min-height:24px}
+.vz-dot{width:10px;height:10px;border-radius:50%;background:#8C86B8}
+.vz-dot.listening{background:#E8485C;box-shadow:0 0 0 0 rgba(232,72,92,.6);animation:pulseMic 1.2s infinite}
+.vz-dot.speaking{background:#FFB547}.vz-dot.thinking{background:#5B8CFF;animation:pulse 1s infinite}
+/* the plan card for paid students: a little luxury */
+.upsell.lux{position:relative;overflow:hidden;background:radial-gradient(200px 120px at 100% 0%,rgba(255,213,138,.55),transparent 70%),linear-gradient(150deg,#2B1D05,#15110A 60%,#2A2010);color:#FDF3DC;border:1px solid rgba(255,213,138,.35);box-shadow:0 18px 40px -20px rgba(255,181,71,.6)}
+.upsell.lux::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,236,190,.22) 50%,transparent 65%);transform:translateX(-100%);animation:sheen 5s 1s ease-in-out infinite}
+.upsell.lux b{display:flex;align-items:center;gap:8px;font-size:17px;background:linear-gradient(100deg,#FFE7B0,#FFB547 60%,#FFE7B0);-webkit-background-clip:text;background-clip:text;color:transparent}
+.upsell.lux p{color:#E9DBBA!important;margin:6px 0 0}
+.upsell.lux .crown{font-size:18px;-webkit-text-fill-color:initial}
+.upsell.lux.pro{background:radial-gradient(200px 120px at 100% 0%,rgba(139,108,255,.55),transparent 70%),linear-gradient(150deg,#1D1550,#110D2E);border-color:rgba(183,174,255,.35);color:#EEEAFF}
+.upsell.lux.pro b{background:linear-gradient(100deg,#E4DEFF,#A897FF 60%,#E4DEFF);-webkit-background-clip:text;background-clip:text}
+.upsell.lux.pro p{color:#CFC8F5!important}
+
+/* exam v3: bigger, calmer reading text like the real screen */
+.exam .ex-passage,.exam .ex-passage p{font-size:19px;line-height:1.75}
+.exam .qstem{font-size:19px;line-height:1.7}
+.exam .choice{font-size:18px;min-height:62px;padding:12px 16px}
+.exam .choice .ct{line-height:1.55}
+.exam .choice .lt{width:30px;height:30px;font-size:14px}
+.exam .qimg.scan{width:100%;max-width:760px;border-radius:8px;border:1px solid #E3E6EE;margin:4px 0 14px;display:block}
+.exam .ex-nav-pop{padding:18px 22px 20px;position:absolute}
+.exam .nav-h{text-align:center;font-weight:700;font-size:18px;line-height:1.35;margin:0 0 10px;color:#1a1a1a}
+.exam .nav-x{position:absolute;right:14px;top:12px;font-size:16px;color:#1a1a1a}
+.exam .ex-legend{display:flex;justify-content:center;gap:22px;padding-bottom:12px;margin-bottom:14px;border-bottom:1px solid #D6D9E0;font-size:14px}
+.lg{display:inline-flex;align-items:center;gap:6px;color:#1a1a1a}
+.lg-un{width:14px;height:14px;border:1.5px dashed #1a1a1a;display:inline-block}
+.hl-bar{position:fixed;z-index:320;display:flex;gap:6px;align-items:center;padding:6px 8px;border-radius:12px;background:#1a1a1a;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:popIn .15s both}
+.hl-bar button{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:13px}
+.hc-yellow{background:#FFE36E}.hc-blue{background:#9FD3FF}.hc-pink{background:#FFB3D1}
+.hc-u{background:#333}.hc-x{background:#333}
+.exam mark,.exam .hl-yellow{background:#FFE36E;color:inherit;border-radius:2px}
+.exam .hl-blue{background:#BFE3FF;color:inherit}.exam .hl-pink{background:#FFCDE0;color:inherit}
+.exam .hl-u{background:none;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+.rp-opts{display:flex;flex-direction:column;gap:8px}
+.rp-opt{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14.5px}
+
+/* tests: score-report cards */
+.tc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.tcard{position:relative;border-radius:18px;overflow:hidden;background:var(--card);border:1px solid var(--line);box-shadow:0 14px 34px -24px rgba(0,0,0,.4);display:flex;flex-direction:column}
+.tc-top{background:color-mix(in srgb,var(--p) 16%,var(--card));padding:18px 22px}
+.tc-top b{display:block;font-size:24px;font-weight:800;letter-spacing:-.03em;color:var(--ink)}
+.tc-top span{display:block;margin-top:4px;font-size:11.5px;font-weight:800;letter-spacing:.12em;color:var(--ink-3)}
+.tc-body{padding:18px 22px 20px;display:flex;flex-direction:column;flex:1}
+.tc-body > small{text-align:center;font-size:11.5px;font-weight:800;letter-spacing:.12em;color:var(--ink-3)}
+.tc-total{text-align:center;font-size:44px;font-weight:800;letter-spacing:-.04em;line-height:1.1;color:var(--ink)}
+.tc-range{text-align:center;font-size:13px;color:var(--ink-3);text-decoration:underline;margin-bottom:10px}
+.tc-sec{padding:12px 0;border-top:1px solid var(--line)}
+.tc-sh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.tc-sh b{font-size:17px}.tc-sh span{font-weight:800;font-size:17px;display:flex;gap:8px;align-items:baseline}.tc-sh em{font-style:normal;font-weight:500;font-size:12.5px;color:var(--ink-3)}
+.tc-mods{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tc-mods span{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:10px;background:var(--line-2);font-weight:700;font-size:14px;color:var(--ink-2)}
+.tc-mods b{font-size:13px;color:var(--ink)}
+.tc-go{margin-top:14px;height:50px;border-radius:12px;background:linear-gradient(135deg,var(--p-hi),var(--p));color:#fff;font-weight:800;font-size:15px;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 12px 24px -14px color-mix(in srgb,var(--p) 80%,transparent)}
+.tc-go:hover{filter:brightness(1.06)}
+.tc-link{text-align:center;margin-top:10px;font-size:13.5px;font-weight:700;color:var(--violet);text-decoration:none}
+.tcard.locked .tc-body,.tcard.locked .tc-top{filter:blur(2px);opacity:.45;pointer-events:none}
+.tc-lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-weight:700;color:var(--ink-2)}
+.tc-lock-ic{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-size:24px;background:color-mix(in srgb,var(--p) 18%,var(--card));box-shadow:0 0 0 10px color-mix(in srgb,var(--p) 8%,transparent)}
+/* results: College Board style */
+.cb-card{max-width:860px;margin:14px auto 0;border-radius:22px;overflow:hidden;background:#fff;color:#1a1a1a;box-shadow:0 20px 50px -30px rgba(0,0,0,.5);font-family:Roboto,"Segoe UI",Arial,sans-serif}
+.cb-head{background:#C5DAFF;padding:26px 34px}
+.cb-head h2{margin:0;font-size:34px;font-weight:700;letter-spacing:-.01em;color:#1a1a1a}
+.cb-head span{display:inline-block;margin-top:6px;font-size:18px;padding-right:18px;border-right:1px solid #1a1a1a}
+.cb-body{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding:30px 34px 10px;flex-wrap:wrap}
+.cb-total small,.cb-secs small{display:block;font-size:17px;font-weight:700;letter-spacing:.02em;text-transform:none}
+.cb-total small{text-transform:uppercase}
+.cb-total b{display:block;font-size:92px;font-weight:800;line-height:1;letter-spacing:-.03em;margin:8px 0 4px}
+.cb-total span,.cb-secs span{font-size:17px}
+.cb-secs{display:flex;gap:56px}
+.cb-secs b{display:block;font-size:44px;font-weight:800;line-height:1.05;margin:6px 0 2px}
+.cb-btn{display:flex;align-items:center;justify-content:center;gap:10px;margin:24px 34px 32px;height:64px;border-radius:999px;border:1.5px solid #324DC7;color:#324DC7;font-weight:700;font-size:19px;text-decoration:none;transition:background .2s}
+.cb-btn:hover{background:#EEF2FF}
+.cb-details{max-width:1000px;margin:14px auto 0;background:#fff;color:#1a1a1a;border-radius:18px;padding:28px 32px 34px;font-family:Roboto,"Segoe UI",Arial,sans-serif;box-shadow:0 20px 50px -30px rgba(0,0,0,.5)}
+.cb-dh{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;padding-bottom:18px;border-bottom:1px solid #D6D9E0}
+.cb-dh h2{margin:0;font-size:28px;color:#1a1a1a}.cb-dh span{color:#555}
+.cb-mini{display:flex;gap:20px;font-size:15px}.cb-mini b{font-size:22px;margin-left:6px}
+.cb-details h3{font-size:20px;margin:26px 0 12px;color:#1a1a1a}
+.cb-ks{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.cb-ks h4{margin:0 0 10px;font-size:16px;color:#324DC7}
+.cb-dom{padding:10px 0;border-bottom:1px solid #EEF0F4;font-size:14.5px}
+.cb-dom span{color:#555}
+.cb-segs{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
+.cb-segs i{height:10px;border-radius:2px;background:#E3E6EE}.cb-segs i.on{background:#324DC7}
+@media (max-width:760px){.cb-ks{grid-template-columns:1fr}.cb-secs{gap:28px}.cb-total b{font-size:70px}}
+.cb-table{width:100%;border-collapse:collapse;font-size:14.5px}
+.cb-table th{text-align:left;font-weight:700;padding:12px 10px;border-bottom:2px solid #1a1a1a;white-space:nowrap}
+.cb-table td{padding:12px 10px;border-bottom:1px solid #E3E6EE}
+.cb-table td.ok span{color:#0B8A62;font-weight:700;margin-left:6px;font-size:13px}.cb-table td.no span{color:#C62828;font-weight:700;margin-left:6px;font-size:13px}
+.cb-rev{padding:6px 14px;border:1.5px solid #324DC7;border-radius:999px;color:#324DC7;font-weight:700;font-size:13px}
+/* finished screen */
+.ex-done{position:absolute;inset:0;display:grid;place-items:center;background:#F2F5FF}
+.exd-card{text-align:center;max-width:520px;padding:40px 30px;color:#1a1a1a}
+.exd-ic{width:76px;height:76px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center;background:#324DC7;color:#fff;font-size:36px;font-weight:800;animation:popIn .5s cubic-bezier(.2,1.4,.4,1) both}
+.exd-card h1{font-size:36px;margin:0 0 10px;color:#1a1a1a}.exd-card p{color:#444;margin:0 0 24px}
+.exd-home{display:block;margin:14px auto 0;color:#324DC7;font-weight:700;text-decoration:underline}
+.rp-box{margin-bottom:18px}.rp-box summary{cursor:pointer}
+.rp-row{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
 </style>
 <meta name="robots" content="noindex,nofollow">
 <script>window.ZINA_ADMIN=true</script>
@@ -1376,6 +1493,7 @@ async function initCaps(){
   S.players = LS.get('local_players', []);
   S.settings = LS.get('local_settings', { aiDrafting:false });
   S.payments = LS.get('local_payments', []);
+  S.reports = LS.get('local_reports', []);
   if(!HOSTED){ const e=LS.get('local_ent_'+(S.user?.id||'x'), null); if(e) applyEnt(e); }
   S.isAdmin = !HOSTED;           // on a hosted page nobody is admin until the platform says so
   if(!S.user?.id && S.user){ S.user.id='u_'+uid(); save('user'); }
@@ -1409,7 +1527,7 @@ async function initCaps(){
     await loadState();
     sub(db.collection('questions'),'questions'); sub(db.collection('mocks'),'mocks'); sub(db.collection('words'),'words');
     sub(db.collection('posts').orderBy('ts','desc').limit(300),'posts'); sub(db.collection('players'),'players');
-    if(S.isAdmin){ sub(db.collection('drafts'),'drafts'); sub(db.collection('payments').orderBy('ts','desc'),'payments'); }
+    if(S.isAdmin){ sub(db.collection('drafts'),'drafts'); sub(db.collection('payments').orderBy('ts','desc'),'payments'); sub(db.collection('reports').orderBy('ts','desc'),'reports'); }
     if(S.user) db.doc('entitlements/'+S.me).onSnapshot(s=>{ applyEnt(s.exists?s.data():null); rerenderSoft(); }, ()=>{});
     db.doc('settings/main').onSnapshot(s => { if(s.exists) { S.settings = { aiDrafting:false, ...s.data() }; rerenderSoft(); } }, ()=>{});
     syncPlayer();
@@ -1824,7 +1942,7 @@ function shell(active, inner){
       <nav>
         ${NAV.map(([r,l,ic])=>`<a href="#/${r}" class="${active===r?'on':''}">${I[ic]}${l}${r==='ai'&&lockAI?'<span class="lock">PRO</span>':''}</a>`).join('')}
       </nav>
-      ${k==='free'?`<div class="upsell"><b>Go Pro</b><p>AI tutor, 20 tests, auto plan.</p><button class="btn btn-sun btn-sm" style="width:100%" data-up>Try 3 days free</button></div>`:`<div class="upsell" style="background:var(--violet-soft);color:var(--ink)"><b style="color:var(--violet)">${PLANS[k].name} plan</b><p style="color:var(--ink-2)">${S.user.trialUntil&&S.user.trialUntil>Date.now()?'Trial ends '+new Date(S.user.trialUntil).toLocaleDateString():'All features unlocked'}</p></div>`}
+      ${k==='free'?`<div class="upsell"><b>Go Pro</b><p>AI tutor, 20 tests, auto plan.</p><button class="btn btn-sun btn-sm" style="width:100%" data-up>Try 3 days free</button></div>`:`<div class="upsell lux ${k}"><b><span class="crown">${k==='elite'?'👑':'✦'}</span>Zina ${PLANS[k].name}</b><p>${S.user.trialUntil&&S.user.trialUntil>Date.now()?'Trial until '+new Date(S.user.trialUntil).toLocaleDateString('en-US',{month:'short',day:'numeric'}):k==='elite'?'Everything, at the top of the stairs':'Your climb is unlocked'}</p></div>`}
       <div class="me"><div class="avatar">${esc((u?.name||'?')[0].toUpperCase())}</div><div style="min-width:0;flex:1"><div style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u?.name)}</div><div class="faint" style="font-size:12px">${PLANS[k].name} · Lv ${levelOf(S.prog.xp)}</div></div><button class="btn btn-sm" id="logout" title="Sign out" style="padding:0 8px">Exit</button></div>
     </aside>
     <main class="main">
@@ -1993,25 +2111,32 @@ function viewTests(){
     <div class="page-h"><div><h1>Full-length tests</h1><p>Adaptive · 2h 14m</p></div>
       <div class="row"><span class="pill">${Math.max(0,p.exams-used)} of ${p.exams} test${p.exams>1?'s':''} left this month</span><span class="pill gray">${Math.max(0,p.retakes-retUsed)} retake credits</span></div></div>
     ${!mocks.length?`<div class="card empty"><div class="ic">⏱</div><h3>No tests published yet</h3><p>New tests are on the way.</p></div>`:`
-    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))">
-      ${mocks.map(m=>{ const t=taken(m.id); const best=t.length?Math.max(...t.map(a=>a.total)):0; const nq=m.modules.reduce((s,x)=>s+x.ids.length,0); return `
-      <div class="card test-card">
-        <div class="row" style="justify-content:space-between"><h3>${esc(m.name)}</h3>${t.length?`<span class="pill mint">Best ${best}</span>`:m.real?'<span class="pill sun">Real exam</span>':'<span class="pill">New</span>'}</div>
-        <div class="faint" style="font-size:13px">${nq} questions${m.modules.some(x=>x.hardIds&&x.hardIds.length)?', adaptive Module 2':''}${t.length?`, taken ${t.length} time${t.length>1?'s':''}`:''}</div>
-        <button class="btn ${t.length?'btn-ghost':'btn-primary'}" data-mock="${m.id}">${t.length?'Retake test':'Start test'}</button>
-      </div>`; }).join('')}
+    <div class="tc-grid">
+      ${mocks.map(m=>{ const tk=taken(m.id); const last=tk[tk.length-1]; const best=tk.length?Math.max(...tk.map(a=>a.total)):0;
+        const modScore=(sec,n)=>{ if(!last) return '—'; const its=last.items.filter(x=>x.mod===(sec==='M'?'Math ':'R&W ')+n); return its.length?`${its.filter(x=>x.c).length}/${its.length}`:'—'; };
+        const locked=!tk.length && used>=p.exams;
+        return `<div class="tcard ${locked?'locked':''}">
+          <div class="tc-top"><b>${esc(m.name)}</b><span>${m.real?'REAL EXAM':'SAT PRACTICE TEST'}</span></div>
+          <div class="tc-body">
+            <small>YOUR TOTAL SCORE</small><div class="tc-total">${best||'—'}</div><div class="tc-range">400–1600</div>
+            ${['RW','M'].map(s=>`<div class="tc-sec"><div class="tc-sh"><b>${s==='M'?'Math':'Reading and Writing'}</b><span>${last?(s==='M'?last.math:last.rw):''}<em>200–800</em></span></div><div class="tc-mods"><span>Mod 1<b>${modScore(s,1)}</b></span><span>Mod 2<b>${modScore(s,2)}</b></span></div></div>`).join('')}
+            <button class="tc-go" data-mock="${m.id}">${tk.length?'Retake test':'Full practice'}</button>
+            ${last?`<a class="tc-link" href="#/results?id=${last.id}">See score details →</a>`:''}
+          </div>
+          ${locked?`<div class="tc-lock"><div class="tc-lock-ic">🔒</div><span>Requires Pro</span><button class="btn btn-primary btn-sm" data-unlock="Take every full-length test">Upgrade to Pro →</button></div>`:''}
+        </div>`; }).join('')}
     </div>`}
     ${S.prog.attempts.filter(a=>a.kind==='mock').length?`<h3 style="font-size:20px;margin:36px 0 12px">Your past tests</h3><div class="card">${S.prog.attempts.filter(a=>a.kind==='mock').slice().reverse().map(a=>`<a href="#/results?id=${a.id}" class="list-row" style="padding:14px 20px;text-decoration:none;color:inherit"><b style="font-family:var(--display);font-size:24px;width:70px">${a.total}</b><span style="flex:1">${esc(a.name)}<br><span class="faint" style="font-size:13px">${new Date(a.date).toLocaleDateString()} , R&W ${a.rw}, Math ${a.math}</span></span><span class="faint">Review</span></a>`).join('')}</div>`:''}`);
 }
 function bindTests(){
   bindShell();
+  $$('[data-unlock]').forEach(b=>b.onclick=()=>upgradeModal(b.dataset.unlock));
   $$('[data-mock]').forEach(b=>b.onclick=()=>{
     const m=S.mocks.find(x=>x.id===b.dataset.mock); const p=plan();
     const retake=S.prog.attempts.some(a=>a.mockId===m.id);
     if(retake){ if(usage('retake','m')>=p.retakes) return upgradeModal(p.retakes?'You used all retake credits this month':'Retakes are included with Pro'); }
     else if(usage('exam','m')>=p.exams) return upgradeModal(`You've used your ${p.exams} free test${p.exams>1?'s':''} this month`);
-    const mm=modal(`<h2 style="font-size:26px">${esc(m.name)}</h2><p class="muted" style="margin:10px 0 18px">Timed and adaptive. Set aside 2h 15m.</p>
-      <div class="card pad" style="background:var(--paper);margin-bottom:18px;font-size:14px">${m.modules.map(x=>`<div class="row" style="justify-content:space-between;padding:4px 0"><span>${secName(x.section)}, Module ${x.n}</span><span class="faint">${x.ids.length} questions, ${x.minutes} min</span></div>`).join('')}</div>
+    const mm=modal(`<h2 style="font-size:26px">${esc(m.name)}</h2><p class="muted" style="margin:10px 0 22px">About 2 hours 14 minutes, with a 10-minute break.</p>
       <div class="row"><button class="btn btn-ghost" data-x style="flex:1">Not now</button><button class="btn btn-primary" id="go" style="flex:1">Start test</button></div>`);
     $('[data-x]',mm).onclick=closeModal;
     $('#go',mm).onclick=()=>{ closeModal(); bump(retake?'retake':'exam','m'); startMock(m); };
@@ -2027,21 +2152,29 @@ function viewResults(params){
     :`<div class="card empty"><div class="ic">📈</div><h3>No results yet</h3><p>Take a full-length test to get your score.</p><a class="btn btn-primary" href="#/tests">See tests</a></div>`}`);
   }
   const a=at.find(x=>x.id===id);
-  const byDom={}; a.items.forEach(it=>{ const q=S.questions.find(x=>x.id===it.qid); const d=q?.domain||'Other'; byDom[d]=byDom[d]||{c:0,t:0}; byDom[d].t++; if(it.c) byDom[d].c++; });
-  const chart = at.map(x=>x.total);
+  const byDom={}; a.items.forEach(it=>{ const q=S.questions.find(x=>x.id===it.qid); const d=q?.domain||'Other'; byDom[d]=byDom[d]||{c:0,t:0,sec:q?.section||'RW'}; byDom[d].t++; if(it.c) byDom[d].c++; });
+  const date=new Date(a.date).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  if(params.get('view')!=='details') return shell('results', `
+    <a href="#/results" class="faint" style="font-size:14px;text-decoration:none">← All results</a>
+    <div class="cb-card">
+      <div class="cb-head"><h2>${esc(a.name)}</h2><span>${date}</span></div>
+      <div class="cb-body">
+        <div class="cb-total"><small>TOTAL SCORE</small><b>${a.total}</b><span>400 - 1600</span></div>
+        <div class="cb-secs"><div><small>Reading and Writing</small><b>${a.rw}</b><span>200 - 800</span></div><div><small>Math</small><b>${a.math}</b><span>200 - 800</span></div></div>
+      </div>
+      <a class="cb-btn" href="#/results?id=${a.id}&view=details">See Score Details <span aria-hidden="true">→</span></a>
+    </div>`);
+  const seg=(c,t)=>{ const f=t?Math.round(c/t*7):0; return `<div class="cb-segs">${[...Array(7)].map((_,i)=>`<i class="${i<f?'on':''}"></i>`).join('')}</div>`; };
   return shell('results', `
-    <a href="#/results" class="faint" style="font-size:14px;text-decoration:none">All results</a>
-    <div class="page-h" style="margin-top:8px"><div><h1>${esc(a.name)}</h1><p>${new Date(a.date).toLocaleString()}</p></div></div>
-    <div class="grid g-dash">
-      <div class="welcome s4" style="justify-content:flex-start;gap:8px"><div style="opacity:.85;font-size:14px">Estimated total</div><div style="font-family:var(--display);font-size:72px;font-weight:800;letter-spacing:-.05em;line-height:1">${a.total}</div><div style="opacity:.85;font-size:14px">out of 1600</div></div>
-      <div class="card pad s4 kpi"><small>Reading and Writing</small><b>${a.rw}</b><div class="faint" style="font-size:13px;margin-top:10px">Module 2 path: ${a.path.RW==='hard'?'harder':'standard'}</div></div>
-      <div class="card pad s4 kpi"><small>Math</small><b>${a.math}</b><div class="faint" style="font-size:13px;margin-top:10px">Module 2 path: ${a.path.M==='hard'?'harder':'standard'}</div></div>
-      <div class="card pad s6">${plan().analytics?`<b>By skill</b><div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">${Object.entries(byDom).map(([d,s])=>{const p=Math.round(s.c/s.t*100);return `<div><div class="row" style="justify-content:space-between;font-size:13px"><span>${esc(d)}</span><span class="faint">${s.c}/${s.t}</span></div><div class="bar" style="height:6px;margin-top:4px"><i style="width:${p}%;background:${p>=75?'var(--mint)':p>=50?'var(--violet)':'var(--sun)'}"></i></div></div>`}).join('')}</div>`:analyticsBlock()}</div>
-      <div class="card pad s6"><b>Score history</b><div id="histChart" style="margin-top:12px">${chart.length>1?sparkSVG(chart):'<p class="muted">Take another test to see your trend.</p>'}</div></div>
-      <div class="card s12" style="grid-column:1/-1"><div class="pad" style="padding-bottom:8px"><b>Question review</b></div>
-        <div class="scroll-x"><table class="qtable"><thead><tr><th>Module</th><th>#</th><th>Question</th><th>Your answer</th><th>Correct</th><th></th></tr></thead><tbody>
-        ${a.items.map((it,i)=>{ const q=S.questions.find(x=>x.id===it.qid); return `<tr><td class="faint">${esc(it.mod)}</td><td>${it.n}</td><td style="max-width:380px">${esc((q?.stem||'Question removed').slice(0,100))}</td><td>${esc(it.ans||'Omitted')}</td><td>${esc(q?.answer||'')}</td><td>${it.c?'<span class="pill mint">Right</span>':'<span class="pill rose">Missed</span>'} ${q?`<button class="btn btn-sm btn-ghost" data-rev="${i}">Review</button>`:''}</td></tr>`; }).join('')}
-        </tbody></table></div></div>
+    <a href="#/results?id=${a.id}" class="faint" style="font-size:14px;text-decoration:none">← Score</a>
+    <div class="cb-details">
+      <div class="cb-dh"><div><h2>${esc(a.name)}</h2><span>${date}</span></div><div class="cb-mini"><span>Total <b>${a.total}</b></span><span>R&amp;W <b>${a.rw}</b></span><span>Math <b>${a.math}</b></span></div></div>
+      <h3>Knowledge and Skills</h3>
+      <div class="cb-ks">${['RW','M'].map(s=>`<div><h4>${s==='M'?'Math':'Reading and Writing'}</h4>${Object.entries(byDom).filter(([,v])=>v.sec===s).map(([d,v])=>`<div class="cb-dom"><div class="row" style="justify-content:space-between"><b>${esc(d)}</b><span>${v.c}/${v.t}</span></div>${seg(v.c,v.t)}</div>`).join('')||'<p class="muted">No questions.</p>'}</div>`).join('')}</div>
+      <h3>Questions</h3>
+      <div class="scroll-x"><table class="cb-table"><thead><tr><th>Question</th><th>Section</th><th>Correct Answer</th><th>Your Answer</th><th></th></tr></thead><tbody>
+      ${a.items.map((it,i)=>{ const q=S.questions.find(x=>x.id===it.qid); return `<tr><td>${it.n}</td><td>${esc(it.mod.replace('R&W','Reading and Writing').replace('Math','Math'))}</td><td><b>${esc(q?.answer||'')}</b></td><td class="${it.c?'ok':'no'}">${it.ans?esc(it.ans):'Omitted'} ${it.c?'<span>Correct</span>':'<span>Incorrect</span>'}</td><td>${q?`<button class="cb-rev" data-rev="${i}">Review</button>`:''}</td></tr>`; }).join('')}
+      </tbody></table></div>
     </div>`);
 }
 function sparkSVG(vals){
@@ -2134,25 +2267,32 @@ function renderExam(){
       <div class="ex-tools">
         ${isMath?`<button class="ex-tool ${EX.popup==='calc'?'on':''}" data-pop="calc">${I.calc}<span>Calculator</span></button><button class="ex-tool ${EX.popup==='ref'?'on':''}" data-pop="ref">${I.ref}<span>Reference</span></button>`
           :`<button class="ex-tool ${EX.hlMode?'on':''}" id="hlTool">${I.pen}<span>Highlights &amp; Notes</span></button>`}
+        <button class="ex-tool" id="reportQ"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5" stroke-linecap="round"/></svg><span>Report</span></button>
         <button class="ex-tool ${EX.popup==='more'?'on':''}" data-pop="more">${I.more}<span>More</span></button>
       </div>
       ${EX.popup==='more'?`<div class="more-pop"><button id="exExit">Exit the ${EX.mode==='mock'?'exam':'practice'}</button></div>`:''}${EX.popup==='dir'?dirPop(mod):''}${EX.popup==='calc'&&EX.calcMode==='basic'?calcPop():''}${EX.popup==='ref'?refPop():''}
     </div>`;
   let body;
+  if(EX.screen==='done'){
+    el.innerHTML=`<div class="ex-done"><div class="exd-card"><div class="exd-ic">✓</div><h1>You’re All Finished!</h1><p>Your answers have been submitted and your score is ready.</p><button class="ex-blue" id="viewScore">View Your Score</button><button class="exd-home" id="doneHome">Return Home</button></div></div>`;
+    $('#viewScore').onclick=()=>{ const id=EX.done; closeExam(); location.hash='#/results?id='+id; };
+    $('#doneHome').onclick=()=>{ closeExam(); location.hash='#/tests'; };
+    return;
+  }
   if(EX.screen==='review'){
-    body = `<div class="ex-center"><h2>Check your work</h2><p style="max-width:560px;color:#444">${EX.mode==='mock'?'On test day, you won\'t be able to move on to the next module until time expires. For these practice questions, you can click Next when you\'re ready to move on.':'Tap any question to go back to it, or finish to save your results.'}</p>
+    body = `<div class="ex-center"><h2>Check your work</h2><p style="max-width:560px;color:#444">Tap any question to go back to it.</p>
       <div style="border:1px solid #ddd;border-radius:14px;padding:22px;margin-top:20px;width:min(640px,100%)">
         <div class="row" style="justify-content:space-between;margin-bottom:14px;flex-wrap:wrap"><b>${esc(mod.title)}</b><span style="font-size:13px">${legend()}</span></div>
         <div class="ex-grid">${gridCells(mod,true)}</div>
       </div>
       ${EX.mode==='practice'?practiceSummary(mod):''}</div>`;
   } else {
-    const split = !!q.passage || (!isMath && q.image);
+    const split = !!q.passage || (!isMath && q.image && !q.scan);
     const choices = q.type==='spr' ? sprHTML(q) : choicesHTML(q);
     const qCol = `<div class="qhead"><span class="qnum">${EX.qi+1}</span><button class="qmark ${EX.marked.has(q.id)?'on':''}" id="markBtn">${I.bookmark}Mark for Review</button>${q.type!=='spr'?`<button class="qabc ${EX.elim?'on':''}" id="elimBtn" title="Answer eliminator">ABC</button>`:''}</div>
-      ${!split&&q.image?`<img class="qimg" src="${q.image}" alt="Figure for question ${EX.qi+1}">`:''}
+      ${(!split||q.scan)&&q.image?`<img class="qimg ${q.scan?'scan':''}" src="${q.image}" alt="Question ${EX.qi+1}">`:''}
       ${q.scan&&q.image?'':`<div class="qstem">${fmt(q.stem)}</div>`}${choices}${explainHTML(q)}`;
-    body = split ? `<div class="ex-pane ex-passage" id="passage" style="${EX.split?`flex:0 0 ${EX.split}%`:''}">${q.image?`<img class="qimg" src="${q.image}" alt="Figure">`:''}${EX.hl[q.id]||fmt(q.passage)}</div><div class="ex-divider" id="divider"></div><div class="ex-pane ex-q">${qCol}</div>`
+    body = split ? `<div class="ex-pane ex-passage" id="passage" style="${EX.split?`flex:0 0 ${EX.split}%`:''}">${q.image&&!q.scan?`<img class="qimg" src="${q.image}" alt="Figure">`:''}${EX.hl[q.id]||fmt(q.passage)}</div><div class="ex-divider" id="divider"></div><div class="ex-pane ex-q">${qCol}</div>`
                  : `<div class="ex-pane ex-q solo" style="flex:1">${qCol}</div>`;
   }
   const last = EX.qi===mod.qs.length-1;
@@ -2166,19 +2306,45 @@ function renderExam(){
   el.innerHTML = top + `<div class="ex-body">${body}</div>` + bot;
   updTimer(); bindExam(); typeset(el);
 }
-function legend(){ return `<span style="margin-right:12px">📍 Current</span><span style="margin-right:12px">▢ Unanswered</span><span>🔖 For review</span>`; }
+/* highlighter: select words → a small bar with colors, underline, and remove */
+function bindHighlighter(pas,q){
+  const bar=()=>$('#hlBar');
+  pas.onmouseup=pas.ontouchend=()=>setTimeout(()=>{
+    const sel=getSelection(); bar()?.remove(); if(!sel.rangeCount||sel.isCollapsed) return; const r=sel.getRangeAt(0); if(!pas.contains(r.commonAncestorContainer)) return;
+    const rect=r.getBoundingClientRect(); const b=document.createElement('div'); b.id='hlBar'; b.className='hl-bar';
+    b.innerHTML=`${['yellow','blue','pink'].map(c=>`<button data-hc="${c}" class="hc hc-${c}" aria-label="Highlight ${c}"></button>`).join('')}<button data-hc="u" class="hc-u" aria-label="Underline"><u>U</u></button><button data-hc="x" class="hc-x" aria-label="Remove highlight">✕</button>`;
+    b.style.left=Math.max(8,Math.min(innerWidth-220,rect.left+rect.width/2-100))+'px'; b.style.top=Math.max(8,rect.top-52)+'px'; document.body.appendChild(b);
+    b.onmousedown=e=>e.preventDefault();
+    b.onclick=e=>{ const c=e.target.closest('[data-hc]')?.dataset.hc; if(!c) return;
+      if(c==='x'){ const m=r.commonAncestorContainer.nodeType===1?r.commonAncestorContainer.closest('mark'):r.commonAncestorContainer.parentElement?.closest('mark'); if(m) m.replaceWith(...m.childNodes); }
+      else { const mk=document.createElement('mark'); mk.className=c==='u'?'hl-u':'hl-'+c; try{ mk.appendChild(r.extractContents()); r.insertNode(mk); }catch(err){} }
+      EX.hl[q.id]=pas.innerHTML; sel.removeAllRanges(); b.remove(); };
+  },10);
+  document.addEventListener('mousedown',e=>{ if(!e.target.closest('#hlBar')) bar()?.remove(); },{once:true});
+}
+function reportModal(q){
+  const m=modal(`<h2 style="font-size:22px">Report a problem</h2><p class="muted" style="margin:6px 0 14px">What's wrong with question ${EX.qi+1}?</p>
+    <div class="rp-opts">${['The answer is wrong','Typo or text is unclear','Picture or formula is broken','Choices are missing','Something else'].map((o,i)=>`<label class="rp-opt"><input type="radio" name="rp" value="${esc(o)}" ${i===0?'checked':''}> ${esc(o)}</label>`).join('')}</div>
+    <textarea class="textarea" id="rpT" placeholder="Tell us more (optional)" style="min-height:90px;margin-top:12px"></textarea>
+    <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn btn-ghost" data-x>Cancel</button><button class="btn btn-primary" id="rpGo">Send report</button></div>`);
+  $('[data-x]',m).onclick=closeModal;
+  $('#rpGo',m).onclick=async()=>{ const why=$('input[name=rp]:checked',m).value; const note=$('#rpT',m).value.trim();
+    try{ await Data.put('reports',{ id:'r_'+uid(), qid:q.id, why, note, uid:S.me, name:S.user?.name||'', test:EX.mock?EX.mock.name:'Question bank', ts:Date.now() }); }catch(e){}
+    closeModal(); toast('Thanks! We’ll check this question.'); };
+}
+function legend(){ return `<span class="lg"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1a1a1a" stroke-width="2"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Current</span><span class="lg"><i class="lg-un"></i>Unanswered</span><span class="lg"><svg viewBox="0 0 24 24" width="16" height="18" fill="#C8102E"><path d="M6 3h12v18l-6-4-6 4z"/></svg>For Review</span>`; }
 function gridCells(mod, big){
   return mod.qs.map((q,i)=>{ const a=EX.answers[q.id]; const done=a!=null&&a!==''; let cls='ex-cell'; if(done) cls+=' ans'; if(i===EX.qi&&EX.screen==='q') cls+=' cur'; if(EX.marked.has(q.id)) cls+=' mk';
     if(EX.mode==='practice'&&EX.checked[q.id]) cls+= isCorrect(q,a)?' ok':' no';
     return `<button class="${cls}" data-go="${i}">${i+1}</button>`; }).join('');
 }
-function navPop(mod){ return `<div class="ex-nav-pop"><div class="row" style="justify-content:space-between;margin-bottom:12px"><b>${esc(mod.title)}</b><button id="navX" aria-label="Close">✕</button></div><div class="ex-legend">${legend()}</div><div class="ex-grid">${gridCells(mod)}</div><div style="text-align:center;margin-top:18px"><button class="ex-blue ghost" id="toReview">Go to Review Page</button></div></div>`; }
+function navPop(mod){ const sec=mod.title.replace(/,\s*Module\s*\d+/i,''); return `<div class="ex-nav-pop"><button id="navX" class="nav-x" aria-label="Close">✕</button><div class="nav-h">${esc(sec)}<br>Questions</div><div class="ex-legend">${legend()}</div><div class="ex-grid">${gridCells(mod)}</div><div style="text-align:center;margin-top:18px"><button class="ex-blue ghost" id="toReview">Go to Review Page</button></div></div>`; }
 function dirPop(mod){ return `<div class="dir-pop">${mod.section==='M'?'<p>The questions in this section address a number of important math skills. Use of a calculator is permitted for all questions. A reference sheet, calculator, and these directions can be accessed throughout the test.</p><p><b>For multiple-choice questions,</b> solve each problem and choose the correct answer from the choices provided. <b>For student-produced response questions,</b> solve each problem and enter your answer. If you find more than one correct answer, enter only one. You can enter up to 5 characters for a positive answer and up to 6 for a negative answer. Enter fractions or decimals, not mixed numbers.</p>':'<p>The questions in this section address a number of important reading and writing skills. Each question includes one or more passages, which may include a table or graph. Read each passage and question carefully, and then choose the best answer to the question based on the passage(s).</p><p>All questions in this section are multiple-choice with four answer choices. Each question has a single best answer.</p>'}<div style="text-align:right"><button class="ex-blue" id="dirX">Close</button></div></div>`; }
 function choicesHTML(q){
   const st=EX.struck[q.id]||new Set(); const a=EX.answers[q.id]; const chk=EX.mode==='practice'&&EX.checked[q.id];
   return (q.choices||[]).map((c,i)=>{ const L='ABCD'[i]; let cls='choice'; if(a===L) cls+=' sel'; if(st.has(L)) cls+=' struck';
     if(chk){ if(L===String(q.answer).toUpperCase()) cls+=' right'; else if(a===L) cls+=' wrong'; }
-    return `<div class="choice-row"><button class="${cls}" data-ch="${L}" ${chk?'disabled':''}><span class="lt">${L}</span><span class="ct">${fmt(c)}</span></button>${EX.elim?(st.has(L)?`<button class="strike-btn undo" data-st="${L}">Undo</button>`:`<button class="strike-btn" data-st="${L}" aria-label="Cross out ${L}">${L}</button>`):''}</div>`; }).join('');
+    return `<div class="choice-row"><button class="${cls}" data-ch="${L}" ${chk?'disabled':''}><span class="lt">${L}</span><span class="ct">${String(c).trim()===L?'':fmt(c)}</span></button>${EX.elim?(st.has(L)?`<button class="strike-btn undo" data-st="${L}">Undo</button>`:`<button class="strike-btn" data-st="${L}" aria-label="Cross out ${L}">${L}</button>`):''}</div>`; }).join('');
 }
 function sprHTML(q){ const a=EX.answers[q.id]||''; const chk=EX.mode==='practice'&&EX.checked[q.id];
   return `<div class="spr"><input id="sprIn" inputmode="decimal" maxlength="6" value="${esc(a)}" aria-label="Your answer" ${chk?'disabled':''} style="${chk?(isCorrect(q,a)?'border-color:#12A877;background:#EAFBF3':'border-color:#D6334B;background:#FDECEF'):''}"><small>Answer preview: <b id="sprPrev">${esc(a)}</b></small></div>`; }
@@ -2212,7 +2378,8 @@ function bindExam(){
   on('#navBtn',()=>{ EX.popup = EX.popup==='nav'?null:'nav'; renderExam(); });
   on('#navX',()=>{ EX.popup=null; renderExam(); });
   on('#toReview',()=>{ EX.popup=null; EX.screen='review'; renderExam(); });
-  on('#hlTool',()=>{ EX.hlMode=!EX.hlMode; toast(EX.hlMode?'Highlighter on: select text in the passage':'Highlighter off'); renderExam(); });
+  on('#hlTool',()=>{ toast('Select any words in the passage to highlight them'); });
+  on('#reportQ',()=>{ const q=getQ(EX.modules[EX.mi].qs[EX.qi].id)||EX.modules[EX.mi].qs[EX.qi]; reportModal(q); });
   on('#exExit',()=>{ const mm=modal(`<h2 style="font-size:24px">Exit ${EX.mode==='mock'?'this test':'practice'}?</h2><p class="muted" style="margin:10px 0 20px">${EX.mode==='mock'?'Progress will be lost. The attempt still counts.':'Your answers are saved.'}</p><div class="row"><button class="btn btn-ghost" style="flex:1" data-x>Keep going</button><button class="btn btn-dark" style="flex:1" id="doExit">Exit</button></div>`); $('[data-x]',mm).onclick=closeModal; $('#doExit',mm).onclick=()=>{ closeModal(); if(EX.mode==='practice') recordPractice(); closeExam(); route(); }; });
   $$('[data-go]',el).forEach(b=>b.onclick=()=>{ EX.qi=+b.dataset.go; EX.screen='q'; EX.popup=null; renderExam(); });
   on('#bk2',()=>{ EX.screen='q'; renderExam(); });
@@ -2230,7 +2397,7 @@ function bindExam(){
   on('#discussQ',()=>{ recordPractice(); closeExam(); location.hash='#/community?q='+q.id; });
   // highlighter
   const pas=$('#passage',el);
-  if(pas && EX.hlMode){ pas.style.cursor='text'; pas.onmouseup=()=>{ const sel=getSelection(); if(!sel.rangeCount||sel.isCollapsed) return; const r=sel.getRangeAt(0); if(!pas.contains(r.commonAncestorContainer)) return; try{ const mk=document.createElement('mark'); r.surroundContents(mk); EX.hl[q.id]=pas.innerHTML; }catch(e){ toast('Highlight within one paragraph at a time'); } sel.removeAllRanges(); }; }
+  if(pas) bindHighlighter(pas,q);
   // divider drag
   const dv=$('#divider',el);
   if(dv&&pas){ dv.onpointerdown=e=>{ dv.setPointerCapture(e.pointerId); const body=$('.ex-body',el).getBoundingClientRect(); dv.onpointermove=ev=>{ const p=Math.min(75,Math.max(25,(ev.clientX-body.left)/body.width*100)); pas.style.flex=`0 0 ${p}%`; EX.split=p; }; dv.onpointerup=()=>{ dv.onpointermove=null; }; }; }
@@ -2281,8 +2448,7 @@ function finishMock(){
   S.prog.attempts.push(at);
   items.forEach(it=>{ S.prog.answers[it.qid] = S.prog.answers[it.qid] || { c:it.c, ans:it.ans, ts:Date.now() }; });
   save('prog'); logStudy(Math.round(EX.modules.reduce((s,m)=>s+m.minutes,0)*0.9)); awardXP(100+items.filter(i=>i.c).length*5);
-  closeExam(); location.hash='#/results?id='+at.id; route();
-  setTimeout(()=>toast(`Test complete. Estimated score ${at.total}`),300);
+  EX.done=at.id; EX.screen='done'; clearInterval(EX.tick); renderExam();
 }
 
 /* ---------- calculator (own parser, no eval) ---------- */
@@ -2583,7 +2749,7 @@ function viewAI(){
     <form class="chat-in" id="chatF"><input class="input" id="chatIn" placeholder="${p.ai?'Ask Zina AI…':'Upgrade to chat with Zina AI'}" autocomplete="off" ${AI_BUSY?'disabled':''}><button class="btn btn-primary" ${AI_BUSY?'disabled':''}>Send</button></form></div>`;
   return shell('ai', `
     <div class="page-h"><div><h1>Zina AI</h1><p>Your 24/7 SAT tutor</p></div>
-      <div class="row"><button class="btn ${planKey()==='elite'?'btn-sun':'btn-ghost'} btn-sm vz-open" id="voiceGo">${zinaFaceMini()}Talk to Zina${planKey()==='elite'?'':' <span class="lock">ELITE</span>'}</button>${p.ai?`<span class="pill">${left>Math.ceil(p.ai*.2)?(planKey()==='elite'?'More access':'Limited access'):left+' left today'}</span>${S.chat.length?'<button class="btn btn-ghost btn-sm" id="chatClear">New chat</button>':''}`:''}</div></div>
+      <div class="row"><button class="btn ${planKey()==='elite'?'btn-sun':'btn-ghost'} btn-sm vz-open" id="voiceGo">${zinaFaceMini()}Talk to Zina${planKey()==='elite'?'':' <span class="lock">ELITE</span>'}</button>${p.ai?`${left<=Math.ceil(p.ai*.2)?`<span class="pill">${left} left today</span>`:''}${S.chat.length?'<button class="btn btn-ghost btn-sm" id="chatClear">New chat</button>':''}`:''}</div></div>
     ${p.ai?inner:`<div class="ai-lock card"><div class="ai-orb" aria-hidden="true"><i></i><i></i><i></i><span>✦</span></div><h2>Every mistake,<br>explained.</h2><div class="ai-demo" aria-hidden="true"><div class="msg u">Why is B wrong?</div><div class="msg a">B restates the method. The question asks what the finding <b>suggests</b>. Look at the last sentence…</div></div><button class="btn btn-primary btn-lg" data-unlock="Chat with Zina AI">Unlock Zina AI</button></div>`}`);
 }
 async function sendAI(text){
@@ -2599,7 +2765,7 @@ async function sendAI(text){
   let reply='';
   if(!sample){ reply='Zina AI connects when this page is opened in Claude with AI access granted. Your message was saved.'; }
   else { try{ const r=await sample(turns,{ cache:false, modelTier: planKey()==='elite'?'default':'quick', onText:({text})=>{ bubble.textContent=text; logEl.scrollTop=logEl.scrollHeight; } }); reply=r.text; }
-    catch(e){ reply = e.text || (e.code==='not_granted'?'AI access was not allowed for this page.':e.code==='rate_limited'?'Too many requests right now. Try again in a minute.':'Zina AI could not answer this time. Try again.'); } }
+    catch(e){ reply = e.text || (e.code==='not_configured'?(S.isAdmin?'Zina AI is not connected yet. In Vercel, add ANTHROPIC_API_KEY and redeploy.':'Zina AI is resting for a moment. Try again soon.'):e.code==='not_granted'?'AI access was not allowed for this page.':e.code==='rate_limited'?'Too many requests right now. Try again in a minute.':(S.isAdmin&&e.message?'Zina AI error: '+e.message+'. ':'')+'Zina AI could not answer this time. Try again.'); } }
   S.chat.push({role:'assistant',content:reply}); S.chat=S.chat.slice(-30); save('chat'); AI_BUSY=false; route();
   setTimeout(()=>{ const l=$('#chatLog'); if(l) l.scrollTop=l.scrollHeight; $('#chatIn')?.focus(); },30);
 }
@@ -2918,107 +3084,119 @@ function bindAdminPayments(){
 }
 </script>
 <script>
-/* ================= ZINA VOICE (Elite) ================= */
-const VLANGS=[['en-US','English'],['uz-UZ','O‘zbekcha'],['ru-RU','Русский'],['tr-TR','Türkçe'],['kk-KZ','Қазақша'],['es-ES','Español'],['fr-FR','Français'],['de-DE','Deutsch'],['ar-SA','العربية'],['hi-IN','हिन्दी'],['zh-CN','中文'],['ko-KR','한국어'],['ja-JP','日本語']];
+/* ================= ZINA VOICE (Elite): hands-free, answers in the language you speak ================= */
 const EMO = {
-  calm:       { c1:'#8B6CFF', c2:'#4A2FE0', brow:0,   mouth:'M84 136 Q100 146 116 136', cheeks:0,  pitch:1.0 },
-  happy:      { c1:'#A07BFF', c2:'#5B3DF5', brow:-4,  mouth:'M80 132 Q100 154 120 132', cheeks:.5, pitch:1.08 },
-  excited:    { c1:'#FFB547', c2:'#F0612B', brow:-9,  mouth:'M78 128 Q100 162 122 128 Z', cheeks:.7, pitch:1.15 },
-  encouraging:{ c1:'#2BD4A0', c2:'#0E9F6E', brow:-3,  mouth:'M82 133 Q100 150 118 133', cheeks:.4, pitch:1.05 },
-  thinking:   { c1:'#7C6CF0', c2:'#3B2C9E', brow:6,   mouth:'M88 138 L112 136', cheeks:0,  pitch:.98 },
-  surprised:  { c1:'#FF8FB1', c2:'#C13B8A', brow:-12, mouth:'M100 142 m-8 0 a8 10 0 1 0 16 0 a8 10 0 1 0 -16 0', cheeks:.2, pitch:1.12 },
-  concerned:  { c1:'#6C7BD9', c2:'#34408F', brow:10,  mouth:'M84 142 Q100 132 116 142', cheeks:0,  pitch:.95 }
+  calm:       { c:'#7B5CFF', pitch:1.0,  rate:1.0  },
+  happy:      { c:'#FF5A7A', pitch:1.1,  rate:1.04 },
+  excited:    { c:'#FFB547', pitch:1.18, rate:1.1  },
+  encouraging:{ c:'#12B886', pitch:1.06, rate:1.02 },
+  thinking:   { c:'#5B8CFF', pitch:.98,  rate:.98  },
+  surprised:  { c:'#FF8FB1', pitch:1.15, rate:1.05 },
+  concerned:  { c:'#8A93B8', pitch:.94,  rate:.95  },
+  angry:      { c:'#E8485C', pitch:.9,   rate:1.08 }
 };
-const VZ = { el:null, state:'idle', emo:'calm', lang:LS.get('vlang', (navigator.language||'en-US')), rec:null, said:'', heard:'', hist:[], busy:false };
-if(!VLANGS.find(l=>l[0]===VZ.lang)) VZ.lang = (VLANGS.find(l=>l[0].slice(0,2)===String(VZ.lang).slice(0,2))||VLANGS[0])[0];
+const VZ = { el:null, state:'idle', emo:'happy', rec:null, said:'', heard:'', hist:[], busy:false, paused:false, lang:(navigator.language||'en-US') };
 
+/* a capsule face: big eyes that look around and blink, a tiny mouth, a staircase antenna */
 function zinaFaceSVG(emo, state){
-  const e=EMO[emo]||EMO.calm; const look = state==='thinking' ? 'translate(-4,-5)' : '';
-  return `<svg class="vz-face" viewBox="0 0 200 200" data-state="${state}" data-emo="${emo}" aria-hidden="true">
-    <defs><linearGradient id="vzg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${e.c1}"/><stop offset="1" stop-color="${e.c2}"/></linearGradient>
-      <radialGradient id="vzs" cx=".3" cy=".2" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+  const c=(EMO[emo]||EMO.calm).c;
+  const eyes = emo==='happy'||emo==='encouraging'
+      ? `<path d="M76 86 Q90 66 104 86" class="eye-arc"/><path d="M136 86 Q150 66 164 86" class="eye-arc"/>`
+    : emo==='angry'
+      ? `<path d="M72 62 L104 74" class="brow"/><path d="M168 62 L136 74" class="brow"/><ellipse cx="90" cy="86" rx="12" ry="9" class="eye"/><ellipse cx="150" cy="86" rx="12" ry="9" class="eye"/>`
+    : emo==='surprised'
+      ? `<ellipse cx="90" cy="80" rx="15" ry="20" class="eye"/><ellipse cx="150" cy="80" rx="15" ry="20" class="eye"/><circle cx="95" cy="73" r="4.5" fill="#fff"/><circle cx="155" cy="73" r="4.5" fill="#fff"/>`
+    : emo==='concerned'
+      ? `<path d="M74 66 L104 60" class="brow"/><path d="M166 66 L136 60" class="brow"/><ellipse cx="90" cy="84" rx="11" ry="15" class="eye"/><ellipse cx="150" cy="84" rx="11" ry="15" class="eye"/>`
+    : emo==='excited'
+      ? `<path d="M90 64 l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z" class="star"/><path d="M150 64 l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z" class="star"/>`
+      : `<g class="eyes-look"><ellipse cx="90" cy="82" rx="13" ry="18" class="eye"/><ellipse cx="150" cy="82" rx="13" ry="18" class="eye"/><circle cx="95" cy="75" r="4" fill="#fff"/><circle cx="155" cy="75" r="4" fill="#fff"/></g>`;
+  const mouth = state==='speaking' ? `<ellipse cx="120" cy="112" rx="12" ry="8" class="talk"/>`
+    : emo==='angry' ? `<path d="M106 116 Q120 106 134 116" class="mouth"/>`
+    : emo==='concerned' ? `<path d="M108 116 Q120 110 132 116" class="mouth"/>`
+    : emo==='surprised' ? `<ellipse cx="120" cy="114" rx="7" ry="9" class="talk"/>`
+    : emo==='thinking' ? `<path d="M110 113 L130 111" class="mouth"/>`
+    : `<path d="M106 108 Q120 122 134 108" class="mouth"/>`;
+  return `<svg class="vz-face" viewBox="0 0 240 170" data-state="${state}" data-emo="${emo}" style="--fc:${c}" aria-hidden="true">
     <g class="vz-body">
-      <path class="vz-steps" d="M128 38 v-10 h12 v-10 h12 v-10 h14" fill="none" stroke="#FFB547" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="168" cy="8" r="7" fill="#FFB547"/>
-      <rect x="22" y="34" width="156" height="146" rx="62" fill="url(#vzg)"/>
-      <rect x="22" y="34" width="156" height="146" rx="62" fill="url(#vzs)"/>
-      <g class="vz-brows" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".9">
-        <line x1="62" y1="${76-e.brow*.3}" x2="86" y2="${76+e.brow*.4}"/><line x1="114" y1="${76+e.brow*.4}" x2="138" y2="${76-e.brow*.3}"/></g>
-      <g class="vz-eyes"><g transform="${look}">
-        <ellipse cx="76" cy="104" rx="13" ry="${state==='listening'?18:16}" fill="#fff"/><ellipse cx="124" cy="104" rx="13" ry="${state==='listening'?18:16}" fill="#fff"/>
-        <circle class="vz-pupil" cx="78" cy="106" r="7" fill="#1B1446"/><circle class="vz-pupil" cx="126" cy="106" r="7" fill="#1B1446"/>
-        <circle cx="81" cy="102" r="2.4" fill="#fff"/><circle cx="129" cy="102" r="2.4" fill="#fff"/></g></g>
-      <g opacity="${e.cheeks}"><ellipse cx="56" cy="130" rx="11" ry="7" fill="#FF8FB1"/><ellipse cx="144" cy="130" rx="11" ry="7" fill="#FF8FB1"/></g>
-      <path class="vz-mouth" d="${e.mouth}" fill="${e.mouth.endsWith('Z')||emo==='surprised'?'#1B1446':'none'}" stroke="#1B1446" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-      <ellipse class="vz-talk" cx="100" cy="140" rx="13" ry="9" fill="#1B1446"/>
+      <path class="vz-steps" d="M170 40 v-9 h10 v-9 h10 v-9 h12" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="208" cy="12" r="7" fill="#FFB547"/>
+      <rect x="14" y="38" width="212" height="112" rx="56" fill="${c}"/>
+      <rect x="26" y="50" width="188" height="88" rx="44" fill="#fff"/>
+      <g class="vz-eyes">${eyes}</g>
+      <ellipse cx="62" cy="106" rx="11" ry="6" fill="#FF8FB1" opacity="${emo==='angry'?0:.55}"/><ellipse cx="178" cy="106" rx="11" ry="6" fill="#FF8FB1" opacity="${emo==='angry'?0:.55}"/>
+      ${mouth}
+      ${state==='thinking'?'<g class="vz-dots"><circle cx="196" cy="30" r="4"/><circle cx="210" cy="22" r="3"/><circle cx="220" cy="14" r="2"/></g>':''}
     </g></svg>`;
 }
 function zinaFaceMini(){ return `<span class="vz-mini" aria-hidden="true"><i></i><i></i></span>`; }
+const SR = () => window.SpeechRecognition || window.webkitSpeechRecognition;
 function voiceHTML(){
-  const cap = VZ.state==='listening' ? (VZ.heard||'Listening…') : VZ.state==='thinking' ? 'Thinking…' : (VZ.said || 'Tap the mic and ask me anything about the SAT.');
-  const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
-  return `<div class="vz-top"><button class="vz-x" id="vzX" aria-label="Close">✕</button><div class="vz-title"><b>Zina</b><span class="badge elite">ELITE</span></div>
-      <select class="vz-lang" id="vzLang" aria-label="Language">${VLANGS.map(([c,n])=>`<option value="${c}" ${c===VZ.lang?'selected':''}>${n}</option>`).join('')}</select></div>
-    <div class="vz-stage vz-${VZ.state}"><div class="vz-rings"><i></i><i></i><i></i></div>${zinaFaceSVG(VZ.emo, VZ.state)}</div>
+  const status = VZ.paused ? 'Paused · tap Zina to talk again' : VZ.state==='listening' ? 'Listening…' : VZ.state==='thinking' ? 'Thinking…' : VZ.state==='speaking' ? 'Speaking…' : '';
+  const cap = VZ.state==='listening' && VZ.heard ? VZ.heard : (VZ.said || '');
+  return `<div class="vz-top"><button class="vz-x" id="vzX" aria-label="Close">✕</button><div class="vz-title"><b>Zina</b><span class="badge elite">ELITE</span></div><span style="width:40px"></span></div>
+    <button class="vz-stage vz-${VZ.state}" id="vzFace" aria-label="${VZ.paused?'Resume':'Pause'} conversation"><div class="vz-rings"><i></i><i></i><i></i></div>${zinaFaceSVG(VZ.emo, VZ.state)}</button>
     <div class="vz-cap" aria-live="polite">${VZ.heard && VZ.state!=='listening' ? `<div class="vz-you">“${esc(VZ.heard)}”</div>`:''}<p>${esc(cap)}</p></div>
-    <div class="vz-bottom">
-      ${SR?`<button class="vz-mic ${VZ.state==='listening'?'on':''}" id="vzMic" aria-label="${VZ.state==='listening'?'Stop listening':'Talk'}"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>`:''}
-      <form class="vz-type" id="vzType"><input id="vzIn" placeholder="${SR?'…or type here':'Type to Zina'}" autocomplete="off" aria-label="Message Zina"><button aria-label="Send">➤</button></form>
-      <div class="vz-left">Elite · more access</div>
-    </div>`;
+    <div class="vz-status">${SR()?`<span class="vz-dot ${VZ.state}"></span>${esc(status)}`:'Voice works in Chrome or Edge.'}</div>`;
 }
-function vzRender(){ if(!VZ.el) return; const keep=$('#vzIn',VZ.el)?.value||''; VZ.el.innerHTML=voiceHTML(); const i=$('#vzIn',VZ.el); if(i) i.value=keep; vzBind(); }
+function vzRender(){ if(!VZ.el) return; VZ.el.innerHTML=voiceHTML(); vzBind(); }
 function vzSet(state, emo){ VZ.state=state; if(emo) VZ.emo=emo; vzRender(); }
 function openVoice(){
-  if(planKey()!=='elite') return upgradeModal('Talk to Zina out loud, in any language. Only on Elite');
+  if(planKey()!=='elite') return upgradeModal('Talk to Zina out loud. Only on Elite');
   if(VZ.el) return; VZ.el=document.createElement('div'); VZ.el.className='vz'; VZ.el.setAttribute('role','dialog'); VZ.el.setAttribute('aria-label','Talk to Zina');
-  document.body.appendChild(VZ.el); document.body.style.overflow='hidden'; VZ.said=''; VZ.heard=''; VZ.emo='happy'; vzSet('idle');
-  setTimeout(()=>{ if(VZ.el){ const hi={uz:'Salom! Men Zinaman. SAT bo‘yicha nima so‘ramoqchisiz?',ru:'Привет! Я Зина. Что разберём сегодня?',tr:'Merhaba! Ben Zina. Bugün neye bakalım?'}[VZ.lang.slice(0,2)]||"Hi! I'm Zina. What should we work on today?"; VZ.said=hi; vzRender(); vzSpeak(hi,'happy'); } },350);
+  document.body.appendChild(VZ.el); document.body.style.overflow='hidden'; VZ.said=''; VZ.heard=''; VZ.paused=false; VZ.emo='happy'; vzSet('idle');
+  const l2=VZ.lang.slice(0,2); const hi={uz:'Salom! Men Zinaman. Nima haqida gaplashamiz?',ru:'Привет! Я Зина. О чём поговорим?',tr:'Merhaba! Ben Zina. Ne konuşalım?',kk:'Сәлем! Мен Зинамын.'}[l2]||"Hi! I'm Zina. What do you want to work on?";
+  setTimeout(()=>{ if(!VZ.el) return; VZ.said=hi; vzRender(); vzSpeak(hi,'happy'); },300);
 }
 function closeVoice(){ try{ speechSynthesis.cancel(); }catch(e){} try{ VZ.rec&&VZ.rec.abort(); }catch(e){} VZ.el?.remove(); VZ.el=null; VZ.state='idle'; document.body.style.overflow=''; }
 function vzBind(){
-  const el=VZ.el;
-  $('#vzX',el).onclick=closeVoice;
-  $('#vzLang',el).onchange=e=>{ VZ.lang=e.target.value; LS.set('vlang',VZ.lang); };
-  $('#vzMic',el)?.addEventListener('click',()=> VZ.state==='listening' ? VZ.rec?.stop() : vzListen());
-  $('#vzType',el).onsubmit=e=>{ e.preventDefault(); const v=$('#vzIn',el).value.trim(); if(!v) return; $('#vzIn',el).value=''; VZ.heard=v; vzAsk(v); };
+  $('#vzX',VZ.el).onclick=closeVoice;
+  $('#vzFace',VZ.el).onclick=()=>{ VZ.paused=!VZ.paused; if(VZ.paused){ try{ VZ.rec&&VZ.rec.abort(); }catch(e){} try{ speechSynthesis.cancel(); }catch(e){} vzSet('idle'); } else vzListen(); };
 }
 function vzListen(){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR) return;
+  const R=SR(); if(!R || !VZ.el || VZ.paused || VZ.busy) return;
   try{ speechSynthesis.cancel(); }catch(e){}
-  const r=new SR(); VZ.rec=r; r.lang=VZ.lang; r.interimResults=true; r.continuous=false; VZ.heard='';
-  r.onresult=ev=>{ VZ.heard=[...ev.results].map(x=>x[0].transcript).join(' '); const p=$('.vz-cap p',VZ.el); if(p) p.textContent=VZ.heard; };
-  r.onerror=ev=>{ VZ.said = ev.error==='not-allowed'||ev.error==='service-not-allowed' ? 'I can’t hear you here. Allow the microphone, or type below.' : 'I didn’t catch that. Try again?'; vzSet('idle','concerned'); };
-  r.onend=()=>{ if(VZ.state!=='listening') return; const t=VZ.heard.trim(); if(t) vzAsk(t); else vzSet('idle'); };
-  vzSet('listening','calm'); try{ r.start(); }catch(e){ vzSet('idle'); }
+  const r=new R(); VZ.rec=r; r.lang=VZ.lang; r.interimResults=true; r.continuous=false; VZ.heard=''; let got='';
+  r.onresult=ev=>{ got=[...ev.results].map(x=>x[0].transcript).join(' '); VZ.heard=got; const p=$('.vz-cap p',VZ.el); if(p) p.textContent=got; };
+  r.onerror=ev=>{ if(ev.error==='not-allowed'||ev.error==='service-not-allowed'){ VZ.paused=true; VZ.said='Allow the microphone so I can hear you.'; vzSet('idle','concerned'); } };
+  r.onend=()=>{ if(!VZ.el || VZ.paused) return; const t=got.trim(); if(t) vzAsk(t); else setTimeout(vzListen,250); };   // silence: keep listening
+  vzSet('listening'); try{ r.start(); }catch(e){}
 }
+/* guess the language of a sentence, so Zina's voice matches it */
+function langOf(t){ t=String(t||'');
+  if(/[\u0400-\u04FF]/.test(t)) return /[әғқңөұүһі]/i.test(t)?'kk-KZ':'ru-RU';
+  if(/[\u0600-\u06FF]/.test(t)) return 'ar-SA'; if(/[\u0900-\u097F]/.test(t)) return 'hi-IN'; if(/[\u3040-\u30FF]/.test(t)) return 'ja-JP'; if(/[\uAC00-\uD7AF]/.test(t)) return 'ko-KR'; if(/[\u4E00-\u9FFF]/.test(t)) return 'zh-CN';
+  if(/o‘|g‘|o'|g'|\b(men|sen|nima|qanday|uchun|bilan|yaxshi|savol|javob|kerak|salom)\b/i.test(t)) return 'uz-UZ';
+  if(/[ğış]/i.test(t) || /\b(ve|bir|için|nasıl)\b/i.test(t)) return 'tr-TR';
+  if(/[ñ¿¡]/.test(t)||/\b(que|los|para|una|hola)\b/i.test(t)) return 'es-ES'; if(/\b(les|des|est|pour|une|bonjour)\b/i.test(t)) return 'fr-FR'; if(/\b(der|die|und|ist|nicht)\b/i.test(t)) return 'de-DE';
+  return 'en-US'; }
 async function vzAsk(text){
   if(VZ.busy) return;
-  const p=plan(); if(usage('ai','d')>=p.ai){ VZ.said='We’ve used all of today’s messages. Back tomorrow!'; return vzSet('idle','concerned'); }
+  const p=plan(); if(usage('ai','d')>=p.ai){ VZ.said='That’s all for today. Talk tomorrow!'; return vzSet('idle','concerned'); }
   const sample=S.caps.sample; if(!sample){ VZ.said='My voice connects on the live site.'; return vzSet('idle','calm'); }
+  VZ.lang=langOf(text)||VZ.lang;
   VZ.busy=true; bump('ai','d'); vzSet('thinking','thinking');
-  const langName=(VLANGS.find(l=>l[0]===VZ.lang)||VLANGS[0])[1];
-  const u=S.user; const sys=`You are Zina, a warm, lively Digital SAT tutor talking out loud with a student (${u.name||'student'}, goal ${u.target||''}${u.examDate?', exam '+u.examDate:''}). Speak like a friendly human coach: short, natural sentences, real emotion, no lists, no markdown, no emojis, under 70 words. Always answer in the language the student uses; their chosen language is ${langName}. Begin your reply with exactly one tag showing how you feel: [calm], [happy], [excited], [encouraging], [thinking], [surprised] or [concerned]. Never invent official SAT questions.`;
+  const u=S.user; const sys=`You are Zina, a lively, funny, warm Digital SAT coach talking out loud with ${u.name||'a student'} (goal ${u.target||''}${u.examDate?', exam '+u.examDate:''}). Talk like a real human friend: short natural sentences, real feelings, under 60 words, no lists, no markdown, no emojis. ALWAYS reply in exactly the same language the student just used. Begin with exactly one tag for how you feel: [calm], [happy], [excited], [encouraging], [thinking], [surprised], [concerned] or [angry] (use [angry] only playfully, e.g. when they skip practice or give up). Never invent official SAT questions.`;
   VZ.hist.push({ role:'user', content:text }); VZ.hist=VZ.hist.slice(-10);
   const turns=VZ.hist.map((m,i)=>({ role:m.role, content:i===0?sys+'\n\n'+m.content:m.content }));
   let out='';
-  try{ const r=await sample(turns,{ cache:false, modelTier:'default', onText:({text})=>{ const m=text.match(/^\s*\[(\w+)\]\s*/); const body=text.replace(/^\s*\[\w+\]\s*/,''); if(m && EMO[m[1]] && VZ.emo!==m[1]){ VZ.emo=m[1]; } if(VZ.state==='thinking' && body){ VZ.state='idle'; vzRender(); } VZ.said=body; const c=$('.vz-cap p',VZ.el); if(c) c.textContent=body; } }); out=r.text; }
-  catch(e){ VZ.busy=false; VZ.said='Something went wrong on my side. Try again?'; return vzSet('idle','concerned'); }
+  try{ const r=await sample(turns,{ cache:false, modelTier:'default', onText:({text})=>{ const m=text.match(/^\s*\[(\w+)\]\s*/); if(m&&EMO[m[1]]) VZ.emo=m[1]; const body=text.replace(/^\s*\[\w+\]\s*/,''); if(VZ.state==='thinking'&&body){ VZ.state='idle'; vzRender(); } VZ.said=body; const c=$('.vz-cap p',VZ.el); if(c) c.textContent=body; } }); out=r.text; }
+  catch(e){ VZ.busy=false; VZ.said = e.code==='not_configured' ? (S.isAdmin?'Add ANTHROPIC_API_KEY in Vercel, then redeploy.':'I’m offline for a moment.') : 'Something went wrong on my side. Say it again?'; vzSet('idle','concerned'); return setTimeout(vzListen,1500); }
   VZ.busy=false;
   const m=out.match(/^\s*\[(\w+)\]\s*/); const emo=m&&EMO[m[1]]?m[1]:'happy'; const said=out.replace(/^\s*\[\w+\]\s*/,'').trim();
   VZ.hist.push({ role:'assistant', content:said }); VZ.said=said; VZ.emo=emo; vzRender(); vzSpeak(said, emo);
 }
-function vzVoice(){ const vs=speechSynthesis.getVoices(); const L=VZ.lang.toLowerCase(), l2=L.slice(0,2);
+function vzVoice(lang){ const vs=speechSynthesis.getVoices(); const L=lang.toLowerCase(), l2=L.slice(0,2);
   return vs.find(v=>v.lang.toLowerCase()===L && /natural|neural|google|premium|enhanced/i.test(v.name)) || vs.find(v=>v.lang.toLowerCase()===L) || vs.find(v=>v.lang.toLowerCase().startsWith(l2)) || null; }
 function vzSpeak(text, emo){
-  if(!('speechSynthesis' in window) || !text) return;
-  try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang=VZ.lang; const v=vzVoice(); if(v) u.voice=v;
-    u.pitch=(EMO[emo]||EMO.calm).pitch; u.rate=emo==='excited'?1.08:emo==='concerned'||emo==='calm'?.96:1.02;
-    u.onstart=()=>{ if(VZ.el){ VZ.state='speaking'; const f=$('.vz-face',VZ.el); if(f) f.dataset.state='speaking'; $('.vz-stage',VZ.el)?.classList.add('vz-speaking'); } };
-    u.onboundary=()=>{ const m=$('.vz-talk',VZ.el); if(m){ m.classList.remove('pop'); void m.getBBox; requestAnimationFrame(()=>m.classList.add('pop')); } };
-    u.onend=()=>{ if(VZ.el && VZ.state==='speaking') vzSet('idle'); };
+  if(!('speechSynthesis' in window) || !text){ setTimeout(vzListen,300); return; }
+  try{ speechSynthesis.cancel(); const lang=langOf(text); const u=new SpeechSynthesisUtterance(text); u.lang=lang; const v=vzVoice(lang); if(v) u.voice=v;
+    const e=EMO[emo]||EMO.calm; u.pitch=e.pitch; u.rate=e.rate;
+    u.onstart=()=>{ if(!VZ.el) return; VZ.state='speaking'; vzRender(); };
+    u.onend=()=>{ if(!VZ.el) return; vzSet('idle'); setTimeout(vzListen,250); };            // then listen again, no buttons
+    u.onerror=()=>{ if(VZ.el) setTimeout(vzListen,250); };
     speechSynthesis.speak(u);
-  }catch(e){}
+  }catch(e){ setTimeout(vzListen,300); }
 }
 if('speechSynthesis' in window){ try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=()=>{}; }catch(e){} }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape' && VZ.el) closeVoice(); });
@@ -3239,6 +3417,8 @@ function parseBBPage(txt, st){
   let stem=stemLines.join(' ').replace(/^.*?m[ae][cr]k\s*f[o0]r\s*rev\w*\s*/i,'').trim().replace(/^[^A-Za-z"“(]*(?=[A-Z"“(])/,'').replace(/^(?:[A-Za-z]{1,2}\s+|[|\d]+\s+){1,4}(?=(Which|What|How|Based|According|As used|The |In |If |A |An ))/,'');
   { const m=stem.match(/\b(Which|What|As used|Based on|According|How|If|In the|The|A|An|For|Suppose|Given)\b/); if(m && m.index>0 && m.index<32) stem=stem.slice(m.index); }
   if(!stem || (n==null && choices.length<4 && !img)) return null;
+  while(left.length && (left[left.length-1].replace(/[^A-Za-z]/g,'').length<4)) left.pop();                 // stray OCR crumbs at the end
+  while(left.length && (left[0].replace(/[^A-Za-z]/g,'').length<3)) left.shift();
   let passage=left.join('\n');
   const sec = st.sec==='M' || (!st.sec && /=|\bx\b|\bf\(/.test(stem)) ? 'M' : 'RW';
   const all=passage+' '+stem+' '+choices.join(' ');
@@ -3297,6 +3477,10 @@ async function readExamFiles(files, progress){
   }
   const good=items.filter(x=>x.q); assignModules(good);
   MOD_KEYS.forEach(([k])=>{ let i=0; good.filter(x=>x.mod===k).forEach(x=>{ if(!x.n) x.n=++i; else i=x.n; }); });
+  // one question per number, and never more than the real test has (27 R&W, 22 Math per module)
+  { const keep=new Map(); const score=x=>(x.q.choices||[]).filter(c=>c&&c.length>1).length*10+(x.q.stem||'').length/100+(x.q.image?5:0);
+    good.forEach(x=>{ const exp=(MOD_KEYS.find(m=>m[0]===x.mod)||[])[3]; if(exp && x.n>exp) return; const key=x.mod+'#'+x.n; const cur=keep.get(key); if(!cur || score(x)>score(cur)) keep.set(key,x); });
+    const kept=new Set(keep.values()); for(let i=good.length-1;i>=0;i--) if(good[i].mod!=='?' && !kept.has(good[i])) good.splice(i,1); }
   let mi=-1, prevN=1e9; const order=['RW1','RW2','M1','M2'];
   keys.forEach(k=>{ if(!order.includes(k.module)){ if(+k.n<=prevN) mi=Math.min(3,mi+1); k.module=order[Math.max(0,mi)]; } prevN=+k.n; });
   keys.forEach(k=>{ const it=good.find(x=>x.mod===k.module && x.n===+k.n); if(it && k.answer && !it.q.answer){ it.q.answer=String(k.answer).trim(); recheckReal(it); } });
@@ -3659,10 +3843,10 @@ function viewAdmin(params){
   if(params.get('tab')) AT=params.get('tab');
   const qs=S.questions.filter(q=>!q.examOnly); const tabs=[['questions',`Questions (${qs.length})`],['import','Upload'],['mocks',`Full-length tests (${S.mocks.length})`],['vocab','Vocabulary'],['payments','Payments'+(S.payments.filter(p=>p.status==='pending').length?` (${S.payments.filter(p=>p.status==='pending').length})`:'')],['ai','AI permissions'+(S.drafts.length?` (${S.drafts.length})`:'')]];
   let body='';
-  if(AT==='questions'){
+  if(AT==='questions'){ const rpts=(S.reports||[]); body=(rpts.length?`<details class="card pad rp-box" open><summary><b>Reports from students (${rpts.length})</b></summary>${rpts.slice(0,50).map(r=>{ const q=S.questions.find(x=>x.id===r.qid); return `<div class="rp-row"><div style="flex:1;min-width:0"><b>${esc(r.why)}</b> <span class="faint">· ${esc(r.name||'Student')} · ${esc(r.test||'')} · ${ago(r.ts)}</span>${r.note?`<div style="font-size:13.5px;margin-top:2px">${esc(r.note)}</div>`:''}<div class="faint ell" style="font-size:12.5px;margin-top:2px">${esc(q?q.stem.slice(0,120):'Question removed')}</div></div>${q?`<button class="btn btn-ghost btn-sm" data-edit="${q.id}">Fix</button>`:''}<button class="post-x" data-rpx="${r.id}" aria-label="Dismiss">✕</button></div>`; }).join('')}</details>`:'');
     const list=qs.filter(q=>(AQ.sec==='all'||q.section===AQ.sec)&&(!AQ.search||(q.stem+' '+q.passage+' '+q.domain).toLowerCase().includes(AQ.search.toLowerCase())));
     const cnt=(s,d)=>qs.filter(q=>q.section===s&&(!d||q.domain===d)).length;
-    body=`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:18px">
+    body+=`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:18px">
       ${[...DOMAINS.RW.map(d=>['RW',d]),...DOMAINS.M.map(d=>['M',d])].map(([s,d])=>`<div class="card" style="padding:12px 14px"><div class="faint" style="font-size:12px">${s==='M'?'Math':'R&W'}</div><div style="font-weight:600;font-size:13.5px">${d}</div><div style="font-family:var(--display);font-size:24px;font-weight:800">${cnt(s,d)}</div></div>`).join('')}</div>
       <div class="row" style="justify-content:space-between;flex-wrap:wrap;margin-bottom:12px"><div class="row"><input class="input" id="aqs" placeholder="Search questions" value="${esc(AQ.search)}" style="width:240px;height:38px"><select class="select" id="aqsec" style="width:auto;height:38px"><option value="all">All sections</option><option value="RW" ${AQ.sec==='RW'?'selected':''}>Reading and Writing</option><option value="M" ${AQ.sec==='M'?'selected':''}>Math</option></select></div>
       <div class="row"><button class="btn btn-ghost btn-sm" id="exportQ">Export</button><button class="btn btn-ghost btn-sm" id="goImport">Bulk import</button><button class="btn btn-primary btn-sm" id="addQ">Add question</button></div></div>
@@ -3850,6 +4034,7 @@ async function draftSimilar(q){
 function bindAdmin(){
   $('#exportQ')?.addEventListener('click',()=>{ const json=JSON.stringify(S.questions); const m=modal(`<h2 style="font-size:22px">Export ${S.questions.length} questions</h2><p class="muted" style="margin:8px 0 12px">Copy this and paste it into Upload on your new site.</p><textarea class="textarea" style="min-height:260px;font-size:12px" readonly>${esc(json)}</textarea><button class="btn btn-primary" id="cpy" style="width:100%;margin-top:12px">Copy</button>`,{wide:true}); $('#cpy',m).onclick=async()=>{ const ta=$('textarea',m); ta.select(); try{ await navigator.clipboard.writeText(json); }catch(e){ document.execCommand('copy'); } toast('Copied'); }; });
   bindShell(); if(!S.isAdmin) return;
+  $$('[data-rpx]').forEach(b=>b.onclick=async()=>{ try{ await Data.del('reports',b.dataset.rpx); }catch(e){} route(); });
   if(AT==='payments') bindAdminPayments();
   if(AT==='mocks') bindRealExams();
   $$('[data-at]').forEach(b=>b.onclick=()=>{ AT=b.dataset.at; history.replaceState(null,'','#/admin'); route(); });
