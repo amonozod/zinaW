@@ -1172,6 +1172,27 @@ body:has(#exam) .look-btn,body:has(#exam) .look,body:has(.vz) .look-btn{display:
 .rq-c{font-size:12px;color:var(--ink-3);white-space:nowrap;font-variant-numeric:tabular-nums}
 .real-engine{margin:0}.real-engine button{flex:1;font-size:13px}
 .real-wrap .bulk-drop{padding:30px 20px}
+.vw-row{display:flex;gap:10px;align-items:flex-start}
+s.was{font-size:.42em;font-weight:600;opacity:.45;margin-right:8px;letter-spacing:0;vertical-align:.35em;text-decoration-thickness:2px}
+.tier ul li:first-child:not(:only-child){}
+.tier li.plus{font-weight:700;opacity:.8}.tier li.plus::before{display:none}
+.day.past{opacity:.35;pointer-events:none;background:transparent}
+.ev small{display:block;font-size:10px;opacity:.7;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn[disabled]{opacity:.35;pointer-events:none}
+.desmos-panel{position:fixed;left:24px;top:96px;width:min(520px,calc(100vw - 48px));height:min(560px,calc(100vh - 140px));z-index:215;display:flex;flex-direction:column;background:#fff;border-radius:10px;box-shadow:0 18px 60px rgba(0,0,0,.35);overflow:hidden;animation:popIn .25s cubic-bezier(.16,1,.3,1) both}
+.desmos-panel.wide{width:min(900px,calc(100vw - 48px));height:calc(100vh - 140px)}
+.desmos-panel.moving iframe{pointer-events:none}
+.dz-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;background:#1a1a1a;color:#fff;cursor:move;user-select:none;touch-action:none}
+.dz-h b{font-size:15px}
+.dz-grip{opacity:.6;font-size:18px;letter-spacing:2px}
+.dz-btns{display:flex;gap:6px}
+.dz-btns button{color:#fff;border:1px solid rgba(255,255,255,.5);border-radius:6px;padding:2px 8px;font-size:12.5px}
+.dz-btns button:hover{background:rgba(255,255,255,.12)}
+.dz-body{flex:1;min-height:0}
+.dz-body iframe{width:100%;height:100%;border:0;display:block}
+.dz-resize{position:absolute;right:0;bottom:0;width:18px;height:18px;cursor:nwse-resize;background:linear-gradient(135deg,transparent 50%,#9aa0ad 50%,#9aa0ad 60%,transparent 60%,transparent 72%,#9aa0ad 72%,#9aa0ad 82%,transparent 82%)}
+.ev{flex-wrap:wrap}.ev small{flex-basis:100%}
+#calPrev[disabled]{opacity:.3!important;pointer-events:none}
 </style>
 <meta name="robots" content="noindex,nofollow">
 <script>window.ZINA_ADMIN=true</script>
@@ -1230,9 +1251,9 @@ function typeset(el){ try{ if(window.MathJax && MathJax.typesetPromise) MathJax.
 const PLANS = {
   free:  { name:'Free',  price:0,     q3:0,     tag:'Start here',
            bankDaily:0,   bankMonthly:0,    exams:1,  retakes:0,  plans:1, words:5,  ownWords:false, ai:0,  autoSchedule:false, analytics:false },
-  pro:   { name:'Pro',   price:9.99,  q3:26.97, tag:'Most popular',
+  pro:   { name:'Pro',   price:11,    was:0,  q3:33, tag:'Most popular',
            bankDaily:50,  bankMonthly:1500, exams:20, retakes:10, plans:2, words:20, ownWords:true,  ai:25, autoSchedule:true,  analytics:true },
-  elite: { name:'Elite', price:18.99, q3:51.27, tag:'Everything, highest limits',
+  elite: { name:'Elite', price:19.49, was:24, q3:58.47, tag:'Everything, highest limits',
            bankDaily:100, bankMonthly:3000, exams:30, retakes:20, plans:3, words:30, ownWords:true,  ai:80, autoSchedule:true,  analytics:true }
 };
 const COMPARE = [
@@ -1240,7 +1261,8 @@ const COMPARE = [
   ['Zina premium bank', 'No access','50 questions/day (up to 1,500/month)','100 questions/day (up to 3,000/month)'],
   ['Full-length adaptive tests','1/month','20 first-time takes/month','30 first-time takes/month'],
   ['Test retakes','No retakes','10 credits/month','20 credits/month'],
-  ['Zina AI tutor','No access','25 messages/day','80 messages/day, priority answers'],
+  ['Zina AI tutor','No access','Limited access, text chat','More access, smarter model'],
+  ['Talk to Zina out loud','—','—','Voice, in any language'],
   ['Study schedule','Manual planning','Auto-generate, 2 plans/month','Auto-generate, 3 plans/month'],
   ['Score analytics','Total score only','Skill-level breakdown','Skill-level breakdown and trend'],
   ['Vocabulary','5 new words/day','20 new words/day, your own words','30 new words/day, your own words'],
@@ -1497,8 +1519,8 @@ function upgradeModal(reason){
       ${['pro','elite'].map(k=>`
         <div class="card pad" style="${k==='pro'?'border-color:var(--violet);box-shadow:0 0 0 1px var(--violet)':''}">
           <div class="row" style="justify-content:space-between"><b style="font-family:var(--display);font-size:20px">${PLANS[k].name}</b>${k==='pro'?'<span class="pill">Popular</span>':''}</div>
-          <div style="font-family:var(--display);font-size:34px;font-weight:800;letter-spacing:-.03em;margin:8px 0">$${PLANS[k].price}<small class="faint" style="font-size:13px;font-weight:500">/month</small></div>
-          <div class="faint" style="font-size:13px;margin-bottom:12px">${PLANS[k].ai} AI messages/day, ${PLANS[k].exams} tests/month</div>
+          <div style="font-family:var(--display);font-size:34px;font-weight:800;letter-spacing:-.03em;margin:8px 0">${PLANS[k].was?`<s class="was">$${PLANS[k].was}</s>`:''}$${PLANS[k].price}<small class="faint" style="font-size:13px;font-weight:500">/month</small></div>
+          <div class="faint" style="font-size:13px;margin-bottom:12px">${k==='elite'?'More Zina AI, voice tutor, ':'Limited Zina AI, '}${PLANS[k].exams} tests/month</div>
           <button class="btn ${k==='pro'?'btn-primary':'btn-sun'} btn-sm" style="width:100%" data-plan="${k}" ${cur===k?'disabled':''}>${cur===k?'Current plan':(k==='pro'?'Start 3-day free trial':'Get Elite')}</button>
         </div>`).join('')}
     </div>
@@ -1507,7 +1529,8 @@ function upgradeModal(reason){
   $$('[data-plan]',m).forEach(b=>b.onclick=()=>{ setPlan(b.dataset.plan); closeModal(); });
 }
 /* ---------- payments: card transfer → owner approves → plan unlocks ---------- */
-const PAY_DEFAULT = { card:'', holder:'', bank:'Humo / Uzcard', support:'', prices:{ 'pro:m':129000, 'pro:q':289000, 'elite:m':239000, 'elite:q':549000 } };
+const PAY_DEFAULT = { card:'', holder:'', bank:'Humo / Uzcard', support:'', prices:{ 'pro:m':139000, 'pro:q':355000, 'elite:m':239000, 'elite:q':549000 } };
+const money = n => (+n)%1===0 ? String(+n) : (+n).toFixed(2);
 const CARD_TYPES = ['Humo','Uzcard','Visa','Mastercard'];
 const paySet = () => { const p={ ...PAY_DEFAULT, ...(S.settings.pay||{}), prices:{ ...PAY_DEFAULT.prices, ...((S.settings.pay||{}).prices||{}) } };
   let cards = Array.isArray(p.cards) ? p.cards.filter(c=>c && String(c.number||'').replace(/\D/g,'').length>=16) : [];
@@ -1622,13 +1645,13 @@ function viewLanding(){
         ${['free','pro','elite'].map(k=>{ const p=PLANS[k]; return `
         <div class="plan ${k==='pro'?'hot':''}">
           <div class="pname">${p.name}${k==='pro'?'<span class="pill">Most popular</span>':''}</div>
-          <div class="price">$${priceOf(k).toFixed(2)}<small>/month</small></div>
+          <div class="price">${(b==='q'&&PLANS[k].price)||PLANS[k].was?`<s class="was">$${money(b==='q'?PLANS[k].price:PLANS[k].was)}</s>`:''}$${money(priceOf(k))}<small>/month</small></div>
           <div class="was">${wasOf(k)}</div>
           <ul>
             <li>Unlimited free question bank</li>
             <li>${p.exams} full-length adaptive test${p.exams>1?'s':''}/month</li>
             <li class="${p.bankDaily?'':'no'}">${p.bankDaily?p.bankDaily+' premium questions/day':'Premium question bank'}</li>
-            <li class="${p.ai?'':'no'}">${p.ai?'Zina AI tutor, '+p.ai+' messages/day':'Zina AI tutor'}</li>
+            <li class="${p.ai?'':'no'}">${k==='elite'?'More access to Zina AI':k==='pro'?'Limited access to Zina AI':'Zina AI tutor'}</li>${k==='elite'?'<li>Talk to Zina out loud, any language</li>':''}
             <li class="${p.autoSchedule?'':'no'}">Auto-generated study schedule</li>
             <li class="${p.analytics?'':'no'}">Skill-level score analytics</li>
             <li>${p.words} new vocab words/day</li>
@@ -1657,7 +1680,7 @@ function viewLanding(){
         ['Will it feel like the real exam?',`<p>Same layout, same timer, same tools, same pressure. By the time you sit the real one, you've already done it a dozen times.</p>
           <div class="fa-chips"><span>Split passages</span><span>Answer eliminator</span><span>Mark for review</span><span>Highlighter</span><span>Calculator</span><span>Reference sheet</span><span>10-min break</span></div>`],
         ['What do I get for free?',`<ul class="fa-list"><li>1 full-length adaptive test every month</li><li>The free question bank</li><li>Daily vocab, flashcards and match</li><li>Community, daily questions, leaderboard</li></ul><p class="faint" style="font-size:14px">No card. Free stays free.</p>`],
-        ['What does Zina AI actually do?',`<div class="fa-chat"><div class="u">I picked C. Why is it wrong?</div><div class="a">C describes the method, but the question asks what the results <b>suggest</b>. Look at the last sentence: "rose sharply after…"</div></div><p>Pro gets 25 messages a day. Elite gets 80, with a sharper model.</p>`],
+        ['What does Zina AI actually do?',`<div class="fa-chat"><div class="u">I picked C. Why is it wrong?</div><div class="a">C describes the method, but the question asks what the results <b>suggest</b>. Look at the last sentence: "rose sharply after…"</div></div><p>Pro gets limited access. Elite gets more access, a sharper model, and can talk to Zina out loud.</p>`],
         ['Can I cancel anytime?',`<p>One click. No emails, no calls. You keep access until your paid period ends.</p>`]
       ].map(([q,a],i)=>`<div class="fq${i===0?' open':''}"><button class="fq-q" aria-expanded="${i===0}" aria-controls="fqa${i}"><span class="fq-n">${String(i+1).padStart(2,'0')}</span><span class="fq-t">${q}</span><i class="fq-ic" aria-hidden="true"></i></button><div class="fq-a" id="fqa${i}" role="region"><div><div class="fq-body">${a}</div></div></div></div>`).join('')}
       </div>
@@ -1941,6 +1964,7 @@ function bindPractice(){
   };
   $('#startSet')?.addEventListener('click',()=>{ const s=build(filteredQs()); if(s) startPractice(s,'Practice set'); });
   $$('[data-dom]').forEach(b=>b.onclick=()=>{ const s=build(filteredQs(q=>q.domain===b.dataset.dom)); if(s) startPractice(s,b.dataset.dom); });
+  if(window.PENDING_DOM){ const d=window.PENDING_DOM; window.PENDING_DOM=null; const b=[...document.querySelectorAll('[data-dom]')].find(x=>x.dataset.dom===d); if(b) setTimeout(()=>b.click(),60); else toast('No questions for this skill yet'); }
   $$('[data-q]').forEach(r=>r.onclick=()=>{ const q=S.questions.find(x=>x.id===r.dataset.q); if(q.tier==='premium'&&!canUsePremium()) return upgradeModal('This question is in the premium bank'); startPractice([q],'Single question'); });
 }
 
@@ -1957,7 +1981,6 @@ function viewTests(){
       ${mocks.map(m=>{ const t=taken(m.id); const best=t.length?Math.max(...t.map(a=>a.total)):0; const nq=m.modules.reduce((s,x)=>s+x.ids.length,0); return `
       <div class="card test-card">
         <div class="row" style="justify-content:space-between"><h3>${esc(m.name)}${m.real?' <span class="pill sun" style="font-size:11px;vertical-align:middle">Real exam</span>':''}</h3>${m.status!=='published'?'<span class="pill gray">Draft</span>':(t.length?`<span class="pill mint">Best ${best}</span>`:'<span class="pill">New</span>')}</div>
-        <div class="mods">${m.modules.map(x=>`<span>${x.section==='M'?'Math':'R&W'} ${x.n}<br><span class="faint" style="font-weight:500">${x.ids.length}q, ${x.minutes}m</span></span>`).join('')}</div>
         <div class="faint" style="font-size:13px">${nq} questions${m.modules.some(x=>x.hardIds&&x.hardIds.length)?', adaptive Module 2':''}${t.length?`, taken ${t.length} time${t.length>1?'s':''}`:''}</div>
         <button class="btn ${t.length?'btn-ghost':'btn-primary'}" data-mock="${m.id}">${t.length?'Retake test':'Start test'}</button>
       </div>`; }).join('')}
@@ -2069,7 +2092,7 @@ function openExam(){
   el.innerHTML=`<div class="ex-loading"><div class="exl-mark">${logoHTML()}</div><div class="exl-ring"></div><p>${EX.mode==='mock'?'Getting your test ready':'Loading questions'}</p></div>`;
   setTimeout(()=>{ if(!$('#exam')) return; EX.tick=setInterval(examTick,1000); renderExam(); }, 1100);
 }
-function closeExam(){ clearInterval(EX.tick); EX.active=false; $('#exam')?.remove(); document.body.style.overflow=''; try{ if(document.fullscreenElement) document.exitFullscreen().catch(()=>{}); }catch(e){} }
+function closeExam(){ clearInterval(EX.tick); EX.active=false; $('#exam')?.remove(); $('#desmosPanel')?.remove(); document.body.style.overflow=''; try{ if(document.fullscreenElement) document.exitFullscreen().catch(()=>{}); }catch(e){} }
 function examTick(){
   if(!EX.active) return;
   if(EX.mode==='practice'){ EX.elapsed++; updTimer(); return; }
@@ -2084,7 +2107,7 @@ function clock(s){ const m=Math.floor(s/60), x=s%60; return (m>=60?Math.floor(m/
 function updTimer(){ const b=$('#exTime'); if(!b) return; const v=EX.mode==='practice'?EX.elapsed:EX.remaining; b.textContent=EX.hide?'':clock(v); b.classList.toggle('warn',EX.mode==='mock'&&v<=300); if(EX.screen==='break'){ const bb=$('#breakT'); if(bb) bb.textContent=clock(EX.remaining); } }
 
 function renderExam(){
-  const el=$('#exam'); if(!el) return;
+  const el=$('#exam'); if(!el) return; setTimeout(syncDesmos,0);
   if(EX.screen==='intro'){ el.innerHTML = examIntro(); bindExam(); return; }
   if(EX.screen==='break') return el.innerHTML = examBreak(), bindExamSimple();
   const mod=EX.modules[EX.mi]; const q=mod.qs[EX.qi];
@@ -2097,7 +2120,7 @@ function renderExam(){
           :`<button class="ex-tool ${EX.hlMode?'on':''}" id="hlTool">${I.pen}<span>Highlights &amp; Notes</span></button>`}
         <button class="ex-tool ${EX.popup==='more'?'on':''}" data-pop="more">${I.more}<span>More</span></button>
       </div>
-      ${EX.popup==='more'?`<div class="more-pop"><button id="exExit">Exit the ${EX.mode==='mock'?'exam':'practice'}</button></div>`:''}${EX.popup==='dir'?dirPop(mod):''}${EX.popup==='calc'?calcPop():''}${EX.popup==='ref'?refPop():''}
+      ${EX.popup==='more'?`<div class="more-pop"><button id="exExit">Exit the ${EX.mode==='mock'?'exam':'practice'}</button></div>`:''}${EX.popup==='dir'?dirPop(mod):''}${EX.popup==='calc'&&EX.calcMode==='basic'?calcPop():''}${EX.popup==='ref'?refPop():''}
     </div>`;
   let body;
   if(EX.screen==='review'){
@@ -2195,7 +2218,7 @@ function bindExam(){
   // divider drag
   const dv=$('#divider',el);
   if(dv&&pas){ dv.onpointerdown=e=>{ dv.setPointerCapture(e.pointerId); const body=$('.ex-body',el).getBoundingClientRect(); dv.onpointermove=ev=>{ const p=Math.min(75,Math.max(25,(ev.clientX-body.left)/body.width*100)); pas.style.flex=`0 0 ${p}%`; EX.split=p; }; dv.onpointerup=()=>{ dv.onpointermove=null; }; }; }
-  bindCalc(el);
+  bindCalc(el); syncDesmos();
 }
 function enterStepFromIntro(){ enterStep(); renderExam(); }
 function submitModule(){
@@ -2248,7 +2271,7 @@ function finishMock(){
 
 /* ---------- calculator (own parser, no eval) ---------- */
 function calcPop(){ const c=EX.calcState; const keys=[['sin','cos','tan','√','⌫'],['(',')','^','π','AC'],['7','8','9','÷','x²'],['4','5','6','×','ln'],['1','2','3','−','log'],['0','.','ans','+','=']];
-  return `<div class="calc" id="calc" style="${EX.calcPos?`left:${EX.calcPos[0]}px;top:${EX.calcPos[1]}px`:''}"><div class="calc-h" id="calcH"><span>Calculator</span><span><button id="degT" style="color:#fff;font-size:12px;border:1px solid #fff;border-radius:6px;padding:0 6px;margin-right:8px">${c.deg?'DEG':'RAD'}</button><button data-pop="calc" aria-label="Close calculator" style="color:#fff">✕</button></span></div><div class="calc-d"><small id="cExpr">${esc(c.expr)}</small><span id="cRes">${esc(c.res||'0')}</span></div><div class="calc-k">${keys.flat().map(k=>`<button data-k="${k}" class="${'÷×−+^'.includes(k)&&k.length===1?'op':''}${k==='='?' eq':''}">${k}</button>`).join('')}</div></div>`; }
+  return `<div class="calc" id="calc" style="${EX.calcPos?`left:${EX.calcPos[0]}px;top:${EX.calcPos[1]}px`:''}"><div class="calc-h" id="calcH"><span>Calculator</span><span><button id="toDesmos" style="color:#fff;font-size:12px;border:1px solid #fff;border-radius:6px;padding:0 6px;margin-right:8px">Graphing</button><button id="degT" style="color:#fff;font-size:12px;border:1px solid #fff;border-radius:6px;padding:0 6px;margin-right:8px">${c.deg?'DEG':'RAD'}</button><button data-pop="calc" aria-label="Close calculator" style="color:#fff">✕</button></span></div><div class="calc-d"><small id="cExpr">${esc(c.expr)}</small><span id="cRes">${esc(c.res||'0')}</span></div><div class="calc-k">${keys.flat().map(k=>`<button data-k="${k}" class="${'÷×−+^'.includes(k)&&k.length===1?'op':''}${k==='='?' eq':''}">${k}</button>`).join('')}</div></div>`; }
 function calcEval(src, deg){
   const s=src.replace(/÷/g,'/').replace(/×/g,'*').replace(/−/g,'-').replace(/√/g,'sqrt').replace(/π/g,'pi'); let i=0;
   const peek=()=>s[i], skip=()=>{ while(s[i]===' ') i++; };
@@ -2263,8 +2286,32 @@ function calcEval(src, deg){
   const expr=()=>{ let v=term(); for(;;){ skip(); if(s[i]==='+'){ i++; v+=term(); } else if(s[i]==='-'){ i++; v-=term(); } else return v; } };
   const v=expr(); skip(); if(i<s.length) throw 0; return v;
 }
+/* College Board version of the Desmos graphing calculator — kept outside the exam re-render so its graphs survive */
+function syncDesmos(){
+  const want = EX.active && EX.popup==='calc' && EX.calcMode!=='basic' && EX.screen!=='intro' && EX.screen!=='break';
+  let p=document.getElementById('desmosPanel');
+  if(!p && want){
+    p=document.createElement('div'); p.id='desmosPanel'; p.className='desmos-panel'; p.setAttribute('role','dialog'); p.setAttribute('aria-label','Desmos graphing calculator');
+    p.innerHTML=`<div class="dz-h" id="dzH"><b>Calculator</b><span class="dz-grip" aria-hidden="true">⠿</span><div class="dz-btns"><button id="dzBasic" title="Simple calculator">Basic</button><button id="dzWide" aria-label="Expand">⤢</button><button id="dzX" aria-label="Close">✕</button></div></div>
+      <div class="dz-body"><iframe src="https://www.desmos.com/testing/cb-sat-ap/graphing" title="Desmos graphing calculator" loading="eager"></iframe></div><span class="dz-resize" aria-hidden="true"></span>`;
+    document.body.appendChild(p);
+    const h=$('#dzH',p); let sx,sy,ox,oy,drag=false;
+    h.addEventListener('pointerdown',e=>{ if(e.target.closest('button')) return; drag=true; sx=e.clientX; sy=e.clientY; const r=p.getBoundingClientRect(); ox=r.left; oy=r.top; h.setPointerCapture(e.pointerId); p.classList.add('moving'); });
+    h.addEventListener('pointermove',e=>{ if(!drag) return; p.style.left=Math.max(0,Math.min(innerWidth-120,ox+e.clientX-sx))+'px'; p.style.top=Math.max(0,Math.min(innerHeight-60,oy+e.clientY-sy))+'px'; });
+    h.addEventListener('pointerup',()=>{ drag=false; p.classList.remove('moving'); });
+    const rz=$('.dz-resize',p); let rs=null;
+    rz.addEventListener('pointerdown',e=>{ rs={x:e.clientX,y:e.clientY,w:p.offsetWidth,h:p.offsetHeight}; rz.setPointerCapture(e.pointerId); p.classList.add('moving'); });
+    rz.addEventListener('pointermove',e=>{ if(!rs) return; p.style.width=Math.max(320,rs.w+e.clientX-rs.x)+'px'; p.style.height=Math.max(320,rs.h+e.clientY-rs.y)+'px'; });
+    rz.addEventListener('pointerup',()=>{ rs=null; p.classList.remove('moving'); });
+    $('#dzX',p).onclick=()=>{ EX.popup=null; renderExam(); };
+    $('#dzWide',p).onclick=()=>p.classList.toggle('wide');
+    $('#dzBasic',p).onclick=()=>{ EX.calcMode='basic'; renderExam(); };
+  }
+  if(p) p.style.display = want ? 'flex' : 'none';
+}
 function bindCalc(el){
   const c=$('#calc',el); if(!c) return; const st=EX.calcState;
+  $('#toDesmos',c)?.addEventListener('click',e=>{ e.stopPropagation(); EX.calcMode='desmos'; renderExam(); });
   const show=()=>{ $('#cExpr').textContent=st.expr; $('#cRes').textContent=st.res||'0'; };
   $$('[data-k]',c).forEach(b=>b.onclick=()=>{ const k=b.dataset.k;
     if(k==='AC'){ st.expr=''; st.res=''; } else if(k==='⌫'){ st.expr=st.expr.slice(0,-1); }
@@ -2302,24 +2349,38 @@ const EVT = {
   vocab:{label:'Vocabulary, 15 min', ic:'Aa'}, review:{label:'Review mistakes', ic:'↺'}, rest:{label:'Rest day', ic:'☾'}
 };
 let CAL = new Date(); CAL.setDate(1);
+/* official Digital SAT skills inside each domain */
+const SKILLS = {
+  'Information and Ideas':['Central Ideas and Details','Command of Evidence: Textual','Command of Evidence: Quantitative','Inferences'],
+  'Craft and Structure':['Words in Context','Text Structure and Purpose','Cross-Text Connections'],
+  'Expression of Ideas':['Rhetorical Synthesis','Transitions'],
+  'Standard English Conventions':['Boundaries','Form, Structure, and Sense'],
+  'Algebra':['Linear equations in one variable','Linear functions','Linear equations in two variables','Systems of linear equations','Linear inequalities'],
+  'Advanced Math':['Nonlinear functions','Nonlinear equations and systems','Equivalent expressions'],
+  'Problem-Solving and Data Analysis':['Ratios, rates and units','Percentages','One-variable data','Two-variable data','Probability','Sample statistics and margin of error','Evaluating statistical claims'],
+  'Geometry and Trigonometry':['Area and volume','Lines, angles and triangles','Right triangles and trigonometry','Circles']
+};
+const monthStart = () => { const d=new Date(); d.setDate(1); d.setHours(0,0,0,0); return d; };
 function viewSchedule(){
-  const y=CAL.getFullYear(), m=CAL.getMonth();
+  if(CAL<monthStart()) CAL=monthStart();
+  const y=CAL.getFullYear(), m=CAL.getMonth(); const atStart=CAL.getTime()<=monthStart().getTime();
   const first=new Date(y,m,1), start=new Date(first); start.setDate(1-first.getDay());
-  const cells=[...Array(42)].map((_,i)=>{ const d=new Date(start); d.setDate(start.getDate()+i); return d; });
+  let cells=[...Array(42)].map((_,i)=>{ const d=new Date(start); d.setDate(start.getDate()+i); return d; });
+  { const t0=todayKey(); while(cells.length>7 && todayKey(cells[6])<t0) cells=cells.slice(7); }      // weeks that are already over are not shown
   const tk=todayKey(); const ex=S.user.examDate;
   const p=plan();
   return shell('schedule', `
     <div class="page-h"><div><h1>Schedule</h1><p>${ex?`${Math.max(0,Math.ceil((new Date(ex+'T08:00')-new Date())/864e5))} days to your SAT`:'Drag sessions onto any day'}</p></div>
       <div class="row"><button class="btn btn-ghost btn-sm" id="clearAuto">Clear generated</button><button class="btn btn-primary" id="autoGen">✦ Auto-generate schedule${p.autoSchedule?'':' <span class="pill sun" style="margin-left:4px;font-size:11px">PRO</span>'}</button></div></div>
     <div class="card" style="padding:14px 18px;margin-bottom:14px"><div class="row" style="justify-content:space-between">
-      <div class="row"><button class="btn btn-ghost btn-sm" id="calPrev" aria-label="Previous month">‹</button><button class="btn btn-ghost btn-sm" id="calNext" aria-label="Next month">›</button><b style="font-size:18px;margin-left:8px">${CAL.toLocaleDateString('en-US',{month:'long',year:'numeric'})}</b></div>
+      <div class="row"><button class="btn btn-ghost btn-sm" id="calPrev" aria-label="Previous month" ${atStart?'disabled':''}>‹</button><button class="btn btn-ghost btn-sm" id="calNext" aria-label="Next month">›</button><b style="font-size:18px;margin-left:8px">${CAL.toLocaleDateString('en-US',{month:'long',year:'numeric'})}</b></div>
       <button class="btn btn-ghost btn-sm" id="calToday">Today</button></div></div>
     <div class="cal" id="cal">
       ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="dow">${d}</div>`).join('')}
-      ${cells.map(d=>{ const k=todayKey(d); const evs=S.sched[k]||[]; const isEx=k===ex; return `<div class="day ${d.getMonth()!==m?'out':''} ${k===tk?'today':''} ${isEx?'exam':''}" data-day="${k}"><span class="dn">${d.getDate()}</span>
+      ${cells.map(d=>{ const k=todayKey(d); const evs=S.sched[k]||[]; const isEx=k===ex; const past=k<tk; return `<div class="day ${d.getMonth()!==m?'out':''} ${k===tk?'today':''} ${isEx?'exam':''} ${past?'past':''}" ${past?'aria-disabled="true"':`data-day="${k}"`}><span class="dn">${d.getDate()}</span>
         ${isEx?`<div class="ev ev-sat">🎓 <span>SAT exam day</span></div>`:''}
-        ${evs.slice(0,3).map(e=>`<div class="ev ev-${e.type} ${e.done?'done':''}" draggable="true" data-ev="${e.id}" data-from="${k}"><span>${esc(e.label)}</span></div>`).join('')}
-        ${evs.length>3?`<div class="faint" style="font-size:11px;padding-left:4px">+${evs.length-3} more</div>`:''}</div>`; }).join('')}
+        ${past?'':evs.slice(0,3).map(e=>`<div class="ev ev-${e.type} ${e.done?'done':''}" draggable="true" data-ev="${e.id}" data-from="${k}" title="${esc(e.label)}"><span>${esc(e.skill||e.label)}</span>${e.dom?`<small>${esc(e.type==='math'?'Math':'R&W')} · ${esc(e.dom.replace('Problem-Solving and Data Analysis','Data Analysis').replace('Standard English Conventions','Conventions').replace('Geometry and Trigonometry','Geometry'))}</small>`:''}</div>`).join('')}
+        ${!past&&evs.length>3?`<div class="faint" style="font-size:11px;padding-left:4px">+${evs.length-3} more</div>`:''}</div>`; }).join('')}
     </div>
     <div class="card pad" style="margin-top:16px"><b style="font-size:14px">Drag a session onto your calendar</b><div class="palette" style="margin-top:12px">
       ${Object.entries(EVT).map(([k,v])=>`<div class="pal ev-${k}" draggable="true" data-pal="${k}"><span aria-hidden="true">${v.ic}</span>${v.label}</div>`).join('')}</div></div>`);
@@ -2328,13 +2389,14 @@ function addEvent(day,type,label,extra={}){ (S.sched[day]=S.sched[day]||[]).push
 function dayModal(day){
   const evs=S.sched[day]||[];
   const m=modal(`<h2 style="font-size:24px">${new Date(day+'T12:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</h2>
-    <div style="margin:16px 0">${evs.length?evs.map(e=>`<div class="list-row"><button class="switch ${e.done?'on':''}" data-done="${e.id}" aria-label="Mark done"></button><span class="ev ev-${e.type}" style="flex:1;font-size:13.5px;padding:6px 10px">${esc(e.label)}</span><button class="btn btn-sm btn-ghost" data-del="${e.id}">Remove</button></div>`).join(''):'<p class="muted">Nothing planned for this day.</p>'}</div>
+    <div style="margin:16px 0">${evs.length?evs.map(e=>`<div class="list-row"><button class="switch ${e.done?'on':''}" data-done="${e.id}" aria-label="Mark done"></button><span class="ev ev-${e.type}" style="flex:1;font-size:13.5px;padding:6px 10px">${esc(e.label)}</span>${e.dom?`<button class="btn btn-sm btn-primary" data-go="${esc(e.dom)}">Practice</button>`:''}<button class="btn btn-sm btn-ghost" data-del="${e.id}">Remove</button></div>`).join(''):'<p class="muted">Nothing planned for this day.</p>'}</div>
     <b style="font-size:14px">Add a session</b><div class="palette" style="margin-top:10px">${Object.entries(EVT).map(([k,v])=>`<button class="pal ev-${k}" data-add="${k}">${v.ic} ${v.label}</button>`).join('')}</div>
     <div class="row" style="margin-top:18px;justify-content:space-between"><span></span><button class="btn btn-dark btn-sm" data-x>Done</button></div>`);
   $('[data-x]',m).onclick=()=>{ closeModal(); route(); };
   $$('[data-done]',m).forEach(b=>b.onclick=()=>{ const e=evs.find(x=>x.id===b.dataset.done); e.done=!e.done; if(e.done) logStudy(e.type==='mock'?120:e.type==='rest'?0:30); save('sched'); b.classList.toggle('on'); });
   $$('[data-del]',m).forEach(b=>b.onclick=()=>{ S.sched[day]=evs.filter(x=>x.id!==b.dataset.del); save('sched'); dayModal(day); });
   $$('[data-add]',m).forEach(b=>b.onclick=()=>{ addEvent(day,b.dataset.add); dayModal(day); });
+  $$('[data-go]',m).forEach(b=>b.onclick=()=>{ window.PENDING_DOM=b.dataset.go; closeModal(); location.hash='#/practice'; });
 }
 function autoGenerate(){
   const p=plan();
@@ -2345,23 +2407,25 @@ function autoGenerate(){
   const by=skillStats(); const order=d=>by[d]?by[d].c/by[d].t:0.5;
   const mathD=[...DOMAINS.M].sort((a,b)=>order(a)-order(b)), rwD=[...DOMAINS.RW].sort((a,b)=>order(a)-order(b));
   Object.keys(S.sched).forEach(k=>{ S.sched[k]=S.sched[k].filter(e=>!e.auto); if(!S.sched[k].length) delete S.sched[k]; });
+  const turn={}; const addSkill=(k,type,dom)=>{ const list=SKILLS[dom]||[dom]; const i=turn[dom]=(turn[dom]||0); turn[dom]++; const skill=list[i%list.length];
+    addEvent(k,type,`${type==='math'?'Math':'R&W'} · ${dom} · ${skill}`,{auto:true,dom,skill}); };
   let d=new Date(); d.setHours(12); let mi=0, ri=0, week=0; let n=0;
   while(d<end){
     const k=todayKey(d); const left=Math.round((end-d)/864e5); const dow=d.getDay();
     if(left<=1) addEvent(k,'rest','Rest before the exam',{auto:true});
     else if(left<=3) addEvent(k,'review','Light review of marked questions',{auto:true});
     else if(dow===0) addEvent(k,'rest','Rest day',{auto:true});
-    else if(dow===6){ if(week%2===0) addEvent(k,'mock','Full-length adaptive test',{auto:true}); else { addEvent(k,'math','Math: '+mathD[mi++%4],{auto:true}); addEvent(k,'rw','R&W: '+rwD[ri++%4],{auto:true}); } week++; }
+    else if(dow===6){ if(week%2===0) addEvent(k,'mock','Full-length adaptive test',{auto:true}); else { addSkill(k,'math',mathD[mi++%4]); addSkill(k,'rw',rwD[ri++%4]); } week++; }
     else if(dow===5) addEvent(k,'review','Review this week\'s mistakes',{auto:true});
-    else if(dow%2===1){ addEvent(k,'math','Math: '+mathD[mi++%4],{auto:true}); if(dow!==3) addEvent(k,'vocab',null,{auto:true}); }
-    else { addEvent(k,'rw','R&W: '+rwD[ri++%4],{auto:true}); addEvent(k,'vocab',null,{auto:true}); }
+    else if(dow%2===1){ addSkill(k,'math',mathD[mi++%4]); if(dow!==3) addEvent(k,'vocab',null,{auto:true}); }
+    else { addSkill(k,'rw',rwD[ri++%4]); addEvent(k,'vocab',null,{auto:true}); }
     d.setDate(d.getDate()+1); n++; if(n>400) break;
   }
   bump('plan','m'); save('sched'); route(); toast('Your schedule is ready. Weakest skills come first.');
 }
 function bindSchedule(){
   bindShell();
-  $('#calPrev').onclick=()=>{ CAL.setMonth(CAL.getMonth()-1); route(); };
+  $('#calPrev').onclick=()=>{ if(CAL.getTime()<=monthStart().getTime()) return; CAL.setMonth(CAL.getMonth()-1); route(); };
   $('#calNext').onclick=()=>{ CAL.setMonth(CAL.getMonth()+1); route(); };
   $('#calToday').onclick=()=>{ CAL=new Date(); CAL.setDate(1); route(); };
   $('#autoGen').onclick=autoGenerate;
@@ -2475,7 +2539,7 @@ function viewAI(){
     <form class="chat-in" id="chatF"><input class="input" id="chatIn" placeholder="${p.ai?'Ask Zina AI…':'Upgrade to chat with Zina AI'}" autocomplete="off" ${AI_BUSY?'disabled':''}><button class="btn btn-primary" ${AI_BUSY?'disabled':''}>Send</button></form></div>`;
   return shell('ai', `
     <div class="page-h"><div><h1>Zina AI</h1><p>Your 24/7 SAT tutor</p></div>
-      <div class="row"><button class="btn ${planKey()==='elite'?'btn-sun':'btn-ghost'} btn-sm vz-open" id="voiceGo">${zinaFaceMini()}Talk to Zina${planKey()==='elite'?'':' <span class="lock">ELITE</span>'}</button>${p.ai?`<span class="pill">${left} / ${p.ai} today</span>${S.chat.length?'<button class="btn btn-ghost btn-sm" id="chatClear">New chat</button>':''}`:''}</div></div>
+      <div class="row"><button class="btn ${planKey()==='elite'?'btn-sun':'btn-ghost'} btn-sm vz-open" id="voiceGo">${zinaFaceMini()}Talk to Zina${planKey()==='elite'?'':' <span class="lock">ELITE</span>'}</button>${p.ai?`<span class="pill">${left>Math.ceil(p.ai*.2)?(planKey()==='elite'?'More access':'Limited access'):left+' left today'}</span>${S.chat.length?'<button class="btn btn-ghost btn-sm" id="chatClear">New chat</button>':''}`:''}</div></div>
     ${p.ai?inner:`<div class="ai-lock card"><div class="ai-orb" aria-hidden="true"><i></i><i></i><i></i><span>✦</span></div><h2>Every mistake,<br>explained.</h2><div class="ai-demo" aria-hidden="true"><div class="msg u">Why is B wrong?</div><div class="msg a">B restates the method. The question asks what the finding <b>suggests</b>. Look at the last sentence…</div></div><button class="btn btn-primary btn-lg" data-unlock="Chat with Zina AI">Unlock Zina AI</button></div>`}`);
 }
 async function sendAI(text){
@@ -2506,18 +2570,18 @@ function bindAI(){
 }
 
 /* ================= SUBSCRIPTION ================= */
-function ring(label,used,max){ const pc=max?Math.min(100,Math.round(used/max*100)):0; return `<div class="ring-card"><div class="ring" style="--p:${pc}"><b>${max?max-used<0?0:max-used:'—'}</b><small>${max?'left':'locked'}</small></div><span>${label}</span></div>`; }
+function ring(label,used,max,pctOnly){ const pc=max?Math.min(100,Math.round(used/max*100)):0; return `<div class="ring-card"><div class="ring" style="--p:${pc}"><b>${!max?'—':pctOnly?(100-pc)+'%':Math.max(0,max-used)}</b><small>${max?'left':'locked'}</small></div><span>${label}</span></div>`; }
 function viewBilling(){
   const k=planKey(), p=plan(); const b=S.bill;
   const trial = S.user.trialUntil&&S.user.trialUntil>Date.now()&&k==='pro';
-  const feats = { pro:['50 premium questions a day','20 full-length tests a month','Zina AI · 25 messages a day','Auto-generated schedule','Skill-level analytics','20 new words a day + your own'],
-                  elite:['100 premium questions a day','30 full-length tests a month','Zina AI · 80 messages a day, smarter model','2× retake credits','Score trend analytics','30 new words a day + your own'] };
+  const feats = { pro:['50 premium questions a day','20 full-length tests a month','Limited access to Zina AI','Auto-generated schedule','Skill-level analytics','20 new words a day + your own'],
+                  elite:['Everything in Pro, plus:','Talk to Zina out loud, in any language','More access to Zina AI, smarter model','100 premium questions a day','30 full-length tests a month, 2× retakes','Score trend analytics','30 new words a day + your own'] };
   return shell('billing', `
     <div class="bill-hero plan-${k}">
       <div class="bh-l"><div class="bh-kicker">Your plan</div><div class="bh-name">${p.name}${trial?'<span class="pill sun">Trial · ends '+new Date(S.user.trialUntil).toLocaleDateString('en-US',{month:'short',day:'numeric'})+'</span>':''}</div>
         ${k==='free'?'<p>You\'re on the ground floor. Pro unlocks the elevator.</p>':`<p>Active until ${S.ent&&S.ent.paid_until?new Date(S.ent.paid_until).toLocaleDateString('en-US',{month:'long',day:'numeric'}):'—'}</p><button class="btn btn-sun btn-sm" style="margin-top:12px" data-plan="${k}">Extend ${PLANS[k].name}</button>`}
         ${k!=='free'?'<button class="linkbtn light" id="cancel">Manage or cancel</button>':''}</div>
-      <div class="bh-rings">${ring('AI today',usage('ai','d'),p.ai)}${ring('Tests this month',usage('exam','m'),p.exams)}${ring('Premium today',usage('bank','d'),p.bankDaily)}${ring('New words',usage('words','d'),p.words)}</div>
+      <div class="bh-rings">${ring('Zina AI today',usage('ai','d'),p.ai,true)}${ring('Tests this month',usage('exam','m'),p.exams)}${ring('Premium today',usage('bank','d'),p.bankDaily)}${ring('New words',usage('words','d'),p.words)}</div>
     </div>
     ${S.user.pendingPay?`<a class="pend-strip" href="#/checkout" style="margin-top:16px"><span class="t-dot"></span>Payment under review. Your plan switches on automatically.</a>`:''}
     ${S.ent&&S.ent.status==='rejected'&&k==='free'?`<div class="pend-strip bad" style="margin-top:16px"><span class="t-dot"></span>${esc(S.ent.note||'We could not confirm your last payment.')} <a href="#/checkout?plan=${S.ent.plan&&S.ent.plan!=='free'?S.ent.plan:'pro'}">Try again →</a></div>`:''}
@@ -2528,9 +2592,9 @@ function viewBilling(){
       <div class="tier tier-${pk} ${k===pk?'is-cur':''}">
         ${pk==='elite'?'<div class="tier-glow" aria-hidden="true"></div>':''}
         <div class="row" style="justify-content:space-between"><b class="tier-name">${P.name}</b>${pk==='pro'?'<span class="pill">Most popular</span>':'<span class="pill sun">Best results</span>'}</div>
-        <div class="tier-price">${b==='q'?`<s>$${P.price}</s>`:''}$${price.toFixed(2)}<small>/mo</small></div>
+        <div class="tier-price">${b==='q'?`<s>$${P.price}</s>`:P.was?`<s>$${P.was}</s>`:''}$${money(price)}<small>/mo</small></div>
         <div class="tier-sub">${b==='q'?`$${(P.q3*.85).toFixed(2)} every 3 months`:pk==='pro'?'3 days free, then monthly':'Billed monthly'}</div>
-        <ul>${feats[pk].map(f=>`<li>${f}</li>`).join('')}</ul>
+        <ul>${feats[pk].map(f=>`<li class="${f.endsWith(':')?'plus':''}">${f}</li>`).join('')}</ul>
         <button class="btn ${pk==='pro'?'btn-primary':'btn-sun'} btn-lg" style="width:100%" data-plan="${pk}">${k===pk?'Extend':pk==='pro'?(S.user.trialUsed?'Get Pro':'Start free trial'):'Go Elite'}</button>
       </div>`; }).join('')}
     </div>
@@ -2667,13 +2731,13 @@ function brandMark(type, small){
   return `<span class="bm bm-humo ${small?'sm':''}">HUMO</span>`;
 }
 const fmtCard = c => String(c||'').replace(/\D/g,'').replace(/(\d{4})(?=\d)/g,'$1 ').trim();
-const PLAN_FEATS = { pro:['Zina AI · 25 messages a day','20 full-length tests a month','50 premium questions a day','Auto-built study schedule','Skill analytics'],
-                     elite:['Zina AI · 80 messages a day, sharper model','30 full-length tests a month','100 premium questions a day','2× retake credits','Score trend analytics'] };
+const PLAN_FEATS = { pro:['Limited access to Zina AI','20 full-length tests a month','50 premium questions a day','Auto-built study schedule','Skill analytics'],
+                     elite:['Talk to Zina out loud, in any language','More access to Zina AI, sharper model','30 full-length tests a month','100 premium questions a day','2× retake credits','Score trend analytics'] };
 function viewCheckout(params){
   const k = (params.get('plan')==='elite') ? 'elite' : 'pro';
   const per = params.get('period')==='q' ? 'q' : 'm';
   const P=PLANS[k], ps=paySet(), price=ps.prices[k+':'+per];
-  const usd = per==='q' ? (P.q3*.85).toFixed(2) : P.price.toFixed(2);
+  const usd = per==='q' ? (P.q3*.85).toFixed(2) : money(P.price);
   const bonus = !S.user.trialUsed; const len = per==='q'?'3 months':'1 month';
   if(S.user.pendingPay){ const pay=S.payments.find(x=>x.id===S.user.pendingPay);
     return `<div class="co-wait"><div class="cw-card">
@@ -2856,7 +2920,7 @@ function voiceHTML(){
     <div class="vz-bottom">
       ${SR?`<button class="vz-mic ${VZ.state==='listening'?'on':''}" id="vzMic" aria-label="${VZ.state==='listening'?'Stop listening':'Talk'}"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>`:''}
       <form class="vz-type" id="vzType"><input id="vzIn" placeholder="${SR?'…or type here':'Type to Zina'}" autocomplete="off" aria-label="Message Zina"><button aria-label="Send">➤</button></form>
-      <div class="vz-left">${Math.max(0,plan().ai-usage('ai','d'))} / ${plan().ai} today</div>
+      <div class="vz-left">Elite · more access</div>
     </div>`;
 }
 function vzRender(){ if(!VZ.el) return; const keep=$('#vzIn',VZ.el)?.value||''; VZ.el.innerHTML=voiceHTML(); const i=$('#vzIn',VZ.el); if(i) i.value=keep; vzBind(); }
@@ -2980,10 +3044,31 @@ function aiErrText(e){ const c=e&&e.code; return c==='no_ai'?'scanned pages need
 let OCR=null;
 async function ocrWorker(){ if(OCR) return OCR;
   if(!window.Tesseract) await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
-  OCR=await Tesseract.createWorker('eng'); return OCR; }
+  OCR=await Tesseract.createWorker('eng'); try{ await OCR.setParameters({ tessedit_pageseg_mode:'6', preserve_interword_spaces:'1' }); }catch(e){} return OCR; }
+function findDivider(c){ const g=c.getContext('2d'); const w=c.width, h=c.height; const y0=Math.round(h*.18), y1=Math.round(h*.85); const d=g.getImageData(Math.round(w*.35),y0,Math.round(w*.3),y1-y0).data; const cw=Math.round(w*.3);
+  let best=-1, bestF=0; for(let x=0;x<cw;x+=2){ let dark=0, n=0; for(let y=0;y<y1-y0;y+=4){ const i=(y*cw+x)*4; const l=.3*d[i]+.59*d[i+1]+.11*d[i+2]; if(l<235) dark++; n++; } const f=dark/n; if(f>bestF){ bestF=f; best=x; } }
+  return bestF>0.55 ? Math.round(w*.35)+best : -1; }
+async function ocrCanvas(c){ const w=await ocrWorker(); return (await w.recognize(c)).data.text||''; }
+function cropCanvas(c,x,wid){ const o=document.createElement('canvas'); o.width=wid; o.height=c.height; o.getContext('2d').drawImage(c,x,0,wid,c.height,0,0,wid,c.height); return o; }
 async function ocrPage(pdf,i){ const page=await pdf.getPage(i); const v=page.getViewport({scale:1}); const s=Math.min(2.6,2000/v.width); const vp=page.getViewport({scale:s});
   const c=document.createElement('canvas'); c.width=vp.width; c.height=vp.height; const g=c.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height);
-  await page.render({ canvasContext:g, viewport:vp }).promise; const w=await ocrWorker(); const r=await w.recognize(c); return r.data.text||''; }
+  await page.render({ canvasContext:g, viewport:vp }).promise;
+  const x=findDivider(c);
+  let out;
+  let area=c;
+  if(x>0){ const L=await ocrCanvas(cropCanvas(c,0,x-4)); area=cropCanvas(c,x+6,c.width-x-6); const R=await ocrCanvas(area); out=L+'\n<<<COL>>>\n'+R; out+=await sparseChoices(R,area); }   // passage | question
+  else { const F=await ocrCanvas(c); out=F+await sparseChoices(F,c); }
+  if(out.includes('<<<SPARSE>>>')) out+='\n<<<IMG>>>'+snapshot(area);   // keep a picture of the question, so formulas and boxed answers stay exact
+  return out; }
+function snapshot(src){ const y0=Math.round(src.height*.1), h=Math.round(src.height*.8); const s=Math.min(1,900/src.width); const o=document.createElement('canvas'); o.width=Math.round(src.width*s); o.height=Math.round(h*s);
+  const g=o.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,o.width,o.height); g.drawImage(src,0,y0,src.width,h,0,0,o.width,o.height);
+  let q=.72, url=o.toDataURL('image/jpeg',q); while(url.length>170000 && q>.35){ q-=.1; url=o.toDataURL('image/jpeg',q); } return url; }
+/* short answers in boxes ("2", "4", "12") are easy for OCR to skip; look again in sparse mode when a question shows fewer than four choices */
+async function sparseChoices(text, canvas){
+  const lines=text.split('\n').map(l=>l.trim()).filter(Boolean); const qi=lines.map(l=>/\?\s*$/.test(l)).lastIndexOf(true);
+  if(qi<0 || lines.length-qi-1>=4) return '';
+  const w=await ocrWorker(); try{ await w.setParameters({ tessedit_pageseg_mode:'11' }); const r=(await w.recognize(canvas)).data.text||''; return '\n<<<SPARSE>>>\n'+r; }
+  catch(e){ return ''; } finally{ try{ await w.setParameters({ tessedit_pageseg_mode:'6' }); }catch(e){} } }
 /* split text by the module headers printed on the pages ("Reading and Writing … Module 2", "Math … Module 1") */
 function parseExamText(text){
   text=text.split('\n').map(l=>l
@@ -3005,6 +3090,62 @@ function parseExamText(text){
     splitByKeys(body).flatMap(seg=>parseImport(seg)).forEach(x=>{ x.mod=s.mod; out.push(x); }); });
   return out;
 }
+/* ---------- page-by-page reading: typed text where the PDF has it, the free reader where it doesn't ---------- */
+async function pageTextTyped(pdf,p){ const page=await pdf.getPage(p); const c=await page.getTextContent(); let lastY=null, line='', out='';
+  const items=c.items.filter(it=>it.str!==undefined).map(it=>({ s:it.str, x:it.transform[4], y:Math.round(it.transform[5]) })); items.sort((a,b)=> b.y-a.y || a.x-b.x);
+  for(const it of items){ if(lastY!==null && Math.abs(it.y-lastY)>3){ out+=line.trimEnd()+'\n'; line=''; if(lastY-it.y>18) out+='\n'; } line+=(line&&!line.endsWith(' ')&&!it.s.startsWith(' ')?' ':'')+it.s; lastY=it.y; }
+  return out+line; }
+async function readPdfPages(pdf, name, progress){
+  const pages=[];
+  for(let p=1;p<=pdf.numPages;p++) pages.push(await pageTextTyped(pdf,p).catch(()=> ''));
+  const typed=pages.join('').replace(/\s/g,'').length;
+  if(typed >= pdf.numPages*150) return pages;                                  // a typed PDF: its own text is exact
+  for(let p=1;p<=pdf.numPages;p++){ if(pages[p-1].replace(/\s/g,'').length>=120) continue;   // scanned pages: the free reader
+    progress&&progress(`${name}: reading page ${p} of ${pdf.numPages}`, (p-1)/pdf.numPages); pages[p-1]=await ocrPage(pdf,p); }
+  return pages;
+}
+/* Bluebook-style PDFs put one question on each page: header, number box, "Mark for Review", passage, question, four choices */
+const BB_NOISE=/^.{0,3}$|^questio\w*$|^hi(de)?$|^\d{1,2}\s*of\s*\d{2}\b|mark\s*for\s*review|question\s*\d+\s*of\s*\d+|^section\s*\d|module\s*\d|^directions|^hide$|annotate|highlights?\s*(&|and)?\s*notes|^more$|^calculator$|^reference$|^back$|^next$|elitexsat|bluebook|@\w{3,}|^\d{1,2}:\d{2}(:\d{2})?$|^[^A-Za-z0-9$]*$/i;
+function parseBBPage(txt, st){
+  if(/reading\s*(and|&)\s*writing/i.test(txt)) st.sec='RW'; else if(/\bmath\b/i.test(txt) && /module|section/i.test(txt)) st.sec='M';
+  const mm=txt.match(/module\s*([12])\b/i); if(mm) st.mod=(st.sec||'RW')+mm[1];
+  const [body,img]=txt.split('<<<IMG>>>'); const [main,sparse]=body.split('<<<SPARSE>>>');
+  const qm=main.match(/(?:questio\w*\s*)?\b(\d{1,2})\s*of\s*(2[27]|\d{2})\b/i);
+  const [leftRaw,rightRaw]=main.includes('<<<COL>>>')?main.split('<<<COL>>>'):['',main];
+  const clean=s=>s.replace(/\r/g,'').split('\n').map(l=>l.replace(/\s+/g,' ').trim()).filter(Boolean);
+  let left=clean(leftRaw), right=clean(rightRaw);
+  let n=qm?+qm[1]:null; const nb=right.findIndex(l=>/^\d{1,2}$/.test(l)); if(n==null && nb>=0 && +right[nb]<=27) n=+right[nb];
+  left=left.filter(l=>!BB_NOISE.test(l)); right=right.filter((l,i)=>i!==nb && !BB_NOISE.test(l));
+  const MARK=/^\s*(?:[(\[]\s*([A-D])\s*[)\]]|([A-D])\s*[).:\]|}]|([A-D])\s+(?=\S)|([@©®]\)?))\s*/;
+  // the question is the last line on the right that asks something; the choices are what follows it
+  let qi=-1; for(let k=right.length-1;k>=0;k--){ if(/\?\s*$|complete[s]? the text|most logical|^which choice|^what\b|^how\b|^based on|^according/i.test(right[k])){ qi=k; break; } }
+  let stemLines, rest;
+  if(qi>=0){ let s0=qi; while(s0>0 && !/[.?!:"”]$/.test(right[s0-1]) && qi-s0<3) s0--; stemLines=right.slice(s0,qi+1); rest=right.slice(qi+1); const extra=right.slice(0,s0); if(extra.length) left=left.concat(extra); }
+  else { const mk=right.findIndex(l=>MARK.test(l)); stemLines=right.slice(0,mk>0?mk:right.length); rest=mk>0?right.slice(mk):[]; }
+  let choices=[];
+  if(rest.length>=4){ const marked=rest.map((l,i)=>MARK.test(l)?i:-1).filter(i=>i>=0);
+    if(marked.length===4 && rest.length>4){ choices=marked.map((ix,j)=>rest.slice(ix, j<3?marked[j+1]:rest.length).join(' ')); }
+    else choices=rest.slice(0,4); }
+  if(choices.length<4 && sparse){ const sl=clean(sparse).filter(l=>!BB_NOISE.test(l) || /^-?[\d.\/]+$/.test(l)); const qk=sl.map(l=>/\?\s*$/.test(l)).lastIndexOf(true); const after=(qk>=0?sl.slice(qk+1):sl).filter(l=>!/^\d{1,2}\s*of/i.test(l) && !/next|back/i.test(l)); if(after.length>=4) choices=after.slice(0,4); }
+  choices=choices.map(c=>c.replace(MARK,'').replace(/^[)\]]\s*/,'').trim());
+  const stem=stemLines.join(' ').trim(); if(!stem || (n==null && choices.length<4)) return null;
+  const passage=left.join('\n');
+  const sec = st.sec==='M' || (!st.sec && /=|\bx\b|\bf\(/.test(stem)) ? 'M' : 'RW';
+  const all=passage+' '+stem+' '+choices.join(' ');
+  const useImg = choices.length<4 && img && img.startsWith('data:image');
+  if(useImg) choices=['A','B','C','D'];                       // the picture shows the real choices; the student picks the letter
+  const r=normalizeQ({ section:sec, domain:guessDomain(all,sec), difficulty:'Medium', tier:'free', passage:sec==='M'?'':passage, question:sec==='M'&&passage?passage+'\n'+stem:stem, choices:choices.length===4?choices:[], answer:'', explanation:'' });
+  if(useImg && r.q) r.q.image=img.trim();
+  r.n=n; r.mod=st.mod||'?'; return r;
+}
+function questionsFromPages(pages){
+  const bb=pages.filter(x=>/mark\s*for\s*review|question\s*\d{1,2}\s*of\s*\d{1,2}/i.test(x)).length >= Math.max(3, pages.length*0.25);
+  if(!bb){ const r=parseExamText(pages.map(p=>p.split('<<<IMG>>>')[0].replace(/<<<SPARSE>>>[\s\S]*$/,'').replace(/<<<COL>>>/g,'')).join('\n\n')); return { items:[...r], keys:r.keys, bb:false }; }
+  const st={sec:'',mod:'?'}, items=[], keys=[];
+  pages.forEach(tx=>{ if(looksLikeKey(tx,'')){ const mm=tx.match(/module\s*([12])/i); const sec=/math/i.test(tx)?'M':/reading|writing/i.test(tx)?'RW':''; keyPairs(tx).forEach(k=>keys.push({ key:true, module:mm&&sec?sec+mm[1]:'?', n:k.n, answer:k.answer })); return; }
+    const it=parseBBPage(tx,st); if(it) items.push(it); });
+  return { items, keys, bb:true };
+}
 async function readExamFiles(files, progress){
   const items=[], keys=[], fail=[]; let lastMod='';
   for(const [fi,f] of files.entries()){
@@ -3017,10 +3158,9 @@ async function readExamFiles(files, progress){
       let pdf=null, pdfErr=null; if(n.endsWith('.pdf')){ try{ pdf=await pdfPages(f); }catch(e){ pdfErr=e; } }
       if(pdfErr && /password/i.test(pdfErr.name+' '+pdfErr.message)){ fail.push(`${f.name}: password protected`); continue; }
       const scanned = pdf && text.replace(/\s/g,'').length < pdf.numPages*150;
-      if(scanned && (REAL_ENGINE!=='ai' || !S.caps.sample)){
-        let all='';
-        for(let p=1;p<=pdf.numPages;p++){ progress(`${f.name}: reading page ${p} of ${pdf.numPages} (free reader)`, (fi+(p-1)/pdf.numPages)/files.length); all+=await ocrPage(pdf,p)+'\n\n'; }
-        { const r=parseExamText(all); r.forEach(x=>items.push(x)); r.keys.forEach(k=>keys.push(k)); }
+      if(pdf && (!scanned || REAL_ENGINE!=='ai' || !S.caps.sample) && !looksLikeKey(text,f.name)){
+        const pages=await readPdfPages(pdf,f.name,(msg,fr)=>progress(msg,(fi+fr)/files.length));
+        const r=questionsFromPages(pages); r.items.forEach(x=>items.push(x)); r.keys.forEach(k=>keys.push(k));
       } else if(scanned){
         const step=Math.max(1,Math.min(3,(await S.caps.sample?.limits?.().catch(()=>null))?.images?.maxCount||3));
         for(let p=1;p<=pdf.numPages;p+=step){ const last=Math.min(pdf.numPages,p+step-1);
@@ -3274,23 +3414,75 @@ function looksLikeKey(text, name){ const lines=String(text).split('\n').map(l=>l
 const examBase = s => String(s||'').replace(/\.[a-z0-9]+$/i,'').replace(/@\S+/g,'')
   .replace(/\b(answer\s*keys?|answers?|keys?|javoblar|kalit|solutions?|explanations?|reading\s*(and|&)\s*writing|reading|writing|english|r\s*&\s*w|rw|math(ematics)?|module\s*\d|m\s*\d|part\s*\d|section\s*\d)\b/gi,' ')
   .replace(/[_\-–—()[\]]+/g,' ').replace(/\s{2,}/g,' ').trim().toLowerCase();
+async function extractText(f, progress){
+  const n=f.name.toLowerCase();
+  if(/\.(jpe?g|png|webp)$/.test(n)){ progress&&progress(`${f.name}: reading the photo`); const w=await ocrWorker(); return (await w.recognize(f)).data.text||''; }
+  let text=''; try{ text=await readAnyFile(f)||''; }catch(e){}
+  if(n.endsWith('.pdf')){
+    let pdf=null; try{ pdf=await pdfPages(f); }catch(e){ if(/password/i.test((e.name||'')+' '+(e.message||''))) throw Object.assign(new Error('password protected'),{code:'pw'}); }
+    if(pdf && text.replace(/\s/g,'').length < pdf.numPages*150){ let all=''; for(let p=1;p<=pdf.numPages;p++){ progress&&progress(`${f.name}: reading page ${p} of ${pdf.numPages}`); all+=(await ocrPage(pdf,p)).split('<<<IMG>>>')[0].replace(/<<<SPARSE>>>[\s\S]*$/,'').replace(/<<<COL>>>/g,'')+'\n\n'; } text=all; }
+  }
+  return text;
+}
+const readFail = (f,e) => `${f.name}: ${e&&e.code==='pw'?'password protected':(e instanceof Event||!e||!e.message)?'the page reader could not load, check the internet':e.message}`;
+let VOCAB_PREVIEW=null, VOCAB_LOG='';
+function parseWords(text){
+  const out=[]; const lines=String(text).replace(/\r/g,'').split('\n').map(l=>l.replace(/\s+/g,' ').trim());
+  const clean=w=>w.replace(/^\s*(\d{1,4}[.)]|[•\-*])\s*/,'').replace(/\s*\((n|v|adj|adv|prep|conj|noun|verb|adjective|adverb)\.?\)\s*/i,' ').replace(/[:;,.\s]+$/,'').trim();
+  const isWord=w=>/^[A-Za-z][A-Za-z'\- ]{1,30}$/.test(w) && w.split(' ').length<=3;
+  const isEx=l=>/^(example|ex|e\.g|sentence|usage)\s*[:.\-]/i.test(l) || /^["“].+["”]$/.test(l);
+  for(let i=0;i<lines.length;i++){ const l=lines[i]; if(!l) continue;
+    if(isEx(l) && out.length){ out[out.length-1].ex=l.replace(/^(example|ex|e\.g|sentence|usage)\s*[:.\-]\s*/i,'').replace(/^["“]|["”]$/g,''); continue; }
+    let m=l.split(/\t|\s*[|;]\s*/); if(m.length<2 && /,/.test(l) && l.split(',').length<=4 && isWord(clean(l.split(',')[0]))) m=l.split(/\s*,\s*/);
+    if(m.length<2) m=l.split(/\s+[-–—=]\s+|\s*:\s+|\s+[-–—]\s*(?=[a-z])/);
+    if(m.length>=2 && /^(word|term|vocab(ulary)?)$/i.test(clean(m[0])) && /^(definition|meaning|def)/i.test(m[1].trim())) continue;   // a header row
+    if(m.length>=2 && isWord(clean(m[0])) && m[1].length>2){ out.push({ word:clean(m[0]), def:m[1].trim().slice(0,220), ex:(m[2]||'').trim().slice(0,240) }); continue; }
+    const w=clean(l); const next=lines[i+1]||'';                                      // two-line format: word, then its meaning
+    if(isWord(w) && next && !isWord(clean(next)) && next.length>6 && !isEx(next)){ out.push({ word:w, def:next.slice(0,220), ex:'' }); i++; }
+  }
+  const have=new Set(allWords().map(w=>(Array.isArray(w)?w[0]:w.word).toLowerCase())); const seen=new Set();
+  return out.filter(w=>{ const k=w.word.toLowerCase(); if(have.has(k)||seen.has(k)) return false; seen.add(k); return true; });
+}
+async function vocabImport(files){
+  files=[...files].filter(f=>/\.(pdf|docx|txt|md|csv|jpe?g|png|webp)$/i.test(f.name)); if(!files.length) return toast('No PDF, Word, text or image files found');
+  const log=()=>$('#vocabLog'); let all=[], failed=[];
+  for(const [i,f] of files.entries()){
+    VOCAB_LOG=`<div class="bulk-status"><div class="save-prog"><i style="width:${Math.round(i/files.length*100)}%"></i></div><span>Reading ${esc(f.name)}</span></div>`; if(log()) log().innerHTML=VOCAB_LOG;
+    try{ const text=await extractText(f,msg=>{ if(log()) log().innerHTML=`<div class="bulk-status"><span>${esc(msg)}</span></div>`; }); const ws=parseWords(text); if(!ws.length) failed.push(`${f.name}: no word lists found`); all=all.concat(ws); }
+    catch(e){ failed.push(readFail(f,e)); }
+  }
+  const seen=new Set(); all=all.filter(w=>{ const k=w.word.toLowerCase(); if(seen.has(k)) return false; seen.add(k); return true; });
+  VOCAB_PREVIEW=all; VOCAB_LOG=`<div class="bulk-status ${all.length?'done':''}"><b>${all.length?`✓ ${all.length} new words found`:'No new words found'}</b>${failed.length?`<span class="bad">${failed.map(esc).join('<br>')}</span>`:''}</div>`;
+  route();
+}
 async function bulkImport(files){
-  files=[...files].filter(f=>/\.(pdf|docx|txt|md|csv|json)$/i.test(f.name)); const log=$('#bulkLog');
-  if(!files.length) return toast('No PDF, Word or text files found');
+  files=[...files].filter(f=>/\.(pdf|docx|txt|md|csv|json|jpe?g|png|webp)$/i.test(f.name)); const log=$('#bulkLog');
+  if(!files.length) return toast('No PDF, Word, text or image files found');
   let all=[]; let skipped=0, failed=[]; const bankKeys={};
   for(const [i,f] of files.entries()){
     if(log) log.innerHTML=`<div class="bulk-status"><div class="save-prog"><i style="width:${Math.round(i/files.length*100)}%"></i></div><span>Reading ${i+1} of ${files.length}: ${esc(f.name)}</span></div>`;
-    try{ const text=await readAnyFile(f); if(!text||!text.trim()){ failed.push(f.name); continue; }
+    try{ const say=msg=>{ if(log) log.innerHTML=`<div class="bulk-status"><div class="save-prog"><i style="width:${Math.round(i/files.length*100)}%"></i></div><span>${esc(msg)}</span></div>`; };
+      if(/\.pdf$/i.test(f.name)){ let pdf=null; try{ pdf=await pdfPages(f); }catch(e){ if(/password/i.test((e.name||'')+' '+(e.message||''))) throw Object.assign(new Error('password protected'),{code:'pw'}); }
+        if(pdf){ const pages=await readPdfPages(pdf,f.name,say); const joined=pages.join('\n\n');
+          if(looksLikeKey(joined,f.name)){ (bankKeys[examBase(f.name)]=bankKeys[examBase(f.name)]||[]).push(...keyPairs(joined)); continue; }
+          const r=questionsFromPages(pages); const found=r.items;
+          r.keys.forEach(k=>{ const it=found.find(x=>x.q && x.n===k.n && (k.module==='?'||x.mod===k.module) && !x.q.answer); if(it){ it.q.answer=k.answer; const z=normalizeQ({ ...it.q, question:it.q.stem }); z.q.id=it.q.id; it.q=z.q; it.errs=z.errs; } });
+          if(!found.length){ failed.push(`${f.name}: no questions found`); continue; }
+          found.forEach(x=>x.src=f.name); all=all.concat(found); continue; } }
+      const text=await extractText(f,say); if(!text||!text.trim()){ failed.push(`${f.name}: no text found`); continue; }
       if(!/\.json$/i.test(f.name) && looksLikeKey(text,f.name)){ (bankKeys[examBase(f.name)]=bankKeys[examBase(f.name)]||[]).push(...keyPairs(text)); continue; }
-      const found = /\.json$/i.test(f.name) ? parseImport(text) : splitByKeys(text).flatMap(seg=>parseImport(seg));
+      let found;
+      if(/\.json$/i.test(f.name)) found=parseImport(text);
+      else { const r=parseExamText(text); found=[...r];                       // strips "Module 1" headers, reads answer-key pages
+        r.keys.forEach(k=>{ const it=found.find(x=>x.q && x.n===k.n && (k.module==='?'||x.mod===k.module) && !x.q.answer); if(it){ it.q.answer=k.answer; const z=normalizeQ({ ...it.q, question:it.q.stem }); z.q.id=it.q.id; it.q=z.q; it.errs=z.errs; } }); }
       found.forEach(x=>x.src=f.name); all=all.concat(found);
-    }catch(e){ failed.push(f.name); }
+    }catch(e){ failed.push(readFail(f,e)); }
   }
   Object.entries(bankKeys).forEach(([base,pairs])=>{ const mine=all.filter(x=>x.q && examBase(x.src)===base); const pool=mine.length?mine:all.filter(x=>x.q);
     pairs.forEach(k=>{ const it=pool.find(x=>x.n===k.n && !x.q.answer); if(it){ it.q.answer=k.answer; const r=normalizeQ({ ...it.q, question:it.q.stem }); r.q.id=it.q.id; it.q=r.q; it.errs=r.errs; } }); });
   const before=all.length; all=markDups(all); skipped=before-all.length; all.forEach(x=>{}); 
   IMPORT_PREVIEW=all; IMP_FILTER=all.some(x=>!x.q||x.errs.length)?'bad':'all'; IMP_SHOW=40;
-  window.BULK_LOG=`<div class="bulk-status done"><b>✓ ${files.length-failed.length} file${files.length-failed.length===1?'':'s'} read · ${all.length} questions</b>${skipped?`<span>${skipped} duplicates skipped</span>`:''}${failed.length?`<span class="bad">Couldn't read: ${esc(failed.join(', '))}</span>`:''}</div>`; if(log) log.innerHTML=window.BULK_LOG;
+  window.BULK_LOG=`<div class="bulk-status done"><b>✓ ${files.length-failed.length} file${files.length-failed.length===1?'':'s'} read · ${all.length} questions</b>${skipped?`<span>${skipped} duplicates skipped</span>`:''}${failed.length?`<span class="bad">${failed.map(esc).join('<br>')}</span>`:''}</div>`; if(log) log.innerHTML=window.BULK_LOG;
   $('#impPrev').innerHTML=all.length?importPreviewHTML():`<div class="card pad imp-empty"><b>No questions found</b><p class="faint">If these are scanned images, paste the text or try ✦ Sort with AI.</p></div>`; if(all.length) bindPreview();
 }
 async function aiSort(raw){
@@ -3365,7 +3557,7 @@ function viewAdmin(params){
           <b>Drop files or a whole folder</b>
           <span>PDF · Word · TXT — 1 or 1,000 questions, Math and English mixed</span>
           <div class="row" style="gap:8px;margin-top:14px;justify-content:center">
-            <span class="btn btn-primary btn-sm">Choose files<input type="file" id="bulkFiles" multiple accept=".pdf,.docx,.txt,.md,.csv,.json" hidden></span>
+            <span class="btn btn-primary btn-sm">Choose files<input type="file" id="bulkFiles" multiple accept=".pdf,.docx,.txt,.md,.csv,.json,.jpg,.jpeg,.png,.webp" hidden></span>
             <span class="btn btn-ghost btn-sm" id="pickFolder">Choose folder</span>
           </div>
           <input type="file" id="bulkFolder" webkitdirectory directory multiple hidden>
@@ -3383,12 +3575,20 @@ function viewAdmin(params){
     body=`${realExamsHTML()}
       <div class="row" style="justify-content:space-between;flex-wrap:wrap;margin:26px 0 16px"><h3 style="margin:0;font-size:20px">Your tests (${S.mocks.length})</h3><div class="row" style="gap:10px"><span class="muted" style="font-size:13px">Bank: ${c('RW')} R&W · ${c('M')} Math</span><button class="btn btn-ghost btn-sm" id="newMock">Build from the bank</button></div></div>
       ${S.mocks.length?`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))">${S.mocks.map(m=>`<div class="card test-card"><div class="row" style="justify-content:space-between"><h3>${esc(m.name)}</h3><span class="pill ${m.status==='published'?'mint':'gray'}">${m.status==='published'?'Published':'Draft'}</span></div>
-        <div class="mods">${m.modules.map(x=>`<span>${x.section==='M'?'Math':'R&W'} ${x.n}<br><span class="faint" style="font-weight:500">${x.ids.length}${x.hardIds&&x.hardIds.length?' / '+x.hardIds.length:''}q</span></span>`).join('')}</div>
         <div class="row" style="flex-wrap:wrap"><button class="btn btn-sm ${m.status==='published'?'btn-ghost':'btn-primary'}" data-pub="${m.id}">${m.status==='published'?'Unpublish':'Publish to students'}</button><button class="btn btn-sm btn-ghost" data-medit="${m.id}">Edit questions</button><button class="btn btn-sm btn-ghost" data-mdel="${m.id}" style="color:var(--rose)">Delete</button></div></div>`).join('')}</div>`
       :`<div class="card empty"><div class="ic">⏱</div><h3>No tests yet</h3><p>Build a full-length adaptive test from your question pool in one click, then fine-tune it by hand.</p></div>`}`;
   }
   if(AT==='vocab'){
-    body=`<div class="card pad" style="max-width:720px"><b style="font-size:17px">Add words for all students</b><p class="muted" style="margin:6px 0 12px;font-size:14px">One per line: <b>word - meaning - example sentence</b>. These join the starter list of ${SEED_WORDS.length} words.</p><textarea class="textarea" id="aw" style="min-height:140px"></textarea><button class="btn btn-primary btn-sm" id="awS" style="margin-top:12px">Add words</button></div>
+    body=`<div class="imp-wrap" style="margin-bottom:18px"><div class="imp-col">
+        <label class="bulk-drop" id="vocabDrop"><div class="bd-ic">📖</div><b>Drop word lists or a folder</b><span>PDF · Word · TXT · CSV · photos — Zina finds each word, its meaning and example</span>
+          <div class="row" style="gap:8px;margin-top:14px;justify-content:center"><span class="btn btn-primary btn-sm">Choose files<input type="file" id="vocabFiles" multiple accept=".pdf,.docx,.txt,.md,.csv,.jpg,.jpeg,.png,.webp" hidden></span><span class="btn btn-ghost btn-sm" id="vocabPickFolder">Choose folder</span></div>
+          <input type="file" id="vocabFolder" webkitdirectory directory multiple hidden></label>
+        <div id="vocabLog">${VOCAB_LOG}</div></div>
+      <div>${VOCAB_PREVIEW?`<div class="card pad"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><b style="font-size:17px">${VOCAB_PREVIEW.length} new words</b><span class="faint" style="font-size:13px">Words you already have are skipped</span></div>
+        <div class="imp-list">${VOCAB_PREVIEW.slice(0,300).map((w,i)=>`<div class="imp-row vw-row"><div style="flex:1;min-width:0"><b>${esc(w.word)}</b> <span class="muted">— ${esc(w.def)}</span>${w.ex?`<div class="faint" style="font-size:12.5px;font-style:italic">${esc(w.ex)}</div>`:''}</div><button class="post-x" data-vwx="${i}" aria-label="Remove">✕</button></div>`).join('')}${VOCAB_PREVIEW.length>300?`<p class="faint">…and ${VOCAB_PREVIEW.length-300} more</p>`:''}</div>
+        <button class="btn btn-primary btn-lg" id="vocabSave" style="width:100%;margin-top:14px" ${VOCAB_PREVIEW.length?'':'disabled'}>Save ${VOCAB_PREVIEW.length} words</button></div>`:`<div class="card pad imp-empty"><div class="ic">Aa</div><b>New words show up here</b><p class="faint" style="font-size:13px;margin:6px 0 0">Check them, then save for every student.</p></div>`}</div></div>
+      <details class="card pad" style="max-width:720px"><summary style="cursor:pointer;font-weight:700">…or type words by hand</summary><p class="muted" style="margin:10px 0 12px;font-size:14px">One per line: <b>word - meaning - example sentence</b>.</p><textarea class="textarea" id="aw" style="min-height:140px"></textarea><button class="btn btn-primary btn-sm" id="awS" style="margin-top:10px">Add words</button></details>
+      <div class="card pad" style="max-width:720px;display:none"><b style="font-size:17px">Add words for all students</b><p class="muted" style="margin:6px 0 12px;font-size:14px">One per line: <b>word - meaning - example sentence</b>. These join the starter list of ${SEED_WORDS.length} words.</p><textarea class="textarea" id="aw" style="min-height:140px"></textarea><button class="btn btn-primary btn-sm" id="awS" style="margin-top:12px">Add words</button></div>
       ${S.words.length?`<div class="card scroll-x" style="margin-top:16px"><table class="qtable"><thead><tr><th>Word</th><th>Meaning</th><th></th></tr></thead><tbody>${S.words.map(w=>`<tr><td><b>${esc(w.word)}</b></td><td class="muted">${esc(w.def)}</td><td><button class="btn btn-sm btn-ghost" data-wdel="${w.id}">Remove</button></td></tr>`).join('')}</tbody></table></div>`:''}`;
   }
   if(AT==='payments'){ body=adminPaymentsHTML(); }
@@ -3558,6 +3758,15 @@ function bindAdmin(){
   $$('[data-medit]').forEach(b=>b.onclick=()=>mockEditor(S.mocks.find(x=>x.id===b.dataset.medit)));
   $$('[data-mdel]').forEach(b=>b.onclick=async()=>{ if(!confirm('Delete this test? Student results stay.')) return; await Data.del('mocks',b.dataset.mdel); route(); });
   // vocab
+  $('#vocabFiles')?.addEventListener('change',e=>vocabImport(e.target.files));
+  $('#vocabFolder')?.addEventListener('change',e=>vocabImport(e.target.files));
+  $('#vocabPickFolder')?.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); $('#vocabFolder').click(); });
+  { const dz=$('#vocabDrop'); if(dz){ ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{ e.preventDefault(); dz.classList.add('over'); })); ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{ e.preventDefault(); dz.classList.remove('over'); }));
+    dz.addEventListener('drop',async e=>{ const items=[...(e.dataTransfer.items||[])]; const files=[]; const walk=async en=>{ if(!en) return; if(en.isFile) files.push(await new Promise(r=>en.file(r))); else if(en.isDirectory){ const rd=en.createReader(); let b; do{ b=await new Promise(r=>rd.readEntries(r)); for(const x of b) await walk(x); }while(b.length); } }; if(items.length&&items[0].webkitGetAsEntry){ for(const it of items) await walk(it.webkitGetAsEntry()); } else files.push(...e.dataTransfer.files); vocabImport(files); }); } }
+  $$('[data-vwx]').forEach(b=>b.onclick=()=>{ VOCAB_PREVIEW.splice(+b.dataset.vwx,1); route(); });
+  $('#vocabSave')?.addEventListener('click',async()=>{ const b=$('#vocabSave'); b.disabled=true; const list=VOCAB_PREVIEW.slice(); let n=0; const q=list.slice();
+    const work=async()=>{ while(q.length){ const w=q.shift(); try{ await Data.put('words',{ id:'w_'+uid(), word:w.word, def:w.def, ex:w.ex||('Use "'+w.word+'" in a sentence.') }); n++; }catch(e){} if(n%10===0) b.textContent=`Saving ${n} of ${list.length}…`; } };
+    await Promise.all(Array.from({length:6},work)); VOCAB_PREVIEW=null; VOCAB_LOG=''; toast(`Added ${n} words for every student`); route(); });
   on('#awS',async()=>{ const lines=$('#aw').value.split('\n').map(l=>l.split(/\s+[-–—]\s+|\t/)).filter(p=>p[0]&&p[1]); for(const [w,d,e] of lines) await Data.put('words',{id:'w_'+uid(),word:w.trim(),def:d.trim(),ex:(e||'').trim()||('Use "'+w.trim()+'" in a sentence.')}); toast(`Added ${lines.length} word${lines.length===1?'':'s'}`); route(); });
   $$('[data-wdel]').forEach(b=>b.onclick=async()=>{ await Data.del('words',b.dataset.wdel); route(); });
   // ai
