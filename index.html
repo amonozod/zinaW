@@ -1254,7 +1254,7 @@ function mountLook(){
   let panel=null;
   const close=()=>{ panel?.remove(); panel=null; };
   b.onclick=e=>{ e.stopPropagation(); if(panel) return close(); panel=document.createElement('div'); panel.className='look'; panel.innerHTML=lookPanelHTML(); document.body.appendChild(panel);
-    panel.onclick=ev=>{ ev.stopPropagation(); const pb=ev.target.closest('[data-pal]'), mb=ev.target.closest('[data-lm]');
+    panel.onclick=ev=>{ ev.stopPropagation(); const pb=ev.target.closest('.look-pals [data-pal]'), mb=ev.target.closest('.look-modes [data-lm]');
       if(pb) LOOK.pal=pb.dataset.pal; if(mb) LOOK.mode=mb.dataset.lm; if(pb||mb){ LS.set('look',LOOK); applyLook(); panel.innerHTML=lookPanelHTML(); } }; };
   document.addEventListener('click',close);
 }
@@ -2149,7 +2149,7 @@ function renderExam(){
     const choices = q.type==='spr' ? sprHTML(q) : choicesHTML(q);
     const qCol = `<div class="qhead"><span class="qnum">${EX.qi+1}</span><button class="qmark ${EX.marked.has(q.id)?'on':''}" id="markBtn">${I.bookmark}Mark for Review</button>${q.type!=='spr'?`<button class="qabc ${EX.elim?'on':''}" id="elimBtn" title="Answer eliminator">ABC</button>`:''}</div>
       ${!split&&q.image?`<img class="qimg" src="${q.image}" alt="Figure for question ${EX.qi+1}">`:''}
-      <div class="qstem">${fmt(q.stem)}</div>${choices}${explainHTML(q)}`;
+      ${q.scan&&q.image?'':`<div class="qstem">${fmt(q.stem)}</div>`}${choices}${explainHTML(q)}`;
     body = split ? `<div class="ex-pane ex-passage" id="passage" style="${EX.split?`flex:0 0 ${EX.split}%`:''}">${q.image?`<img class="qimg" src="${q.image}" alt="Figure">`:''}${EX.hl[q.id]||fmt(q.passage)}</div><div class="ex-divider" id="divider"></div><div class="ex-pane ex-q">${qCol}</div>`
                  : `<div class="ex-pane ex-q solo" style="flex:1">${qCol}</div>`;
   }
@@ -2398,7 +2398,7 @@ function viewSchedule(){
         ${!past&&evs.length>3?`<div class="faint" style="font-size:11px;padding-left:4px">+${evs.length-3} more</div>`:''}</div>`; }).join('')}
     </div>
     <div class="card pad" style="margin-top:16px"><b style="font-size:14px">Drag a session onto your calendar</b><div class="palette" style="margin-top:12px">
-      ${Object.entries(EVT).map(([k,v])=>`<div class="pal ev-${k}" draggable="true" data-pal="${k}"><span aria-hidden="true">${v.ic}</span>${v.label}</div>`).join('')}</div></div>`);
+      ${Object.entries(EVT).map(([k,v])=>`<div class="pal ev-${k}" draggable="true" data-sess="${k}"><span aria-hidden="true">${v.ic}</span>${v.label}</div>`).join('')}</div></div>`);
 }
 function nextSkill(type){                       // weakest domain first, then walk through its skills
   const doms=[...DOMAINS[type==='math'?'M':'RW']]; const by=(typeof skillStats==='function')?skillStats():{}; const acc=d=>by[d]?by[d].c/by[d].t:0.5;
@@ -2481,7 +2481,7 @@ function bindSchedule(){
       else if(kind==='ev'){ const src=S.sched[b]||[]; const ev=src.find(x=>x.id===a); if(ev&&b!==c.dataset.day){ S.sched[b]=src.filter(x=>x.id!==a); (S.sched[c.dataset.day]=S.sched[c.dataset.day]||[]).push(ev); save('sched'); } }
       route(); };
   });
-  $$('[data-pal]').forEach(p=>p.ondragstart=e=>e.dataTransfer.setData('text/plain','pal|'+p.dataset.pal));
+  $$('[data-sess]').forEach(p=>p.ondragstart=e=>{ e.stopPropagation(); e.dataTransfer.setData('text/plain','pal|'+p.dataset.sess); });
   $$('[data-ev]').forEach(p=>p.ondragstart=e=>{ e.stopPropagation(); e.dataTransfer.setData('text/plain','ev|'+p.dataset.ev+'|'+p.dataset.from); });
 }
 
@@ -3083,34 +3083,63 @@ function groupExams(files){
 }
 function aiErrText(e){ const c=e&&e.code; return c==='no_ai'?'scanned pages need AI (works on the live site)':c==='not_configured'?'AI key is missing: add ANTHROPIC_API_KEY in Vercel and redeploy':c==='not_granted'||c==='forbidden'?'AI access was not allowed for this account':c==='rate_limited'||c==='limit'?'AI is busy, try again in a minute':(e instanceof Event||!e||!(e.message||e.code))?'the page reader could not load. Check the internet and drop the file again':'stopped: '+(e.message||e.code); }
 /* free reader: Tesseract OCR runs in the browser, no AI, no cost */
-let OCR=null;
-async function ocrWorker(){ if(OCR) return OCR;
-  if(!window.Tesseract) await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
-  OCR=await Tesseract.createWorker('eng'); try{ await OCR.setParameters({ tessedit_pageseg_mode:'6', preserve_interword_spaces:'1' }); }catch(e){} return OCR; }
-function findDivider(c){ const g=c.getContext('2d'); const w=c.width, h=c.height; const y0=Math.round(h*.18), y1=Math.round(h*.85); const d=g.getImageData(Math.round(w*.35),y0,Math.round(w*.3),y1-y0).data; const cw=Math.round(w*.3);
-  let best=-1, bestF=0; for(let x=0;x<cw;x+=2){ let dark=0, n=0; for(let y=0;y<y1-y0;y+=4){ const i=(y*cw+x)*4; const l=.3*d[i]+.59*d[i+1]+.11*d[i+2]; if(l<235) dark++; n++; } const f=dark/n; if(f>bestF){ bestF=f; best=x; } }
-  return bestF>0.55 ? Math.round(w*.35)+best : -1; }
-async function ocrCanvas(c){ const w=await ocrWorker(); return (await w.recognize(c)).data.text||''; }
-function cropCanvas(c,x,wid){ const o=document.createElement('canvas'); o.width=wid; o.height=c.height; o.getContext('2d').drawImage(c,x,0,wid,c.height,0,0,wid,c.height); return o; }
-async function ocrPage(pdf,i){ const page=await pdf.getPage(i); const v=page.getViewport({scale:1}); const s=Math.min(2.6,2000/v.width); const vp=page.getViewport({scale:s});
-  const c=document.createElement('canvas'); c.width=vp.width; c.height=vp.height; const g=c.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height);
+/* free reader, fast: several OCR workers in parallel; the page is cropped to the screenshot and the grey watermark is removed first */
+let OCRPOOL=null, OCRSPARSE=null;
+const OCR_N = Math.max(1, Math.min(4, (navigator.hardwareConcurrency||4) - 1));
+let TESS_P=null, POOL_P=null;
+function loadTesseract(){ return TESS_P=TESS_P||(window.Tesseract?Promise.resolve():loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js').catch(e=>{ TESS_P=null; throw e; })); }
+function ocrPool(){ return POOL_P=POOL_P||makePool().catch(e=>{ POOL_P=null; throw e; }); }
+async function makePool(){ if(OCRPOOL) return OCRPOOL; await loadTesseract();
+  const sch=Tesseract.createScheduler(); const ws=await Promise.all(Array.from({length:OCR_N},async()=>{ const w=await Tesseract.createWorker('eng'); try{ await w.setParameters({ tessedit_pageseg_mode:'6', preserve_interword_spaces:'1' }); }catch(e){} return w; }));
+  ws.forEach(w=>sch.addWorker(w)); OCRPOOL=sch; return sch; }
+async function ocrWorker(){ const sch=await ocrPool(); return { recognize:(img)=>sch.addJob('recognize',img) }; }
+let DIGIT_P=null;
+function digitWorker(){ return DIGIT_P=DIGIT_P||(async()=>{ await loadTesseract(); const w=await Tesseract.createWorker('eng'); try{ await w.setParameters({ tessedit_pageseg_mode:'7', tessedit_char_whitelist:'0123456789' }); }catch(e){} return w; })(); }
+/* the question number sits white-on-black in a small square next to "Mark for Review": find it, flip it, read it */
+function findNumBox(c){ const g=c.getContext('2d'); const {width:w,height:h}=c; const d=g.getImageData(0,0,w,h).data; const dark=(x,y)=>d[(y*w+x)*4]<128;
+  const minL=Math.max(12,Math.round(w*.012)), maxL=Math.round(w*.07);
+  for(let y=Math.round(h*.1); y<Math.round(h*.45); y+=2){ let run=0;
+    for(let x=0;x<w;x++){ if(dark(x,y)) run++; else { if(run>=minL && run<=maxL){ const x0=x-run; let vr=0; for(let yy=y; yy<Math.min(h,y+run*1.4); yy++){ let rowDark=0; for(let xx=x0; xx<x; xx+=2) if(dark(xx,yy)) rowDark++; if(rowDark>=(run/2)*.55) vr++; }
+            if(vr>=run*.6 && vr<=run*1.5){ let top=y; while(top>0){ let rd=0; for(let xx=x0;xx<x;xx+=2) if(dark(xx,top-1)) rd++; if(rd<(run/2)*.55) break; top--; } return {x:x0,y:top,w:run,h:vr+(y-top)}; } } run=0; } } }
+  return null; }
+async function readNumBox(c){ const b=findNumBox(c); if(!b) return null;
+  const s=3, pad=10; const o=document.createElement('canvas'); o.width=(b.w+pad*2)*s; o.height=(b.h+pad*2)*s; const g=o.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,o.width,o.height);
+  g.filter='invert(1)'; g.drawImage(c,b.x,b.y,b.w,b.h,pad*s,pad*s,b.w*s,b.h*s); g.filter='none';
+  const w=await digitWorker(); const r=(await w.recognize(o)).data.text.replace(/\D/g,''); const n=+r; return n>=1&&n<=27?n:null; }
+let SPARSE_P=null;
+function sparseWorker(){ return SPARSE_P=SPARSE_P||(async()=>{ await loadTesseract(); const w=await Tesseract.createWorker('eng'); try{ await w.setParameters({ tessedit_pageseg_mode:'11' }); }catch(e){} OCRSPARSE=w; return w; })(); }
+async function ocrCanvas(c){ const sch=await ocrPool(); return (await sch.addJob('recognize',c)).data.text||''; }
+function cropCanvas(c,x,wid,y=0,h=c.height){ const o=document.createElement('canvas'); o.width=Math.max(1,wid); o.height=Math.max(1,h); o.getContext('2d').drawImage(c,x,y,wid,h,0,0,wid,h); return o; }
+function contentBox(c){ const g=c.getContext('2d'); const {width:w,height:h}=c; const d=g.getImageData(0,0,w,h).data; let x0=w,y0=h,x1=0,y1=0;
+  for(let y=0;y<h;y+=3) for(let x=0;x<w;x+=3){ const i=(y*w+x)*4; if(.3*d[i]+.59*d[i+1]+.11*d[i+2]<240){ if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y; } }
+  return x1>x0&&y1>y0 ? {x:Math.max(0,x0-4),y:Math.max(0,y0-4),w:Math.min(w,x1+8)-Math.max(0,x0-4),h:Math.min(h,y1+8)-Math.max(0,y0-4)} : {x:0,y:0,w,h}; }
+function binarize(c,th=158){ const o=cropCanvas(c,0,c.width); const g=o.getContext('2d'); const im=g.getImageData(0,0,o.width,o.height); const d=im.data;
+  for(let i=0;i<d.length;i+=4){ const v=(.3*d[i]+.59*d[i+1]+.11*d[i+2])<th?0:255; d[i]=d[i+1]=d[i+2]=v; } g.putImageData(im,0,0); return o; }
+function findDivider(c){ const g=c.getContext('2d'); const w=c.width, h=c.height; const y0=Math.round(h*.18), y1=Math.round(h*.95); const cw=Math.round(w*.3); const d=g.getImageData(Math.round(w*.35),y0,cw,y1-y0).data;
+  let best=-1, bestF=0; for(let x=0;x<cw;x+=1){ let dark=0, n=0; for(let y=0;y<y1-y0;y+=4){ const i=(y*cw+x)*4; if(d[i]<128) dark++; n++; } const f=dark/n; if(f>bestF){ bestF=f; best=x; } }
+  return bestF>0.6 ? Math.round(w*.35)+best : -1; }
+async function ocrPage(pdf,i){ const page=await pdf.getPage(i); const v=page.getViewport({scale:1}); const s=Math.min(3,2900/v.width); const vp=page.getViewport({scale:s});
+  const full=document.createElement('canvas'); full.width=vp.width; full.height=vp.height; const g=full.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,full.width,full.height);
   await page.render({ canvasContext:g, viewport:vp }).promise;
-  const x=findDivider(c);
-  let out;
-  let area=c;
-  if(x>0){ const L=await ocrCanvas(cropCanvas(c,0,x-4)); area=cropCanvas(c,x+6,c.width-x-6); const R=await ocrCanvas(area); out=L+'\n<<<COL>>>\n'+R; out+=await sparseChoices(R,area); }   // passage | question
+  const bb=contentBox(full); const gray=cropCanvas(full,bb.x,bb.w,bb.y,bb.h); const c=binarize(gray);    // just the screenshot, watermark gone
+  const x=findDivider(c); let out, area=gray, areaBin=c;
+  const numP=readNumBox(x>0?cropCanvas(c,x+6,c.width-x-6):c).catch(()=>null);
+  if(x>0){ const [L,R]=await Promise.all([ocrCanvas(cropCanvas(c,0,x-4)), ocrCanvas(areaBin=cropCanvas(c,x+6,c.width-x-6))]); area=cropCanvas(gray,x+6,gray.width-x-6); out=L+'\n<<<COL>>>\n'+R; out+=await sparseChoices(R,areaBin); }   // passage | question
   else { const F=await ocrCanvas(c); out=F+await sparseChoices(F,c); }
-  if(out.includes('<<<SPARSE>>>')) out+='\n<<<IMG>>>'+snapshot(area);   // keep a picture of the question, so formulas and boxed answers stay exact
+  const num=await numP; if(num) out+='\n<<<NUM>>>'+num+'\n';
+  const isMathPage=/section\s*\d?,?\s*module\s*\d\s*:?\s*math|\bmath\b.{0,20}\n|calculator\s+reference/i.test(out.slice(0,400));
+  if(isMathPage && x<0) out+='\n<<<IMG>>>'+snapshot(cropCanvas(gray,Math.round(gray.width*.22),Math.round(gray.width*.56),Math.round(gray.height*.15),Math.round(gray.height*.68)),true);
+  else out+='\n<<<IMG>>>'+snapshot(area);   // a picture of the question column, used when its text can't be trusted
   return out; }
-function snapshot(src){ const y0=Math.round(src.height*.1), h=Math.round(src.height*.8); const s=Math.min(1,900/src.width); const o=document.createElement('canvas'); o.width=Math.round(src.width*s); o.height=Math.round(h*s);
+function snapshot(src,whole){ const y0=whole?0:Math.round(src.height*.1), h=whole?src.height:Math.round(src.height*.8); const s=Math.min(1,900/src.width); const o=document.createElement('canvas'); o.width=Math.round(src.width*s); o.height=Math.round(h*s);
   const g=o.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,o.width,o.height); g.drawImage(src,0,y0,src.width,h,0,0,o.width,o.height);
   let q=.72, url=o.toDataURL('image/jpeg',q); while(url.length>170000 && q>.35){ q-=.1; url=o.toDataURL('image/jpeg',q); } return url; }
 /* short answers in boxes ("2", "4", "12") are easy for OCR to skip; look again in sparse mode when a question shows fewer than four choices */
 async function sparseChoices(text, canvas){
   const lines=text.split('\n').map(l=>l.trim()).filter(Boolean); const qi=lines.map(l=>/\?\s*$/.test(l)).lastIndexOf(true);
   if(qi<0 || lines.length-qi-1>=4) return '';
-  const w=await ocrWorker(); try{ await w.setParameters({ tessedit_pageseg_mode:'11' }); const r=(await w.recognize(canvas)).data.text||''; return '\n<<<SPARSE>>>\n'+r; }
-  catch(e){ return ''; } finally{ try{ await w.setParameters({ tessedit_pageseg_mode:'6' }); }catch(e){} } }
+  try{ const w=await sparseWorker(); const r=(await w.recognize(canvas)).data.text||''; return '\n<<<SPARSE>>>\n'+r; }
+  catch(e){ return ''; } }
 /* split text by the module headers printed on the pages ("Reading and Writing … Module 2", "Math … Module 1") */
 function parseExamText(text){
   text=text.split('\n').map(l=>l
@@ -3137,26 +3166,59 @@ async function pageTextTyped(pdf,p){ const page=await pdf.getPage(p); const c=aw
   const items=c.items.filter(it=>it.str!==undefined).map(it=>({ s:it.str, x:it.transform[4], y:Math.round(it.transform[5]) })); items.sort((a,b)=> b.y-a.y || a.x-b.x);
   for(const it of items){ if(lastY!==null && Math.abs(it.y-lastY)>3){ out+=line.trimEnd()+'\n'; line=''; if(lastY-it.y>18) out+='\n'; } line+=(line&&!line.endsWith(' ')&&!it.s.startsWith(' ')?' ':'')+it.s; lastY=it.y; }
   return out+line; }
+const normName = s => String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+async function tableKeys(pdf, pno, fname){                 // "2025 June Int-A | Int-B | …" with 读写/数学 M1 M2 columns
+  const page=await pdf.getPage(pno); const c=await page.getTextContent();
+  const it=c.items.filter(x=>x.str&&x.str.trim()).map(x=>({ s:x.str.replace(/[\u200e\u200f\u202a-\u202e]/g,'').trim(), x:x.transform[4], y:x.transform[5] }));
+  // a column header is "M1"/"M2" plus the words just left of it on the same line (读写 = R&W, 数学 = Math); the answers sit under its left edge
+  const heads=it.filter(x=>/M\s*[12]\b/.test(x.s)).map(m=>{ const grp=it.filter(x=>Math.abs(x.y-m.y)<2 && x.x<=m.x && m.x-x.x<45 && x.s!==' ').sort((a,b)=>a.x-b.x); const label=grp.map(g=>g.s).join('');
+    return { s:label, x:grp[0].x, y:m.y }; }).filter(h=>/(读写|数学|R\s*&?\s*W|Reading|Writing|Math|English|RW)/i.test(h.s));
+  if(heads.length<2) return null;
+  const hy=[...new Set(heads.map(h=>Math.round(h.y)))];
+  const examTok=it.filter(x=>/\b(Int|US|Asia|EU|Intl)[-\s]?[A-Z0-9]{1,2}\b/i.test(x.s));
+  const exams=examTok.map(tk=>{ const row=it.filter(x=>Math.abs(x.y-tk.y)<3 && x.x<=tk.x && tk.x-x.x<120 && x.s!==' ').sort((a,b)=>a.x-b.x); return { name:row.map(r=>r.s).join(' ').replace(/\s+/g,' '), x0:row[0].x-15, y:tk.y }; })
+    .filter((e,i,a)=>a.findIndex(z=>Math.abs(z.x0-e.x0)<5)===i).sort((a,b)=>a.x0-b.x0);
+  const want=normName(cleanExamName(fname)); let target=exams.find(e=>want.includes(normName(e.name))) || exams.find(e=>normName(e.name).endsWith(normName(e.name.split(' ').pop())) && want.endsWith(normName(e.name.split(' ').pop()))) || (exams.length<=1?exams[0]:null);
+  const inTarget = x => !target || (x>=target.x0 && (exams[exams.indexOf(target)+1]?x<exams[exams.indexOf(target)+1].x0:true));
+  const cols=heads.filter(h=>inTarget(h.x)).map(h=>({ x:h.x, y:h.y, mod:(/(数学|Math)/i.test(h.s)?'M':'RW')+h.s.match(/M\s*([12])/)[1] }));
+  if(!cols.length) return null;
+  const blocks=[...new Set(cols.map(c=>Math.round(c.y)))].sort((a,b)=>b-a);        // header rows, top to bottom
+  const keys=[];
+  cols.forEach(col=>{ const top=col.y, next=blocks.find(y=>y<top-5); const bottom=next!=null?next:-1e9;
+    it.filter(x=>x.y<top-3 && x.y>bottom+3 && Math.abs(x.x-col.x)<22 && /^([A-D](\/[A-D]\??)?|-?[\d.,\/ ]+)\??$/.test(x.s)).forEach(a=>{
+      const num=it.filter(x=>Math.abs(x.y-a.y)<4 && /^\d{1,2}$/.test(x.s) && x.x<col.x).sort((p,q)=>q.x-p.x)[0]; if(!num) return;
+      keys.push({ key:true, module:col.mod, n:+num.s, answer:a.s.replace(/\?$/,'').split('/')[0].trim() }); }); });
+  return keys.length?keys:null;
+}
 async function readPdfPages(pdf, name, progress){
-  const pages=[];
+  const pages=[]; pages.keys=[];
   for(let p=1;p<=pdf.numPages;p++) pages.push(await pageTextTyped(pdf,p).catch(()=> ''));
+  const skip=new Set();
+  for(let p=1;p<=pdf.numPages;p++){ const tx=pages[p-1]; if(tx.length>200 && /M\s*1/.test(tx) && /M\s*2/.test(tx)){ try{ const k=await tableKeys(pdf,p,name); if(k){ pages.keys.push(...k); pages[p-1]=''; skip.add(p); } }catch(e){} } }
   const typed=pages.join('').replace(/\s/g,'').length;
   if(typed >= pdf.numPages*150) return pages;                                  // a typed PDF: its own text is exact
-  for(let p=1;p<=pdf.numPages;p++){ if(pages[p-1].replace(/\s/g,'').length>=120) continue;   // scanned pages: the free reader
-    progress&&progress(`${name}: reading page ${p} of ${pdf.numPages}`, (p-1)/pdf.numPages); pages[p-1]=await ocrPage(pdf,p); }
+  const todo=[]; for(let p=1;p<=pdf.numPages;p++) if(!skip.has(p) && pages[p-1].replace(/\s/g,'').length<120) todo.push(p);
+  let done=0; const t0=Date.now();
+  const run=async()=>{ while(todo.length){ const p=todo.shift(); pages[p-1]=await ocrPage(pdf,p); done++;
+      const per=(Date.now()-t0)/done, left=Math.round(per*(todo.length)/1000/OCR_N);
+      progress&&progress(`${name}: ${done} of ${done+todo.length} pages read${done>2?` · about ${left>90?Math.round(left/60)+' min':left+' s'} left`:''}`, done/(done+todo.length)); } };
+  await ocrPool(); await Promise.all(Array.from({length:OCR_N},run));
   return pages;
 }
 /* Bluebook-style PDFs put one question on each page: header, number box, "Mark for Review", passage, question, four choices */
-const BB_NOISE=/^.{0,3}$|^questio\w*$|^hi(de)?$|^\d{1,2}\s*of\s*\d{2}\b|mark\s*for\s*review|question\s*\d+\s*of\s*\d+|^section\s*\d|module\s*\d|^directions|^hide$|annotate|highlights?\s*(&|and)?\s*notes|^more$|^calculator$|^reference$|^back$|^next$|elitexsat|bluebook|@\w{3,}|^\d{1,2}:\d{2}(:\d{2})?$|^[^A-Za-z0-9$]*$/i;
+const BB_NOISE=/^[A-Za-z]{0,3}$|^[^\w$\-−]{0,3}$|^questio\w*$|^hi(de)?$|^\d{1,2}\s*of\s*\d{2}\b|mark\s*for\s*review|question\s*\d+\s*of\s*\d+|^section\s*\d|module\s*\d|^directions|^hide$|annotate|highlights?\s*(&|and)?\s*notes|^more$|^calculator$|^reference$|^back$|^next$|elitexsat|bluebook|@\w{3,}|^\d{1,2}:\d{2}(:\d{2})?$|^[^A-Za-z0-9$]*$/i;
 function parseBBPage(txt, st){
+  if(/reference\s+sheet/i.test(txt) && !/m[ae][cr]k\s*f[o0]r\s*rev/i.test(txt)) return null;
   if(/reading\s*(and|&)\s*writing/i.test(txt)) st.sec='RW'; else if(/\bmath\b/i.test(txt) && /module|section/i.test(txt)) st.sec='M';
   const mm=txt.match(/module\s*([12])\b/i); if(mm) st.mod=(st.sec||'RW')+mm[1];
+  let boxNum=null; txt=txt.replace(/\n<<<NUM>>>(\d+)\n/,(m,d)=>{ boxNum=+d; return '\n'; });
   const [body,img]=txt.split('<<<IMG>>>'); const [main,sparse]=body.split('<<<SPARSE>>>');
   const qm=main.match(/(?:questio\w*\s*)?\b(\d{1,2})\s*of\s*(2[27]|\d{2})\b/i);
   const [leftRaw,rightRaw]=main.includes('<<<COL>>>')?main.split('<<<COL>>>'):['',main];
   const clean=s=>s.replace(/\r/g,'').split('\n').map(l=>l.replace(/\s+/g,' ').trim()).filter(Boolean);
   let left=clean(leftRaw), right=clean(rightRaw);
-  let n=qm?+qm[1]:null; const nb=right.findIndex(l=>/^\d{1,2}$/.test(l)); if(n==null && nb>=0 && +right[nb]<=27) n=+right[nb];
+  let n=boxNum || (qm?+qm[1]:null); const nb=right.findIndex(l=>/^\d{1,2}$/.test(l)); if(n==null && nb>=0 && +right[nb]<=27) n=+right[nb];
+  if(n==null){ const ml=right.find(l=>/mark\s*for\s*review/i.test(l)); const mm2=ml&&ml.match(/(\d{1,2})\s*\W{0,3}\s*(?:[|\[\]()]\s*)?mark\s*for/i); if(mm2 && +mm2[1]<=27) n=+mm2[1]; }
   left=left.filter(l=>!BB_NOISE.test(l)); right=right.filter((l,i)=>i!==nb && !BB_NOISE.test(l));
   const MARK=/^\s*(?:[(\[]\s*([A-D])\s*[)\]]|([A-D])\s*[).:\]|}]|([A-D])\s+(?=\S)|([@©®]\)?))\s*/;
   // the question is the last line on the right that asks something; the choices are what follows it
@@ -3164,20 +3226,29 @@ function parseBBPage(txt, st){
   let stemLines, rest;
   if(qi>=0){ let s0=qi; while(s0>0 && !/[.?!:"”]$/.test(right[s0-1]) && qi-s0<3) s0--; stemLines=right.slice(s0,qi+1); rest=right.slice(qi+1); const extra=right.slice(0,s0); if(extra.length) left=left.concat(extra); }
   else { const mk=right.findIndex(l=>MARK.test(l)); stemLines=right.slice(0,mk>0?mk:right.length); rest=mk>0?right.slice(mk):[]; }
+  // a wrapped choice continues on a line that starts in lower case; glue it back first
+  rest=rest.reduce((a,l)=>{ if(a.length && /^[a-z(]/.test(l) && !MARK.test(l)) a[a.length-1]+=' '+l; else a.push(l); return a; },[]);
   let choices=[];
   if(rest.length>=4){ const marked=rest.map((l,i)=>MARK.test(l)?i:-1).filter(i=>i>=0);
     if(marked.length===4 && rest.length>4){ choices=marked.map((ix,j)=>rest.slice(ix, j<3?marked[j+1]:rest.length).join(' ')); }
     else choices=rest.slice(0,4); }
   if(choices.length<4 && sparse){ const sl=clean(sparse).filter(l=>!BB_NOISE.test(l) || /^-?[\d.\/]+$/.test(l)); const qk=sl.map(l=>/\?\s*$/.test(l)).lastIndexOf(true); const after=(qk>=0?sl.slice(qk+1):sl).filter(l=>!/^\d{1,2}\s*of/i.test(l) && !/next|back/i.test(l)); if(after.length>=4) choices=after.slice(0,4); }
-  choices=choices.map(c=>c.replace(MARK,'').replace(/^[)\]]\s*/,'').trim());
-  const stem=stemLines.join(' ').trim(); if(!stem || (n==null && choices.length<4)) return null;
-  const passage=left.join('\n');
+  choices=choices.map(c=>c.replace(MARK,'').replace(/^[\s|®©@()\[\]{}'‘’"“”.,:;&-]+/,'').replace(/^[A-Za-z]{1,2}[)\]}|]\s*/,'').replace(/^[A-D][).:\]]\s+/,'').replace(/[\s|]+$/,'').trim());
+  let stem=stemLines.join(' ').replace(/^.*?m[ae][cr]k\s*f[o0]r\s*rev\w*\s*/i,'').trim().replace(/^[^A-Za-z"“(]*(?=[A-Z"“(])/,'').replace(/^(?:[A-Za-z]{1,2}\s+|[|\d]+\s+){1,4}(?=(Which|What|How|Based|According|As used|The |In |If |A |An ))/,'');
+  { const m=stem.match(/\b(Which|What|As used|Based on|According|How|If|In the|The|A|An|For|Suppose|Given)\b/); if(m && m.index>0 && m.index<32) stem=stem.slice(m.index); }
+  if(!stem || (n==null && choices.length<4 && !img)) return null;
+  let passage=left.join('\n');
   const sec = st.sec==='M' || (!st.sec && /=|\bx\b|\bf\(/.test(stem)) ? 'M' : 'RW';
   const all=passage+' '+stem+' '+choices.join(' ');
-  const useImg = choices.length<4 && img && img.startsWith('data:image');
-  if(useImg) choices=['A','B','C','D'];                       // the picture shows the real choices; the student picks the letter
+  const isSPR = /student[- ]produced\s+response/i.test(txt);        // the left pane holds the typed-answer directions
+  if(isSPR){ choices=[]; left=[]; }
+  const junk = choices.length===4 && choices.some(c=>!/[A-Za-z0-9]{1}/.test(c) || c.length>160);
+  const isM = st.sec==='M' || isSPR;
+  const useImg = img && img.startsWith('data:image') && (choices.length<4 || junk || isM);
+  if(isSPR) passage='';
+  if(useImg && !isSPR && (choices.length<4 || junk)) choices=['A','B','C','D'];
   const r=normalizeQ({ section:sec, domain:guessDomain(all,sec), difficulty:'Medium', tier:'free', passage:sec==='M'?'':passage, question:sec==='M'&&passage?passage+'\n'+stem:stem, choices:choices.length===4?choices:[], answer:'', explanation:'' });
-  if(useImg && r.q) r.q.image=img.trim();
+  if(useImg && r.q){ r.q.image=img.trim(); r.q.scan=true; }   // math is shown as the original picture, so every formula stays exact
   r.n=n; r.mod=st.mod||'?'; return r;
 }
 function questionsFromPages(pages){
@@ -3186,6 +3257,12 @@ function questionsFromPages(pages){
   const st={sec:'',mod:'?'}, items=[], keys=[];
   pages.forEach(tx=>{ if(looksLikeKey(tx,'')){ const mm=tx.match(/module\s*([12])/i); const sec=/math/i.test(tx)?'M':/reading|writing/i.test(tx)?'RW':''; keyPairs(tx).forEach(k=>keys.push({ key:true, module:mm&&sec?sec+mm[1]:'?', n:k.n, answer:k.answer })); return; }
     const it=parseBBPage(tx,st); if(it) items.push(it); });
+  // page numbers read from pictures can slip; fix any that break an otherwise steady 1, 2, 3 … run
+  const byMod={}; items.forEach(x=>(byMod[x.mod]=byMod[x.mod]||[]).push(x));
+  Object.values(byMod).forEach(list=>{ for(let i=0;i<list.length;i++){ const p=list[i-1], q=list[i+1], c=list[i];
+    if(p&&q&&p.n!=null&&q.n!=null&&q.n-p.n===2&&c.n!==p.n+1) c.n=p.n+1;
+    else if(p&&p.n!=null&&(c.n==null||c.n<=p.n)) c.n=p.n+1;
+    else if(!p&&q&&q.n!=null&&(c.n==null||c.n>=q.n)) c.n=Math.max(1,q.n-1); } });
   return { items, keys, bb:true };
 }
 async function readExamFiles(files, progress){
@@ -3202,7 +3279,7 @@ async function readExamFiles(files, progress){
       const scanned = pdf && text.replace(/\s/g,'').length < pdf.numPages*150;
       if(pdf && (!scanned || REAL_ENGINE!=='ai' || !S.caps.sample) && !looksLikeKey(text,f.name)){
         const pages=await readPdfPages(pdf,f.name,(msg,fr)=>progress(msg,(fi+fr)/files.length));
-        const r=questionsFromPages(pages); r.items.forEach(x=>items.push(x)); r.keys.forEach(k=>keys.push(k));
+        const r=questionsFromPages(pages); r.items.forEach(x=>items.push(x)); r.keys.forEach(k=>keys.push(k)); (pages.keys||[]).forEach(k=>keys.push(k));
       } else if(scanned){
         const step=Math.max(1,Math.min(3,(await S.caps.sample?.limits?.().catch(()=>null))?.images?.maxCount||3));
         for(let p=1;p<=pdf.numPages;p+=step){ const last=Math.min(pdf.numPages,p+step-1);
@@ -3504,12 +3581,12 @@ async function bulkImport(files){
   for(const [i,f] of files.entries()){
     if(log) log.innerHTML=`<div class="bulk-status"><div class="save-prog"><i style="width:${Math.round(i/files.length*100)}%"></i></div><span>Reading ${i+1} of ${files.length}: ${esc(f.name)}</span></div>`;
     try{ const say=msg=>{ if(log) log.innerHTML=`<div class="bulk-status"><div class="save-prog"><i style="width:${Math.round(i/files.length*100)}%"></i></div><span>${esc(msg)}</span></div>`; };
-      if(/\.pdf$/i.test(f.name)){ let pdf=null; try{ pdf=await pdfPages(f); }catch(e){ if(/password/i.test((e.name||'')+' '+(e.message||''))) throw Object.assign(new Error('password protected'),{code:'pw'}); }
+      if(/\.pdf$/i.test(f.name)){ let pdf=null; try{ pdf=await pdfPages(f); }catch(e){ if(/password/i.test((e.name||'')+' '+(e.message||''))) throw Object.assign(new Error('password protected'),{code:'pw'}); throw new Error('could not open this PDF ('+(e.message||e.name||'unknown')+')'); }
         if(pdf){ const pages=await readPdfPages(pdf,f.name,say); const joined=pages.join('\n\n');
           if(looksLikeKey(joined,f.name)){ (bankKeys[examBase(f.name)]=bankKeys[examBase(f.name)]||[]).push(...keyPairs(joined)); continue; }
-          const r=questionsFromPages(pages); const found=r.items;
+          const r=questionsFromPages(pages); const found=r.items; (pages.keys||[]).forEach(k=>r.keys.push(k));
           r.keys.forEach(k=>{ const it=found.find(x=>x.q && x.n===k.n && (k.module==='?'||x.mod===k.module) && !x.q.answer); if(it){ it.q.answer=k.answer; const z=normalizeQ({ ...it.q, question:it.q.stem }); z.q.id=it.q.id; it.q=z.q; it.errs=z.errs; } });
-          if(!found.length){ failed.push(`${f.name}: no questions found`); continue; }
+          if(!found.length){ const chars=joined.replace(/\s/g,'').length; failed.push(`${f.name}: ${chars<50?`no readable text on ${pdf.numPages} pages`:`read ${pdf.numPages} pages, but no questions matched (${chars} characters)`}`); continue; }
           found.forEach(x=>x.src=f.name); all=all.concat(found); continue; } }
       const text=await extractText(f,say); if(!text||!text.trim()){ failed.push(`${f.name}: no text found`); continue; }
       if(!/\.json$/i.test(f.name) && looksLikeKey(text,f.name)){ (bankKeys[examBase(f.name)]=bankKeys[examBase(f.name)]||[]).push(...keyPairs(text)); continue; }
