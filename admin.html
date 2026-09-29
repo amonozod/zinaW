@@ -308,7 +308,7 @@ h1,h2,h3{font-family:var(--display);letter-spacing:-.02em;line-height:1.1;margin
 .cal .day.out{background:var(--paper)}
 .cal .day.out .dn{color:var(--ink-3)}
 .cal .day.today .dn{background:var(--violet);color:#fff}
-.cal .day.exam{background:var(--sun-soft)}
+.cal .day.examday{background:var(--sun-soft)}
 .cal .day.over{background:var(--violet-soft);outline:2px dashed var(--violet);outline-offset:-3px}
 .cal .dn{font-size:12.5px;font-weight:700;width:24px;height:24px;border-radius:50%;display:grid;place-items:center}
 .ev{font-size:11.5px;font-weight:600;padding:3px 7px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
@@ -1193,6 +1193,22 @@ s.was{font-size:.42em;font-weight:600;opacity:.45;margin-right:8px;letter-spacin
 .dz-resize{position:absolute;right:0;bottom:0;width:18px;height:18px;cursor:nwse-resize;background:linear-gradient(135deg,transparent 50%,#9aa0ad 50%,#9aa0ad 60%,transparent 60%,transparent 72%,#9aa0ad 72%,#9aa0ad 82%,transparent 82%)}
 .ev{flex-wrap:wrap}.ev small{flex-basis:100%}
 #calPrev[disabled]{opacity:.3!important;pointer-events:none}
+.sk-pick{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;padding:8px 10px;border-radius:12px}
+.sk-pick .select{width:100%;background:rgba(255,255,255,.85);color:#15123B;border-color:transparent}
+.sk-tag{font-size:11.5px;font-weight:700;opacity:.8}
+.sk-btn{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;height:36px;padding:0 12px;border-radius:10px;background:rgba(255,255,255,.9);color:#15123B;font-weight:600;font-size:14px;text-align:left;transition:box-shadow .2s}
+.sk-btn:hover{box-shadow:0 0 0 2px color-mix(in srgb,var(--p) 40%,transparent)}
+.sk-btn span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sk-btn[aria-expanded="true"] svg{transform:rotate(180deg)}
+.sk-panel{margin:-4px 0 10px 56px;padding:14px;border-radius:14px;background:var(--paper);border:1px solid var(--line);display:flex;flex-direction:column;gap:12px;max-height:300px;overflow:auto;animation:popIn .2s cubic-bezier(.16,1,.3,1) both}
+.sk-dom b{display:block;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px}
+.sk-chips{display:flex;flex-wrap:wrap;gap:6px}
+.sk-chip{padding:7px 11px;border-radius:99px;border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--ink-2);transition:.15s}
+.sk-chip:hover{border-color:var(--violet);color:var(--violet)}
+.sk-chip.on{background:var(--violet);border-color:var(--violet);color:#fff}
+.sk-modal{margin:0;max-height:52vh}
+.sk-modal .sk-chip{padding:9px 13px;font-size:14px}
+.sk-acc{text-transform:none;letter-spacing:0;font-weight:600;color:var(--violet);margin-left:6px}
 </style>
 <meta name="robots" content="noindex,nofollow">
 <script>window.ZINA_ADMIN=true</script>
@@ -1974,13 +1990,13 @@ function viewTests(){
   const p=plan(); const used=usage('exam','m'), retUsed=usage('retake','m');
   const taken = id => S.prog.attempts.filter(a=>a.mockId===id);
   return shell('tests', `
-    <div class="page-h"><div><h1>Full-length tests</h1><p>Adaptive · 2h 14m · real test-day screen</p></div>
+    <div class="page-h"><div><h1>Full-length tests</h1><p>Adaptive · 2h 14m</p></div>
       <div class="row"><span class="pill">${Math.max(0,p.exams-used)} of ${p.exams} test${p.exams>1?'s':''} left this month</span><span class="pill gray">${Math.max(0,p.retakes-retUsed)} retake credits</span></div></div>
     ${!mocks.length?`<div class="card empty"><div class="ic">⏱</div><h3>No tests published yet</h3><p>New tests are on the way.</p></div>`:`
     <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))">
       ${mocks.map(m=>{ const t=taken(m.id); const best=t.length?Math.max(...t.map(a=>a.total)):0; const nq=m.modules.reduce((s,x)=>s+x.ids.length,0); return `
       <div class="card test-card">
-        <div class="row" style="justify-content:space-between"><h3>${esc(m.name)}${m.real?' <span class="pill sun" style="font-size:11px;vertical-align:middle">Real exam</span>':''}</h3>${m.status!=='published'?'<span class="pill gray">Draft</span>':(t.length?`<span class="pill mint">Best ${best}</span>`:'<span class="pill">New</span>')}</div>
+        <div class="row" style="justify-content:space-between"><h3>${esc(m.name)}</h3>${t.length?`<span class="pill mint">Best ${best}</span>`:m.real?'<span class="pill sun">Real exam</span>':'<span class="pill">New</span>'}</div>
         <div class="faint" style="font-size:13px">${nq} questions${m.modules.some(x=>x.hardIds&&x.hardIds.length)?', adaptive Module 2':''}${t.length?`, taken ${t.length} time${t.length>1?'s':''}`:''}</div>
         <button class="btn ${t.length?'btn-ghost':'btn-primary'}" data-mock="${m.id}">${t.length?'Retake test':'Start test'}</button>
       </div>`; }).join('')}
@@ -2345,7 +2361,7 @@ async function explainWithAI(q){
 <script>
 /* ================= SCHEDULE ================= */
 const EVT = {
-  math:{label:'Math practice', ic:'∑'}, rw:{label:'Reading and Writing', ic:'¶'}, mock:{label:'Full-length test', ic:'⏱'},
+  math:{label:'Math skill', ic:'∑'}, rw:{label:'R&W skill', ic:'¶'}, mock:{label:'Full-length test', ic:'⏱'},
   vocab:{label:'Vocabulary, 15 min', ic:'Aa'}, review:{label:'Review mistakes', ic:'↺'}, rest:{label:'Rest day', ic:'☾'}
 };
 let CAL = new Date(); CAL.setDate(1);
@@ -2366,7 +2382,8 @@ function viewSchedule(){
   const y=CAL.getFullYear(), m=CAL.getMonth(); const atStart=CAL.getTime()<=monthStart().getTime();
   const first=new Date(y,m,1), start=new Date(first); start.setDate(1-first.getDay());
   let cells=[...Array(42)].map((_,i)=>{ const d=new Date(start); d.setDate(start.getDate()+i); return d; });
-  { const t0=todayKey(); while(cells.length>7 && todayKey(cells[6])<t0) cells=cells.slice(7); }      // weeks that are already over are not shown
+  { const t0=todayKey(); while(cells.length>7 && todayKey(cells[6])<t0) cells=cells.slice(7);      // weeks that are already over are not shown
+    while(cells.length<35){ const d=new Date(cells[cells.length-1]); d.setDate(d.getDate()+1); cells.push(d); } cells=cells.slice(0,Math.max(35,Math.ceil(cells.length/7)*7)); }
   const tk=todayKey(); const ex=S.user.examDate;
   const p=plan();
   return shell('schedule', `
@@ -2377,7 +2394,7 @@ function viewSchedule(){
       <button class="btn btn-ghost btn-sm" id="calToday">Today</button></div></div>
     <div class="cal" id="cal">
       ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="dow">${d}</div>`).join('')}
-      ${cells.map(d=>{ const k=todayKey(d); const evs=S.sched[k]||[]; const isEx=k===ex; const past=k<tk; return `<div class="day ${d.getMonth()!==m?'out':''} ${k===tk?'today':''} ${isEx?'exam':''} ${past?'past':''}" ${past?'aria-disabled="true"':`data-day="${k}"`}><span class="dn">${d.getDate()}</span>
+      ${cells.map(d=>{ const k=todayKey(d); const evs=S.sched[k]||[]; const isEx=k===ex; const past=k<tk; return `<div class="day ${d.getMonth()!==m?'out':''} ${k===tk?'today':''} ${isEx?'examday':''} ${past?'past':''}" ${past?'aria-disabled="true"':`data-day="${k}"`}><span class="dn">${d.getDate()}</span>
         ${isEx?`<div class="ev ev-sat">🎓 <span>SAT exam day</span></div>`:''}
         ${past?'':evs.slice(0,3).map(e=>`<div class="ev ev-${e.type} ${e.done?'done':''}" draggable="true" data-ev="${e.id}" data-from="${k}" title="${esc(e.label)}"><span>${esc(e.skill||e.label)}</span>${e.dom?`<small>${esc(e.type==='math'?'Math':'R&W')} · ${esc(e.dom.replace('Problem-Solving and Data Analysis','Data Analysis').replace('Standard English Conventions','Conventions').replace('Geometry and Trigonometry','Geometry'))}</small>`:''}</div>`).join('')}
         ${!past&&evs.length>3?`<div class="faint" style="font-size:11px;padding-left:4px">+${evs.length-3} more</div>`:''}</div>`; }).join('')}
@@ -2385,17 +2402,44 @@ function viewSchedule(){
     <div class="card pad" style="margin-top:16px"><b style="font-size:14px">Drag a session onto your calendar</b><div class="palette" style="margin-top:12px">
       ${Object.entries(EVT).map(([k,v])=>`<div class="pal ev-${k}" draggable="true" data-pal="${k}"><span aria-hidden="true">${v.ic}</span>${v.label}</div>`).join('')}</div></div>`);
 }
-function addEvent(day,type,label,extra={}){ (S.sched[day]=S.sched[day]||[]).push({ id:uid(), type, label:label||EVT[type].label, done:false, ...extra }); save('sched'); }
+function nextSkill(type){                       // weakest domain first, then walk through its skills
+  const doms=[...DOMAINS[type==='math'?'M':'RW']]; const by=(typeof skillStats==='function')?skillStats():{}; const acc=d=>by[d]?by[d].c/by[d].t:0.5;
+  doms.sort((a,b)=>acc(a)-acc(b));
+  const used=Object.values(S.sched).flat().filter(e=>e.type===type && e.dom).length;
+  const dom=doms[used%doms.length]; const list=SKILLS[dom]||[dom]; const turn=Object.values(S.sched).flat().filter(e=>e.dom===dom).length;
+  return { dom, skill:list[turn%list.length] };
+}
+const skillLabel=(type,dom,skill)=>`${type==='math'?'Math':'R&W'} · ${dom} · ${skill}`;
+function addEvent(day,type,label,extra={}){
+  if(!label && (type==='math'||type==='rw') && !extra.dom){ const s=nextSkill(type); extra={ ...extra, ...s }; label=skillLabel(type,s.dom,s.skill); }
+  (S.sched[day]=S.sched[day]||[]).push({ id:uid(), type, label:label||EVT[type].label, done:false, ...extra }); save('sched'); }
+let SKOPEN=null;
+function chooseSkill(day,type,after){           // dropped a Math or R&W session: ask what exactly to work on
+  const sec=type==='math'?'M':'RW'; const by=(typeof skillStats==='function')?skillStats():{}; const pct=d=>by[d]&&by[d].t?Math.round(by[d].c/by[d].t*100):null;
+  const m=modal(`<span class="pill">${type==='math'?'Math':'Reading &amp; Writing'} · ${new Date(day+'T12:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}</span>
+    <h2 style="font-size:26px;margin:12px 0 4px">What will you work on?</h2><p class="muted" style="margin:0 0 16px">Pick one skill. Tap “Pick for me” and Zina chooses your weakest.</p>
+    <div class="sk-panel sk-modal">${DOMAINS[sec].map(d=>`<div class="sk-dom"><b>${esc(d)}${pct(d)!=null?` <span class="sk-acc">${pct(d)}% correct</span>`:''}</b><div class="sk-chips">${(SKILLS[d]||[d]).map(s=>`<button type="button" class="sk-chip" data-pick="${esc(d)}|${esc(s)}">${esc(s)}</button>`).join('')}</div></div>`).join('')}</div>
+    <div class="row" style="justify-content:space-between;margin-top:16px"><button class="btn btn-ghost" data-x>Cancel</button><button class="btn btn-primary" id="skAuto">✦ Pick for me</button></div>`,{wide:true});
+  const done=(dom,skill)=>{ addEvent(day,type,skillLabel(type,dom,skill),{dom,skill}); closeModal(); after?after():route(); toast(`Planned: ${skill}`); };
+  $('[data-x]',m).onclick=()=>{ closeModal(); after?after():route(); };
+  $$('[data-pick]',m).forEach(b=>b.onclick=()=>{ const [d,s]=b.dataset.pick.split('|'); done(d,s); });
+  $('#skAuto',m).onclick=()=>{ const s=nextSkill(type); done(s.dom,s.skill); };
+}
+function skillSelect(e){ return `<button type="button" class="sk-btn" data-skpick="${e.id}" aria-expanded="${SKOPEN===e.id}"><span>${esc(e.skill||'Choose a skill')}</span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></button>`; }
+function skillPanel(e){ const sec=e.type==='math'?'M':'RW';
+  return `<div class="sk-panel">${DOMAINS[sec].map(d=>`<div class="sk-dom"><b>${esc(d)}</b><div class="sk-chips">${(SKILLS[d]||[d]).map(s=>`<button type="button" class="sk-chip ${e.dom===d&&e.skill===s?'on':''}" data-skset="${e.id}" data-v="${esc(d)}|${esc(s)}">${esc(s)}</button>`).join('')}</div></div>`).join('')}</div>`; }
 function dayModal(day){
   const evs=S.sched[day]||[];
   const m=modal(`<h2 style="font-size:24px">${new Date(day+'T12:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</h2>
-    <div style="margin:16px 0">${evs.length?evs.map(e=>`<div class="list-row"><button class="switch ${e.done?'on':''}" data-done="${e.id}" aria-label="Mark done"></button><span class="ev ev-${e.type}" style="flex:1;font-size:13.5px;padding:6px 10px">${esc(e.label)}</span>${e.dom?`<button class="btn btn-sm btn-primary" data-go="${esc(e.dom)}">Practice</button>`:''}<button class="btn btn-sm btn-ghost" data-del="${e.id}">Remove</button></div>`).join(''):'<p class="muted">Nothing planned for this day.</p>'}</div>
+    <div style="margin:16px 0">${evs.length?evs.map(e=>`<div class="list-row"><button class="switch ${e.done?'on':''}" data-done="${e.id}" aria-label="Mark done"></button>${(e.type==='math'||e.type==='rw')?`<div class="sk-pick ev-${e.type}"><span class="sk-tag">${e.type==='math'?'Math':'R&W'} · ${esc(e.dom||'')}</span>${skillSelect(e)}</div>`:`<span class="ev ev-${e.type}" style="flex:1;font-size:13.5px;padding:6px 10px">${esc(e.label)}</span>`}${e.dom?`<button class="btn btn-sm btn-primary" data-go="${esc(e.dom)}">Practice</button>`:''}<button class="post-x" data-del="${e.id}" aria-label="Remove">✕</button></div>${SKOPEN===e.id&&(e.type==='math'||e.type==='rw')?skillPanel(e):''}`).join(''):'<p class="muted">Nothing planned for this day.</p>'}</div>
     <b style="font-size:14px">Add a session</b><div class="palette" style="margin-top:10px">${Object.entries(EVT).map(([k,v])=>`<button class="pal ev-${k}" data-add="${k}">${v.ic} ${v.label}</button>`).join('')}</div>
-    <div class="row" style="margin-top:18px;justify-content:space-between"><span></span><button class="btn btn-dark btn-sm" data-x>Done</button></div>`);
+    <div class="row" style="margin-top:18px;justify-content:space-between"><span></span><button class="btn btn-dark btn-sm" data-x>Done</button></div>`,{wide:true});
   $('[data-x]',m).onclick=()=>{ closeModal(); route(); };
   $$('[data-done]',m).forEach(b=>b.onclick=()=>{ const e=evs.find(x=>x.id===b.dataset.done); e.done=!e.done; if(e.done) logStudy(e.type==='mock'?120:e.type==='rest'?0:30); save('sched'); b.classList.toggle('on'); });
   $$('[data-del]',m).forEach(b=>b.onclick=()=>{ S.sched[day]=evs.filter(x=>x.id!==b.dataset.del); save('sched'); dayModal(day); });
-  $$('[data-add]',m).forEach(b=>b.onclick=()=>{ addEvent(day,b.dataset.add); dayModal(day); });
+  $$('[data-add]',m).forEach(b=>b.onclick=()=>{ const ty=b.dataset.add; if(ty==='math'||ty==='rw') return chooseSkill(day,ty,()=>dayModal(day)); addEvent(day,ty); dayModal(day); });
+  $$('[data-skpick]',m).forEach(b=>b.onclick=()=>{ SKOPEN = SKOPEN===b.dataset.skpick ? null : b.dataset.skpick; dayModal(day); });
+  $$('[data-skset]',m).forEach(b=>b.onclick=()=>{ const e=evs.find(x=>x.id===b.dataset.skset); const [dom,skill]=b.dataset.v.split('|'); Object.assign(e,{ dom, skill, label:skillLabel(e.type,dom,skill) }); SKOPEN=null; save('sched'); dayModal(day); });
   $$('[data-go]',m).forEach(b=>b.onclick=()=>{ window.PENDING_DOM=b.dataset.go; closeModal(); location.hash='#/practice'; });
 }
 function autoGenerate(){
@@ -2408,7 +2452,7 @@ function autoGenerate(){
   const mathD=[...DOMAINS.M].sort((a,b)=>order(a)-order(b)), rwD=[...DOMAINS.RW].sort((a,b)=>order(a)-order(b));
   Object.keys(S.sched).forEach(k=>{ S.sched[k]=S.sched[k].filter(e=>!e.auto); if(!S.sched[k].length) delete S.sched[k]; });
   const turn={}; const addSkill=(k,type,dom)=>{ const list=SKILLS[dom]||[dom]; const i=turn[dom]=(turn[dom]||0); turn[dom]++; const skill=list[i%list.length];
-    addEvent(k,type,`${type==='math'?'Math':'R&W'} · ${dom} · ${skill}`,{auto:true,dom,skill}); };
+    addEvent(k,type,skillLabel(type,dom,skill),{auto:true,dom,skill}); };
   let d=new Date(); d.setHours(12); let mi=0, ri=0, week=0; let n=0;
   while(d<end){
     const k=todayKey(d); const left=Math.round((end-d)/864e5); const dow=d.getDay();
@@ -2435,7 +2479,7 @@ function bindSchedule(){
     c.ondragover=e=>{ e.preventDefault(); c.classList.add('over'); };
     c.ondragleave=()=>c.classList.remove('over');
     c.ondrop=e=>{ e.preventDefault(); c.classList.remove('over'); const t=e.dataTransfer.getData('text/plain'); if(!t) return; const [kind,a,b]=t.split('|');
-      if(kind==='pal') addEvent(c.dataset.day,a);
+      if(kind==='pal'){ if(a==='math'||a==='rw'){ c.classList.remove('over'); return chooseSkill(c.dataset.day,a); } addEvent(c.dataset.day,a); }
       else if(kind==='ev'){ const src=S.sched[b]||[]; const ev=src.find(x=>x.id===a); if(ev&&b!==c.dataset.day){ S.sched[b]=src.filter(x=>x.id!==a); (S.sched[c.dataset.day]=S.sched[c.dataset.day]||[]).push(ev); save('sched'); } }
       route(); };
   });
