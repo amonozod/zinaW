@@ -1160,6 +1160,18 @@ body:has(#exam) .look-btn,body:has(#exam) .look,body:has(.vz) .look-btn{display:
 .rm-chips button:hover{border-color:var(--violet)}
 .rm-key{margin-top:10px}.rm-key summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--ink-2)}
 .rm-key textarea{min-height:70px;margin:8px 0;font-size:13px}
+
+.rq-list{display:flex;flex-direction:column;gap:6px;margin-top:14px;max-height:520px;overflow:auto}
+.rq-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--paper)}
+.rq-ic{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;flex:none;background:var(--line-2);color:var(--ink-3)}
+.rq-reading .rq-ic,.rq-saving .rq-ic{background:var(--violet-soft);color:var(--violet);animation:pulse 1.4s infinite}
+.rq-done .rq-ic{background:var(--mint-soft);color:var(--mint)}
+.rq-draft .rq-ic{background:var(--sun-soft);color:var(--on-sun)}
+.rq-fail .rq-ic{background:var(--rose-soft);color:var(--rose)}
+.rq-fail .faint{color:var(--rose)!important}
+.rq-c{font-size:12px;color:var(--ink-3);white-space:nowrap;font-variant-numeric:tabular-nums}
+.real-engine{margin:0}.real-engine button{flex:1;font-size:13px}
+.real-wrap .bulk-drop{padding:30px 20px}
 </style>
 <meta name="robots" content="noindex,nofollow">
 <script>window.ZINA_ADMIN=true</script>
@@ -1756,7 +1768,7 @@ function adminShell(inner){
   return `<div class="shell admin-shell">
     <aside class="side" id="side">
       <a class="logo" href="#/admin">${LOGO_SVG}Zina <span class="adm-tag">Admin</span></a>
-      <nav>${[['questions','Questions','bank'],['import','Upload','pen'],['mocks','Full-length tests','test'],['exams','Real exams','test'],['vocab','Vocabulary','vocab'],['payments','Payments'+(S.payments.filter(p=>p.status==='pending').length?` <span class="lock">${S.payments.filter(p=>p.status==='pending').length}</span>`:''),'card'],['ai','AI permissions','ai']].map(([k,l,ic])=>`<a href="#/admin?tab=${k}" class="${AT===k?'on':''}">${I[ic]||''}${l}</a>`).join('')}
+      <nav>${[['questions','Questions','bank'],['import','Upload','pen'],['mocks','Full-length tests','test'],['vocab','Vocabulary','vocab'],['payments','Payments'+(S.payments.filter(p=>p.status==='pending').length?` <span class="lock">${S.payments.filter(p=>p.status==='pending').length}</span>`:''),'card'],['ai','AI permissions','ai']].map(([k,l,ic])=>`<a href="#/admin?tab=${k}" class="${AT===k?'on':''}">${I[ic]||''}${l}</a>`).join('')}
         <div class="grp">Site</div><a href="/" target="_blank" rel="noopener">${I.home||''}Open Zina ↗</a></nav>
       <div style="flex:1"></div>
       <div class="me"><div class="avatar">${esc((u?.name||'?')[0].toUpperCase())}</div><div style="min-width:0;flex:1"><div style="font-weight:600;font-size:14px">${esc(u?.name||'')}</div><div class="faint" style="font-size:12px">${S.isAdmin?'Owner':'Not admin yet'}</div></div><button class="btn btn-ghost btn-sm" id="logout">Exit</button></div>
@@ -1938,7 +1950,7 @@ function viewTests(){
   const p=plan(); const used=usage('exam','m'), retUsed=usage('retake','m');
   const taken = id => S.prog.attempts.filter(a=>a.mockId===id);
   return shell('tests', `
-    <div class="page-h"><div><h1>Full-length tests</h1><p>Adaptive · 2h 14m · Bluebook interface</p></div>
+    <div class="page-h"><div><h1>Full-length tests</h1><p>Adaptive · 2h 14m · real test-day screen</p></div>
       <div class="row"><span class="pill">${Math.max(0,p.exams-used)} of ${p.exams} test${p.exams>1?'s':''} left this month</span><span class="pill gray">${Math.max(0,p.retakes-retUsed)} retake credits</span></div></div>
     ${!mocks.length?`<div class="card empty"><div class="ic">⏱</div><h3>No tests published yet</h3><p>New tests are on the way.</p></div>`:`
     <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))">
@@ -2950,41 +2962,141 @@ function assignModules(items){
   items.forEach(x=>{ if(x.q) x.q.section=x.mod.startsWith('RW')?'RW':'M'; });
   return items;
 }
-async function realExamImport(files){
-  files=[...files].filter(f=>/\.(pdf|docx|txt|md|jpe?g|png|webp)$/i.test(f.name)).sort((a,b)=>(a.webkitRelativePath||a.relPath||a.name).localeCompare(b.webkitRelativePath||b.relPath||b.name,undefined,{numeric:true}));
-  if(!files.length) return toast('No PDF, Word, text or image files found');
-  REAL={ name:examNameFrom(files), items:[], m2:{RW:'hard',M:'hard'}, log:'' }; route();
-  const keys=[]; let lastMod=''; const fail=[];
-  try{
-    for(const [fi,f] of files.entries()){
-      const n=f.name.toLowerCase();
-      if(/\.(jpe?g|png|webp)$/.test(n)){ realLog(`<div class="bulk-status"><span>AI is reading ${esc(f.name)}…</span></div>`); const out=await aiReadPages([f],1,lastMod); out.forEach(o=>o.key?keys.push(o):REAL.items.push(toItem(o))); continue; }
+/* ---------- reading one exam (one file, or one sub-folder of files) ---------- */
+const cleanExamName = s => String(s||'').replace(/\.[a-z0-9]+$/i,'').replace(/@\S+/g,'').replace(/[_]+/g,' ').replace(/\s{2,}/g,' ').trim() || 'Real exam';
+function groupExams(files){
+  const path=f=>(f.webkitRelativePath||f.relPath||f.name).replace(/^\/+/,'');
+  const groups={}, label={};
+  files.forEach(f=>{ const parts=path(f).split('/'); let key, nice;
+    if(parts.length>=3){ key='dir:'+parts.slice(0,-1).join('/'); nice=parts[parts.length-2]; }                 // one exam per sub-folder
+    else if(parts.length===2 && /\.(jpe?g|png|webp)$/i.test(f.name)){ key='dir:'+parts[0]; nice=parts[0]; }   // a folder of page photos
+    else { key='base:'+(examBase(f.name)||f.name); nice=f.name; }                                              // "2025 March RW.pdf" + "2025 March Math.pdf" + "2025 March key.pdf" → one exam
+    (groups[key]=groups[key]||[]).push(f); if(!label[key] || !/key|answer/i.test(nice)) label[key]=nice; });
+  return Object.entries(groups).map(([k,fs])=>{ let nm=cleanExamName(label[k]); if(k.startsWith('base:')) nm=cleanExamName(nm.replace(/\b(answer\s*keys?|answers?|keys?|reading\s*(and|&)\s*writing|r\s*&\s*w|rw|english|math|module\s*\d)\b/gi,' ')).replace(/\s*[-–]\s*$/,'');
+    return { name:nm||'Real exam', files:fs.sort((a,b)=>{ const ka=/key|answer/i.test(a.name), kb=/key|answer/i.test(b.name); return ka-kb || path(a).localeCompare(path(b),undefined,{numeric:true}); }) }; });
+}
+function aiErrText(e){ const c=e&&e.code; return c==='no_ai'?'scanned pages need AI (works on the live site)':c==='not_configured'?'AI key is missing: add ANTHROPIC_API_KEY in Vercel and redeploy':c==='not_granted'||c==='forbidden'?'AI access was not allowed for this account':c==='rate_limited'||c==='limit'?'AI is busy, try again in a minute':(e instanceof Event||!e||!(e.message||e.code))?'the page reader could not load. Check the internet and drop the file again':'stopped: '+(e.message||e.code); }
+/* free reader: Tesseract OCR runs in the browser, no AI, no cost */
+let OCR=null;
+async function ocrWorker(){ if(OCR) return OCR;
+  if(!window.Tesseract) await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
+  OCR=await Tesseract.createWorker('eng'); return OCR; }
+async function ocrPage(pdf,i){ const page=await pdf.getPage(i); const v=page.getViewport({scale:1}); const s=Math.min(2.6,2000/v.width); const vp=page.getViewport({scale:s});
+  const c=document.createElement('canvas'); c.width=vp.width; c.height=vp.height; const g=c.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height);
+  await page.render({ canvasContext:g, viewport:vp }).promise; const w=await ocrWorker(); const r=await w.recognize(c); return r.data.text||''; }
+/* split text by the module headers printed on the pages ("Reading and Writing … Module 2", "Math … Module 1") */
+function parseExamText(text){
+  text=text.split('\n').map(l=>l
+      .replace(/^\s*\(?([A-D])\s*[)\]}|]\s*/,'$1) ')          // OCR: "A]", "A}", "A|" → "A) "
+      .replace(/^\s*([A-D])\)?\s*[lI|]\s*$/,'$1) 1')           // OCR: "Al", "A)l" → "A) 1"
+      .replace(/^\s*([A-D])\)\s*[oO]\s*$/,'$1) 0')).join('\n');
+  const lines=text.split('\n'); const segs=[]; let cur={mod:'?',lines:[]}; let sec='';
+  for(const l of lines){
+    if(l.length<70 && /^\s*(section\s*\d[,:.]?\s*)?(reading\s*(and|&)\s*writing)\b/i.test(l)) sec='RW';
+    else if(l.length<70 && /^\s*(section\s*\d[,:.]?\s*)?math\b/i.test(l)) sec='M';
+    const m=l.match(/module\s*([12])\b/i);
+    if(m && l.length<90 && !/^\s*\d{1,3}\s*[.)]/.test(l)){ if(/reading|writing/i.test(l)) sec='RW'; else if(/\bmath/i.test(l)) sec='M';
+      const mod=sec?sec+m[1]:'?'; if(mod!==cur.mod){ segs.push(cur); cur={mod,lines:[]}; } continue; }
+    cur.lines.push(l); }
+  segs.push(cur);
+  const out=[]; out.keys=[];
+  segs.filter(s=>s.lines.join('').trim()).forEach(s=>{ const body=s.lines.join('\n');
+    if(looksLikeKey(body,'')){ keyPairs(body).forEach(k=>out.keys.push({ key:true, module:s.mod, n:k.n, answer:k.answer })); return; }   // answer-key pages
+    splitByKeys(body).flatMap(seg=>parseImport(seg)).forEach(x=>{ x.mod=s.mod; out.push(x); }); });
+  return out;
+}
+async function readExamFiles(files, progress){
+  const items=[], keys=[], fail=[]; let lastMod='';
+  for(const [fi,f] of files.entries()){
+    const n=f.name.toLowerCase();
+    try{
+      if(/\.(jpe?g|png|webp)$/.test(n)){
+        if(REAL_ENGINE!=='ai' || !S.caps.sample){ progress(`Reading ${f.name} (free reader)`, fi/files.length); const w=await ocrWorker(); const r=await w.recognize(f); const pr=parseExamText(r.data.text||''); pr.forEach(x=>items.push(x)); pr.keys.forEach(k=>keys.push(k)); continue; }
+        progress(`AI is reading ${f.name}`, fi/files.length); const out=await aiReadPages([f],1,lastMod); out.forEach(o=>{ if(o.key) keys.push(o); else { const it=toItem(o); items.push(it); if(it.mod!=='?') lastMod=it.mod; } }); continue; }
       let text=''; try{ text=await readAnyFile(f)||''; }catch(e){}
-      const pdf = n.endsWith('.pdf') ? await pdfPages(f).catch(()=>null) : null;
+      let pdf=null, pdfErr=null; if(n.endsWith('.pdf')){ try{ pdf=await pdfPages(f); }catch(e){ pdfErr=e; } }
+      if(pdfErr && /password/i.test(pdfErr.name+' '+pdfErr.message)){ fail.push(`${f.name}: password protected`); continue; }
       const scanned = pdf && text.replace(/\s/g,'').length < pdf.numPages*150;
-      if(scanned){
+      if(scanned && (REAL_ENGINE!=='ai' || !S.caps.sample)){
+        let all='';
+        for(let p=1;p<=pdf.numPages;p++){ progress(`${f.name}: reading page ${p} of ${pdf.numPages} (free reader)`, (fi+(p-1)/pdf.numPages)/files.length); all+=await ocrPage(pdf,p)+'\n\n'; }
+        { const r=parseExamText(all); r.forEach(x=>items.push(x)); r.keys.forEach(k=>keys.push(k)); }
+      } else if(scanned){
         const step=Math.max(1,Math.min(3,(await S.caps.sample?.limits?.().catch(()=>null))?.images?.maxCount||3));
         for(let p=1;p<=pdf.numPages;p+=step){ const last=Math.min(pdf.numPages,p+step-1);
-          realLog(`<div class="bulk-status"><div class="save-prog"><i style="width:${Math.round((p-1)/pdf.numPages*100)}%"></i></div><span>${esc(f.name)}: AI is reading pages ${p}–${last} of ${pdf.numPages}</span></div>`);
+          progress(`${f.name}: AI is reading pages ${p}–${last} of ${pdf.numPages}`, (fi+(p-1)/pdf.numPages)/files.length);
           const blobs=[]; for(let i=p;i<=last;i++) blobs.push(await pageImage(pdf,i));
-          const out=await aiReadPages(blobs,p,lastMod); out.forEach(o=>{ if(o.key) keys.push(o); else { const it=toItem(o); REAL.items.push(it); if(it.mod!=='?') lastMod=it.mod; } });
-          $('#realPrev') && ($('#realPrev').innerHTML=realBuilderHTML(true)); }
+          const out=await aiReadPages(blobs,p,lastMod); out.forEach(o=>{ if(o.key) keys.push(o); else { const it=toItem(o); items.push(it); if(it.mod!=='?') lastMod=it.mod; } }); }
       } else if(text.trim()){
-        realLog(`<div class="bulk-status"><span>Reading ${esc(f.name)} (${fi+1} of ${files.length})…</span></div>`);
-        const found=splitByKeys(text).flatMap(seg=>parseImport(seg)); found.forEach(x=>{ x.mod='?'; REAL.items.push(x); });
-      } else fail.push(f.name);
-    }
-  }catch(e){ if(e.code==='no_ai') fail.push('scanned pages need AI (works on the live site)'); else if(e.code==='not_granted') fail.push('AI access was not allowed'); else fail.push('AI stopped: '+(e.message||e.code)); }
-  assignModules(REAL.items.filter(x=>x.q));
-  REAL.items=REAL.items.filter(x=>x.q);
-  keys.forEach(k=>{ const it=REAL.items.find(x=>x.mod===k.module && x.n===+k.n); if(it && k.answer){ it.q.answer=String(k.answer).trim(); recheckReal(it); } });
-  realLog(`<div class="bulk-status done"><b>✓ ${REAL.items.length} questions found</b>${fail.length?`<span class="bad">${esc(fail.join(' · '))}</span>`:''}</div>`);
+        progress(`Reading ${f.name}`, fi/files.length);
+        if(looksLikeKey(text,f.name)){ const r=parseExamText(text); if(r.keys.length) r.keys.forEach(k=>keys.push(k)); else keyPairs(text).forEach(k=>keys.push({ key:true, module:'?', n:k.n, answer:k.answer })); continue; }
+        { const r=parseExamText(text); r.forEach(x=>items.push(x)); r.keys.forEach(k=>keys.push(k)); }
+      } else fail.push(`${f.name}: ${pdfErr?'could not open this PDF':'no text found'}`);
+    }catch(e){ fail.push(`${f.name}: ${aiErrText(e)}`); if(['no_ai','not_configured','not_granted','forbidden'].includes(e&&e.code)) break; }
+  }
+  const good=items.filter(x=>x.q); assignModules(good);
+  MOD_KEYS.forEach(([k])=>{ let i=0; good.filter(x=>x.mod===k).forEach(x=>{ if(!x.n) x.n=++i; else i=x.n; }); });
+  let mi=-1, prevN=1e9; const order=['RW1','RW2','M1','M2'];
+  keys.forEach(k=>{ if(!order.includes(k.module)){ if(+k.n<=prevN) mi=Math.min(3,mi+1); k.module=order[Math.max(0,mi)]; } prevN=+k.n; });
+  keys.forEach(k=>{ const it=good.find(x=>x.mod===k.module && x.n===+k.n); if(it && k.answer && !it.q.answer){ it.q.answer=String(k.answer).trim(); recheckReal(it); } });
+  return { items:good, fail };
+}
+async function saveRealExam(name, items, m2, publish){
+  const qs=items.map(x=>({ ...x.q, examOnly:true, exam:name, tier:'free' }));
+  const queue=qs.slice(); const work=async()=>{ while(queue.length){ const q=queue.shift(); try{ await Data.put('questions',q); }catch(e){} } };
+  await Promise.all(Array.from({length:6},work));
+  const ids=k=>items.filter(x=>x.mod===k).sort((a,c)=>(a.n||0)-(c.n||0)).map(x=>x.q.id);
+  const modules=[{section:'RW',n:1,minutes:32,ids:ids('RW1')},{section:'RW',n:2,minutes:32,ids:ids('RW2'),fixedPath:m2.RW},{section:'M',n:1,minutes:35,ids:ids('M1')},{section:'M',n:2,minutes:35,ids:ids('M2'),fixedPath:m2.M}].filter(x=>x.ids.length);
+  await Data.put('mocks',{ id:'m_'+uid(), name, status:publish?'published':'draft', real:true, created:Date.now(), modules });
+}
+const examComplete = items => MOD_KEYS.every(([k,,,exp])=>items.filter(x=>x.mod===k).length===exp) && items.every(x=>x.q.answer);
+
+/* ---------- one exam → builder you review; many exams → a queue that builds them all ---------- */
+let REALQ=null; let REAL_ENGINE=LS.get('realEngine','free');
+async function realExamImport(files){
+  files=[...files].filter(f=>/\.(pdf|docx|txt|md|jpe?g|png|webp)$/i.test(f.name));
+  if(!files.length) return toast('No PDF, Word, text or image files found');
+  const groups=groupExams(files);
+  if(groups.length>1) return realBatch(groups);
+  REAL={ name:groups[0].name, items:[], m2:{RW:'hard',M:'hard'}, log:'' }; route();
+  const res=await readExamFiles(groups[0].files,(msg,f)=>realLog(`<div class="bulk-status"><div class="save-prog"><i style="width:${Math.round(f*100)}%"></i></div><span>${esc(msg)}</span></div>`));
+  REAL.items=res.items;
+  realLog(`<div class="bulk-status ${res.items.length?'done':''}"><b>${res.items.length?`✓ ${res.items.length} questions found`:'No questions found'}</b>${res.fail.length?`<span class="bad">${res.fail.map(esc).join('<br>')}</span>`:''}</div>`);
   route();
+}
+async function realBatch(groups){
+  REAL=null; const existing=new Set(S.mocks.map(m=>m.name));
+  REALQ={ running:true, rows:groups.map(g=>({ name:g.name, files:g.files, status:existing.has(g.name)?'skip':'wait', note:existing.has(g.name)?'already added':'' })) };
+  route(); const draw=()=>{ const el=$('#realPrev'); if(el) el.innerHTML=realQueueHTML(); };
+  for(const row of REALQ.rows){
+    if(!REALQ.running) break; if(row.status==='skip') continue;
+    row.status='reading'; row.note='starting…'; draw();
+    const res=await readExamFiles(row.files,(msg,f)=>{ row.note=msg; row.pct=Math.round(f*100); draw(); });
+    row.counts=MOD_KEYS.map(([k])=>res.items.filter(x=>x.mod===k).length);
+    if(!res.items.length){ row.status='fail'; row.note=res.fail[0]||'no questions found'; draw();
+      if(/AI key is missing|not allowed/.test(row.note)){ REALQ.rows.filter(r=>r.status==='wait').forEach(r=>{ r.status='fail'; r.note='stopped: '+row.note; }); break; } continue; }
+    const complete=examComplete(res.items);
+    row.status='saving'; row.note=`saving ${res.items.length} questions…`; draw();
+    try{ await saveRealExam(row.name,res.items,{RW:'hard',M:'hard'},complete); row.status=complete?'done':'draft'; row.note=complete?'live in Full-length tests':`saved as draft: ${res.items.filter(x=>!x.q.answer).length} answers missing${res.fail.length?' · '+res.fail[0]:''}`; }
+    catch(e){ row.status='fail'; row.note='could not save'; }
+    draw();
+  }
+  REALQ.running=false; draw(); toast('Real exams finished');
+}
+function realQueueHTML(){
+  if(!REALQ) return '';
+  const R=REALQ.rows, done=R.filter(r=>r.status==='done').length, draft=R.filter(r=>r.status==='draft').length, fail=R.filter(r=>r.status==='fail').length;
+  const icon={wait:'○',reading:'◐',saving:'◑',done:'✓',draft:'!',fail:'✕',skip:'–'};
+  return `<div class="card pad"><div class="imp-sum"><div><b>${R.length}</b><span>exams</span></div><div><b>${done}</b><span>live</span></div><div><b>${draft}</b><span>drafts to check</span></div><div class="${fail?'bad':''}"><b>${fail}</b><span>failed</span></div></div>
+    <div class="rq-list">${R.map(r=>`<div class="rq-row rq-${r.status}"><span class="rq-ic">${icon[r.status]}</span><div style="flex:1;min-width:0"><b class="ell" style="display:block">${esc(r.name)}</b><span class="faint" style="font-size:12.5px">${esc(r.note||'waiting')}</span>${r.status==='reading'?`<div class="save-prog" style="margin-top:6px"><i style="width:${r.pct||0}%"></i></div>`:''}</div>${r.counts?`<span class="rq-c">${r.counts.join(' · ')}</span>`:''}</div>`).join('')}</div>
+    ${REALQ.running?`<button class="btn btn-ghost" id="rqStop" style="width:100%;margin-top:12px">Stop after this exam</button>`:`<button class="btn btn-primary" id="rqDone" style="width:100%;margin-top:12px">Open Full-length tests</button>`}
+    <p class="faint" style="font-size:12.5px;margin:10px 0 0">Keep this tab open while it works. Drafts open in Full-length tests, where you can fix answers and publish.</p></div>`;
 }
 function recheckReal(it){ const r=normalizeQ({ ...it.q, question:it.q.stem }); r.q.id=it.q.id; it.q=r.q; it.errs=r.errs; }
 function applyKey(mod,text){ const pairs=[...String(text).matchAll(/(\d{1,2})\s*[.)\-:]?\s*([A-D]|-?[\d.\/]+)\b/gi)]; let n=0;
   pairs.forEach(([,num,ans])=>{ const it=REAL.items.find(x=>x.mod===mod && x.n===+num); if(it){ it.q.answer=ans.toUpperCase(); recheckReal(it); n++; } }); return n; }
 function realBuilderHTML(busy){
+  if(REALQ) return realQueueHTML();
   if(!REAL) return `<div class="card pad imp-empty"><div class="ic">📄</div><b>Drop a real exam folder</b><p class="faint" style="font-size:13px;margin:6px 0 0">Name it like "2025 March". It becomes one full-length test. Nothing goes into the question bank.</p></div>`;
   const by=k=>REAL.items.filter(x=>x.mod===k).sort((a,b)=>(a.n||0)-(b.n||0));
   const miss=REAL.items.filter(x=>!x.q.answer).length;
@@ -3003,20 +3115,21 @@ function realBuilderHTML(busy){
   </div>`;
 }
 function realExamsHTML(){
-  return `<div class="imp-wrap">
+  const hasAI=!!S.caps.sample;
+  return `<div class="imp-wrap real-wrap">
     <div class="imp-col">
       <label class="bulk-drop" id="realDrop">
-        <div class="bd-ic">📚</div><b>Drop a real exam folder</b>
-        <span>e.g. "2025 March" — PDF (typed or scanned), Word, photos of pages</span>
+        <div class="bd-ic">📚</div><b>Drop exam PDFs or a folder</b>
+        <span>Each PDF becomes its own full-length test. Nothing goes into the question bank.</span>
         <div class="row" style="gap:8px;margin-top:14px;justify-content:center">
           <span class="btn btn-primary btn-sm">Choose files<input type="file" id="realFiles" multiple accept=".pdf,.docx,.txt,.md,.jpg,.jpeg,.png,.webp" hidden></span>
           <span class="btn btn-ghost btn-sm" id="realPickFolder">Choose folder</span></div>
         <input type="file" id="realFolder" webkitdirectory directory multiple hidden>
       </label>
+      ${hasAI?`<div class="seg real-engine" role="group" aria-label="Reader"><button data-eng="free" class="${REAL_ENGINE!=='ai'?'on':''}">Free reader</button><button data-eng="ai" class="${REAL_ENGINE==='ai'?'on':''}">AI reader · more accurate, paid</button></div>`:''}
       <div id="realLog">${REAL&&REAL.log||''}</div>
-      <div class="card pad" style="font-size:13.5px;color:var(--ink-2)"><b style="color:var(--ink)">How it works</b><p style="margin:6px 0 0">Zina finds Module 1 and Module 2 of Reading &amp; Writing and Math, reads scanned pages with AI, and builds the test exactly as it was. These questions stay out of the question bank.</p></div>
     </div>
-    <div id="realPrev">${realBuilderHTML()}</div></div>`;
+    <div id="realPrev">${REAL||REALQ?realBuilderHTML():`<div class="card pad imp-empty"><div class="ic">📄</div><b>Your tests appear here</b><p class="faint" style="font-size:13px;margin:6px 0 0">Zina finds Reading &amp; Writing and Math, Module 1 and 2, in every file.</p></div>`}</div></div>`;
 }
 function realQuestionModal(id){
   const it=REAL.items.find(x=>x.q.id===id); if(!it) return; const q=it.q;
@@ -3031,6 +3144,8 @@ function realQuestionModal(id){
   $('#rqDel',m).onclick=()=>{ REAL.items=REAL.items.filter(x=>x!==it); closeModal(); route(); };
 }
 function bindRealExams(){
+  $$('[data-eng]').forEach(b=>b.onclick=e=>{ e.preventDefault(); REAL_ENGINE=b.dataset.eng; LS.set('realEngine',REAL_ENGINE); $$('[data-eng]').forEach(x=>x.classList.toggle('on',x===b)); });
+  $('#realPrev')?.addEventListener('click',e=>{ if(e.target.id==='rqStop'){ REALQ.running=false; e.target.textContent='Stopping after this exam…'; } if(e.target.id==='rqDone'){ REALQ=null; route(); } });
   $('#realFiles')?.addEventListener('change',e=>realExamImport(e.target.files));
   $('#realFolder')?.addEventListener('change',e=>realExamImport(e.target.files));
   $('#realPickFolder')?.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); $('#realFolder').click(); });
@@ -3049,7 +3164,7 @@ function bindRealExams(){
     const ids=k=>REAL.items.filter(x=>x.mod===k).sort((a,c)=>(a.n||0)-(c.n||0)).map(x=>x.q.id);
     const modules=[{section:'RW',n:1,minutes:32,ids:ids('RW1')},{section:'RW',n:2,minutes:32,ids:ids('RW2'),fixedPath:REAL.m2.RW},{section:'M',n:1,minutes:35,ids:ids('M1')},{section:'M',n:2,minutes:35,ids:ids('M2'),fixedPath:REAL.m2.M}].filter(m=>m.ids.length);
     await Data.put('mocks',{ id:'m_'+uid(), name, status:'published', real:true, created:Date.now(), modules });
-    REAL=null; toast(`"${name}" is live in Full-length tests`); AT='mocks'; route(); });
+    REAL=null; toast(`"${name}" is live in Full-length tests`); route(); });
 }
 </script>
 <script>
@@ -3151,18 +3266,28 @@ function splitByKeys(text){ // a file can hold several sections, each ending wit
 }
 const normStem = s => String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().slice(0,160);
 function markDups(list){ const seen=new Set(S.questions.map(q=>normStem(q.passage+' '+q.stem))); return list.filter(x=>{ if(!x.q) return true; const k=normStem(x.q.passage+' '+x.q.stem); if(k.length>12 && seen.has(k)){ list.dupCount=(list.dupCount||0)+1; return false; } seen.add(k); return true; }); }
+/* ---------- answer keys: a key can be its own file, or pages at the end of a file ---------- */
+const PAIR_LINE=/^\s*(?:\(?\d{1,3}\)?\s*[.):\-]?\s*(?:[A-D]|-?[\d.\/]+)\s*[,;|]?\s*)+$/i;
+function keyPairs(text){ const out=[]; String(text).split('\n').forEach(l=>{ if(!PAIR_LINE.test(l)) return; for(const m of l.matchAll(/\(?(\d{1,3})\)?\s*[.):\-]?\s*([A-D]|-?[\d.\/]+)(?=\s|[,;|]|$)/gi)) out.push({ n:+m[1], answer:m[2].toUpperCase() }); }); return out; }
+function looksLikeKey(text, name){ const lines=String(text).split('\n').map(l=>l.trim()).filter(Boolean); if(!lines.length) return false;
+  const pairs=lines.filter(l=>PAIR_LINE.test(l)).length; return pairs>=5 && (pairs/lines.length>0.55 || /answer|key|javob|kalit/i.test(name||'')); }
+const examBase = s => String(s||'').replace(/\.[a-z0-9]+$/i,'').replace(/@\S+/g,'')
+  .replace(/\b(answer\s*keys?|answers?|keys?|javoblar|kalit|solutions?|explanations?|reading\s*(and|&)\s*writing|reading|writing|english|r\s*&\s*w|rw|math(ematics)?|module\s*\d|m\s*\d|part\s*\d|section\s*\d)\b/gi,' ')
+  .replace(/[_\-–—()[\]]+/g,' ').replace(/\s{2,}/g,' ').trim().toLowerCase();
 async function bulkImport(files){
-  const exam=[...files].filter(f=>MONTH_RE.test(f.webkitRelativePath||f.relPath||f.name)); if(exam.length){ files=[...files].filter(f=>!exam.includes(f)); AT='exams'; location.hash='#/admin?tab=exams'; setTimeout(()=>realExamImport(exam),50); if(!files.length) return; toast('Real exam files went to Real exams. The rest go to the bank.'); }
   files=[...files].filter(f=>/\.(pdf|docx|txt|md|csv|json)$/i.test(f.name)); const log=$('#bulkLog');
   if(!files.length) return toast('No PDF, Word or text files found');
-  let all=[]; let skipped=0, failed=[];
+  let all=[]; let skipped=0, failed=[]; const bankKeys={};
   for(const [i,f] of files.entries()){
     if(log) log.innerHTML=`<div class="bulk-status"><div class="save-prog"><i style="width:${Math.round(i/files.length*100)}%"></i></div><span>Reading ${i+1} of ${files.length}: ${esc(f.name)}</span></div>`;
     try{ const text=await readAnyFile(f); if(!text||!text.trim()){ failed.push(f.name); continue; }
+      if(!/\.json$/i.test(f.name) && looksLikeKey(text,f.name)){ (bankKeys[examBase(f.name)]=bankKeys[examBase(f.name)]||[]).push(...keyPairs(text)); continue; }
       const found = /\.json$/i.test(f.name) ? parseImport(text) : splitByKeys(text).flatMap(seg=>parseImport(seg));
       found.forEach(x=>x.src=f.name); all=all.concat(found);
     }catch(e){ failed.push(f.name); }
   }
+  Object.entries(bankKeys).forEach(([base,pairs])=>{ const mine=all.filter(x=>x.q && examBase(x.src)===base); const pool=mine.length?mine:all.filter(x=>x.q);
+    pairs.forEach(k=>{ const it=pool.find(x=>x.n===k.n && !x.q.answer); if(it){ it.q.answer=k.answer; const r=normalizeQ({ ...it.q, question:it.q.stem }); r.q.id=it.q.id; it.q=r.q; it.errs=r.errs; } }); });
   const before=all.length; all=markDups(all); skipped=before-all.length; all.forEach(x=>{}); 
   IMPORT_PREVIEW=all; IMP_FILTER=all.some(x=>!x.q||x.errs.length)?'bad':'all'; IMP_SHOW=40;
   window.BULK_LOG=`<div class="bulk-status done"><b>✓ ${files.length-failed.length} file${files.length-failed.length===1?'':'s'} read · ${all.length} questions</b>${skipped?`<span>${skipped} duplicates skipped</span>`:''}${failed.length?`<span class="bad">Couldn't read: ${esc(failed.join(', '))}</span>`:''}</div>`; if(log) log.innerHTML=window.BULK_LOG;
@@ -3219,7 +3344,7 @@ Explanation: (optional)`;
 function viewAdmin(params){
   if(!S.isAdmin) return shell('admin',`<div class="card empty"><div class="ic">🔒</div><h3>No access yet</h3><p>Signed in as <b>${esc(S.user?.email||'')}</b>. Add this email as admin in Supabase, then refresh.</p></div>`);
   if(params.get('tab')) AT=params.get('tab');
-  const qs=S.questions.filter(q=>!q.examOnly); const tabs=[['questions',`Questions (${qs.length})`],['import','Upload'],['exams','Real exams'],['mocks',`Full-length tests (${S.mocks.length})`],['vocab','Vocabulary'],['payments','Payments'+(S.payments.filter(p=>p.status==='pending').length?` (${S.payments.filter(p=>p.status==='pending').length})`:'')],['ai','AI permissions'+(S.drafts.length?` (${S.drafts.length})`:'')]];
+  const qs=S.questions.filter(q=>!q.examOnly); const tabs=[['questions',`Questions (${qs.length})`],['import','Upload'],['mocks',`Full-length tests (${S.mocks.length})`],['vocab','Vocabulary'],['payments','Payments'+(S.payments.filter(p=>p.status==='pending').length?` (${S.payments.filter(p=>p.status==='pending').length})`:'')],['ai','AI permissions'+(S.drafts.length?` (${S.drafts.length})`:'')]];
   let body='';
   if(AT==='questions'){
     const list=qs.filter(q=>(AQ.sec==='all'||q.section===AQ.sec)&&(!AQ.search||(q.stem+' '+q.passage+' '+q.domain).toLowerCase().includes(AQ.search.toLowerCase())));
@@ -3255,7 +3380,8 @@ function viewAdmin(params){
   }
   if(AT==='mocks'){
     const vis=visibleQuestions(); const c=s=>vis.filter(q=>q.section===s).length;
-    body=`<div class="row" style="justify-content:space-between;flex-wrap:wrap;margin-bottom:16px"><p class="muted" style="margin:0">Pool: ${c('RW')} R&W · ${c('M')} Math</p><button class="btn btn-primary btn-sm" id="newMock">Build a test</button></div>
+    body=`${realExamsHTML()}
+      <div class="row" style="justify-content:space-between;flex-wrap:wrap;margin:26px 0 16px"><h3 style="margin:0;font-size:20px">Your tests (${S.mocks.length})</h3><div class="row" style="gap:10px"><span class="muted" style="font-size:13px">Bank: ${c('RW')} R&W · ${c('M')} Math</span><button class="btn btn-ghost btn-sm" id="newMock">Build from the bank</button></div></div>
       ${S.mocks.length?`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))">${S.mocks.map(m=>`<div class="card test-card"><div class="row" style="justify-content:space-between"><h3>${esc(m.name)}</h3><span class="pill ${m.status==='published'?'mint':'gray'}">${m.status==='published'?'Published':'Draft'}</span></div>
         <div class="mods">${m.modules.map(x=>`<span>${x.section==='M'?'Math':'R&W'} ${x.n}<br><span class="faint" style="font-weight:500">${x.ids.length}${x.hardIds&&x.hardIds.length?' / '+x.hardIds.length:''}q</span></span>`).join('')}</div>
         <div class="row" style="flex-wrap:wrap"><button class="btn btn-sm ${m.status==='published'?'btn-ghost':'btn-primary'}" data-pub="${m.id}">${m.status==='published'?'Unpublish':'Publish to students'}</button><button class="btn btn-sm btn-ghost" data-medit="${m.id}">Edit questions</button><button class="btn btn-sm btn-ghost" data-mdel="${m.id}" style="color:var(--rose)">Delete</button></div></div>`).join('')}</div>`
@@ -3266,7 +3392,6 @@ function viewAdmin(params){
       ${S.words.length?`<div class="card scroll-x" style="margin-top:16px"><table class="qtable"><thead><tr><th>Word</th><th>Meaning</th><th></th></tr></thead><tbody>${S.words.map(w=>`<tr><td><b>${esc(w.word)}</b></td><td class="muted">${esc(w.def)}</td><td><button class="btn btn-sm btn-ghost" data-wdel="${w.id}">Remove</button></td></tr>`).join('')}</tbody></table></div>`:''}`;
   }
   if(AT==='payments'){ body=adminPaymentsHTML(); }
-  if(AT==='exams'){ body=realExamsHTML(); }
   if(AT==='ai'){
     body=`<div class="card pad" style="max-width:760px"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:20px"><div><b style="font-size:17px">Allow Zina AI to draft new questions</b><p class="muted" style="margin:6px 0 0;font-size:14px">Off = AI never creates questions.</p></div><button class="switch ${S.settings.aiDrafting?'on':''}" id="aiToggle" aria-label="Allow AI drafting"></button></div></div>
       <h3 style="font-size:20px;margin:26px 0 12px">Drafts waiting for review (${S.drafts.length})</h3>
@@ -3405,7 +3530,7 @@ function bindAdmin(){
   $('#exportQ')?.addEventListener('click',()=>{ const json=JSON.stringify(S.questions); const m=modal(`<h2 style="font-size:22px">Export ${S.questions.length} questions</h2><p class="muted" style="margin:8px 0 12px">Copy this and paste it into Upload on your new site.</p><textarea class="textarea" style="min-height:260px;font-size:12px" readonly>${esc(json)}</textarea><button class="btn btn-primary" id="cpy" style="width:100%;margin-top:12px">Copy</button>`,{wide:true}); $('#cpy',m).onclick=async()=>{ const ta=$('textarea',m); ta.select(); try{ await navigator.clipboard.writeText(json); }catch(e){ document.execCommand('copy'); } toast('Copied'); }; });
   bindShell(); if(!S.isAdmin) return;
   if(AT==='payments') bindAdminPayments();
-  if(AT==='exams') bindRealExams();
+  if(AT==='mocks') bindRealExams();
   $$('[data-at]').forEach(b=>b.onclick=()=>{ AT=b.dataset.at; history.replaceState(null,'','#/admin'); route(); });
   const on=(s,f)=>{ const n=$(s); if(n) n.onclick=f; };
   on('#addQ',()=>questionForm(null, q=>Data.put('questions',q)));
