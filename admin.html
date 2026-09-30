@@ -1395,6 +1395,16 @@ s.was{font-size:.42em;font-weight:600;opacity:.45;margin-right:8px;letter-spacin
 .exam .nav-h{font-size:20px}
 .exam .ex-timer b{font-size:26px;min-height:34px}
 .exam .ex-title{font-size:22px}
+
+/* exam v5: bluecorn-size reading text; review page header like the navigator */
+.exam .ex-passage,.exam .ex-passage p{font-size:24px;line-height:1.75}
+.exam .qstem{font-size:23px;line-height:1.7}
+.exam .choice{font-size:22px;min-height:76px}
+.exam .choice .lt{width:34px;height:34px;font-size:16px}
+.exam .rv-head{border-bottom:1px solid #D6D9E0;margin-bottom:18px}
+.exam .rv-head .nav-h{font-size:22px}
+@media (max-width:1100px){.exam .ex-passage,.exam .ex-passage p{font-size:20px}.exam .qstem{font-size:20px}.exam .choice{font-size:19px}}
+.exam .rv-head .ex-legend{border-bottom:0;margin-bottom:0}
 </style>
 <meta name="robots" content="noindex,nofollow">
 <script>window.ZINA_ADMIN=true</script>
@@ -2349,7 +2359,7 @@ function renderExam(){
   if(EX.screen==='review'){
     body = `<div class="ex-center"><h2>Check your work</h2><p style="max-width:560px;color:#444">Tap any question to go back to it.</p>
       <div style="border:1px solid #ddd;border-radius:14px;padding:22px;margin-top:20px;width:min(640px,100%)">
-        <div class="row" style="justify-content:space-between;margin-bottom:14px;flex-wrap:wrap"><b>${esc(mod.title)}</b><span style="font-size:13px">${legend()}</span></div>
+        <div class="rv-head"><div class="nav-h">${esc(mod.title.replace(/,\s*Module\s*\d+/i,''))}<br>Questions</div><div class="ex-legend">${legend()}</div></div>
         <div class="ex-grid">${gridCells(mod,true)}</div>
       </div>
       ${EX.mode==='practice'?practiceSummary(mod):''}</div>`;
