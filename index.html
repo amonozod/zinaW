@@ -1326,6 +1326,59 @@ s.was{font-size:.42em;font-weight:600;opacity:.45;margin-right:8px;letter-spacin
 .exd-home{display:block;margin:14px auto 0;color:#324DC7;font-weight:700;text-decoration:underline}
 .rp-box{margin-bottom:18px}.rp-box summary{cursor:pointer}
 .rp-row{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.exam .letters-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px}
+.exam .letters-row .choice-row{margin:0}
+.exam .letters-row .choice{min-height:54px;justify-content:center;padding:8px}
+.exam .letters-row .choice .ct{display:none}
+.exam .letters-row .choice .lt{width:34px;height:34px;font-size:16px;margin:0}
+.exam .letters-row .strike-btn{display:none}
+.exam .ex-passage .qimg.scan{border:0;max-width:100%}
+.tier.is-cur{outline:none}
+.tier.is-cur .tier-name::after{content:"Your plan";margin-left:10px;font:700 11px/1 var(--ui);letter-spacing:.06em;text-transform:uppercase;padding:5px 8px;border-radius:99px;background:rgba(255,255,255,.14);vertical-align:middle}
+.tier-pro.is-cur .tier-name::after{background:var(--violet-soft);color:var(--violet)}
+.exam .explain{border-radius:14px;padding:18px 20px;background:#F6F8FF;border:1px solid #DCE3F7;font-size:16px;line-height:1.65}
+.exam .ex-verdict{font-weight:700;font-size:16px;margin-bottom:8px}.exam .ex-verdict.ok{color:#0B8A62}.exam .ex-verdict.no{color:#C62828}
+.exam .ex-exp{color:#222}
+.exam .ex-gen{display:inline-flex;align-items:center;gap:10px;color:#556}.exam .ex-gen i{width:16px;height:16px;border-radius:50%;border:2px solid #C9D2EE;border-top-color:#324DC7;animation:spin2 .8s linear infinite}
+.exam .ex-actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:14px}
+.exam .ex-actions .ex-blue{padding:9px 18px;font-size:14px}
+.exam .ex-ai{margin-top:12px;white-space:pre-wrap;color:#222}
+.exam .ex-ai:empty{display:none}
+.aic-row{display:flex;gap:10px;align-items:flex-start;margin-top:10px;font-size:14px}.aic-row b{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:none;font-size:12px}.aic-row.ok b{background:var(--mint-soft);color:var(--mint)}.aic-row.no b{background:var(--rose-soft);color:var(--rose)}
+
+/* voice v3: the Zina blob */
+.vz-face.blob{width:min(340px,66vw);overflow:visible;filter:drop-shadow(0 30px 40px rgba(0,0,0,.35))}
+.blob .ln{fill:none;stroke:#1B1446;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+.blob .ln.thick{stroke-width:9}
+.blob .look{animation:none}.blob .pupil{animation:look 5s ease-in-out infinite}
+.blob .vz-eyes{transform-box:fill-box;transform-origin:center;animation:vzBlink 4.2s infinite}
+.blob[data-emo="laughing"] .vz-eyes,.blob[data-emo="happy"] .vz-eyes,.blob[data-emo="crying"] .vz-eyes,.blob[data-emo="sleepy"] .vz-eyes{animation:none}
+.blob .star{fill:#FFE36E;stroke:#1B1446;stroke-width:3;stroke-linejoin:round;transform-box:fill-box;transform-origin:center;animation:starSpin 1s ease-in-out infinite alternate}
+.blob .heart{fill:#FF3D71;stroke:#1B1446;stroke-width:3;transform-box:fill-box;transform-origin:center;animation:beat .7s ease-in-out infinite}
+@keyframes beat{50%{transform:scale(1.18)}}
+.blob .ha{font:900 22px var(--display);fill:#fff;stroke:#1B1446;stroke-width:3;paint-order:stroke;animation:haUp 1s ease-out infinite}
+.blob .ha.h2{animation-delay:.5s}
+@keyframes haUp{from{transform:translateY(8px);opacity:0}30%{opacity:1}to{transform:translateY(-16px);opacity:0}}
+.blob[data-emo="laughing"] .vz-body{animation:laughBob .35s ease-in-out infinite alternate}
+@keyframes laughBob{to{transform:translateY(-6px) rotate(-2deg)}}
+.blob .tearj{fill:none;stroke:#8FD3FF;stroke-width:4;stroke-linecap:round}
+.blob .tear{fill:#8FD3FF;stroke:#1B1446;stroke-width:2;animation:drip 1.6s ease-in infinite}
+.blob .tear.t2{animation-delay:.8s}
+@keyframes drip{from{transform:translateY(0);opacity:1}to{transform:translateY(60px);opacity:0}}
+.blob .stream{stroke:#8FD3FF;stroke-width:9;stroke-linecap:round;opacity:.85;stroke-dasharray:14 10;animation:flow .8s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-24}}
+.blob[data-emo="crying"] .vz-body{animation:sob .5s ease-in-out infinite alternate}
+@keyframes sob{to{transform:translateY(3px) scaleY(.98)}}
+.blob .steam path{fill:none;stroke:#fff;stroke-width:6;stroke-linecap:round;opacity:.8;animation:steam 1.2s ease-out infinite}
+@keyframes steam{from{transform:translateY(6px);opacity:0}40%{opacity:.9}to{transform:translateY(-14px);opacity:0}}
+.blob[data-emo="angry"] .vz-body,.blob[data-emo="scolding"] .vz-body{animation:shake .4s ease-in-out infinite}
+.blob .grawl{animation:popIn .3s both}
+.blob .gr{font:900 20px var(--display);fill:#E0413A}
+.blob .zz{font:800 22px var(--display);fill:#fff;animation:haUp 2s ease-out infinite}.blob .zz.z2{animation-delay:1s;font-size:28px}
+.blob .dots circle{fill:#fff;opacity:.9;animation:pulse 1.2s infinite}
+.blob .dots circle:nth-child(2){animation-delay:.2s}.blob .dots circle:nth-child(3){animation-delay:.4s}
+.blob .talk{transform-box:fill-box;transform-origin:center;animation:vzTalk .2s ease-in-out infinite alternate}
+.blob[data-emo="excited"] .vz-body,.blob[data-emo="love"] .vz-body{animation:vzBounce .7s ease-in-out infinite}
 </style>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect x=%271%27 y=%271%27 width=%2730%27 height=%2730%27 rx=%279%27 fill=%27%235B3DF5%27/%3E%3Cpath d=%27M8 9h15.5v4h-4.5v4h-4.5v4h-4.5v2.5H24%27 fill=%27none%27 stroke=%27%23fff%27 stroke-width=%272.6%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3Ccircle cx=%2723.6%27 cy=%278.9%27 r=%272.6%27 fill=%27%23FFB547%27/%3E%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2119,12 +2172,10 @@ function viewTests(){
             <small>YOUR TOTAL SCORE</small><div class="tc-total">${best||'—'}</div><div class="tc-range">400–1600</div>
             ${['RW','M'].map(s=>`<div class="tc-sec"><div class="tc-sh"><b>${s==='M'?'Math':'Reading and Writing'}</b><span>${last?(s==='M'?last.math:last.rw):''}<em>200–800</em></span></div><div class="tc-mods"><span>Mod 1<b>${modScore(s,1)}</b></span><span>Mod 2<b>${modScore(s,2)}</b></span></div></div>`).join('')}
             <button class="tc-go" data-mock="${m.id}">${tk.length?'Retake test':'Full practice'}</button>
-            ${last?`<a class="tc-link" href="#/results?id=${last.id}">See score details →</a>`:''}
           </div>
           ${locked?`<div class="tc-lock"><div class="tc-lock-ic">🔒</div><span>Requires Pro</span><button class="btn btn-primary btn-sm" data-unlock="Take every full-length test">Upgrade to Pro →</button></div>`:''}
         </div>`; }).join('')}
-    </div>`}
-    ${S.prog.attempts.filter(a=>a.kind==='mock').length?`<h3 style="font-size:20px;margin:36px 0 12px">Your past tests</h3><div class="card">${S.prog.attempts.filter(a=>a.kind==='mock').slice().reverse().map(a=>`<a href="#/results?id=${a.id}" class="list-row" style="padding:14px 20px;text-decoration:none;color:inherit"><b style="font-family:var(--display);font-size:24px;width:70px">${a.total}</b><span style="flex:1">${esc(a.name)}<br><span class="faint" style="font-size:13px">${new Date(a.date).toLocaleDateString()} , R&W ${a.rw}, Math ${a.math}</span></span><span class="faint">Review</span></a>`).join('')}</div>`:''}`);
+    </div>`}`);
 }
 function bindTests(){
   bindShell();
@@ -2285,12 +2336,12 @@ function renderExam(){
       </div>
       ${EX.mode==='practice'?practiceSummary(mod):''}</div>`;
   } else {
-    const split = !!q.passage || (!isMath && q.image && !q.scan);
+    const split = !!q.passage || !!q.image2 || (!isMath && q.image && !q.scan);
     const choices = q.type==='spr' ? sprHTML(q) : choicesHTML(q);
     const qCol = `<div class="qhead"><span class="qnum">${EX.qi+1}</span><button class="qmark ${EX.marked.has(q.id)?'on':''}" id="markBtn">${I.bookmark}Mark for Review</button>${q.type!=='spr'?`<button class="qabc ${EX.elim?'on':''}" id="elimBtn" title="Answer eliminator">ABC</button>`:''}</div>
       ${(!split||q.scan)&&q.image?`<img class="qimg ${q.scan?'scan':''}" src="${q.image}" alt="Question ${EX.qi+1}">`:''}
       ${q.scan&&q.image?'':`<div class="qstem">${fmt(q.stem)}</div>`}${choices}${explainHTML(q)}`;
-    body = split ? `<div class="ex-pane ex-passage" id="passage" style="${EX.split?`flex:0 0 ${EX.split}%`:''}">${q.image&&!q.scan?`<img class="qimg" src="${q.image}" alt="Figure">`:''}${EX.hl[q.id]||fmt(q.passage)}</div><div class="ex-divider" id="divider"></div><div class="ex-pane ex-q">${qCol}</div>`
+    body = split ? `<div class="ex-pane ex-passage" id="passage" style="${EX.split?`flex:0 0 ${EX.split}%`:''}">${q.image2?`<img class="qimg scan" src="${q.image2}" alt="Passage">`:''}${q.image&&!q.scan?`<img class="qimg" src="${q.image}" alt="Figure">`:''}${q.image2?'':(EX.hl[q.id]||fmt(q.passage))}</div><div class="ex-divider" id="divider"></div><div class="ex-pane ex-q">${qCol}</div>`
                  : `<div class="ex-pane ex-q solo" style="flex:1">${qCol}</div>`;
   }
   const last = EX.qi===mod.qs.length-1;
@@ -2340,17 +2391,36 @@ function navPop(mod){ const sec=mod.title.replace(/,\s*Module\s*\d+/i,''); retur
 function dirPop(mod){ return `<div class="dir-pop">${mod.section==='M'?'<p>The questions in this section address a number of important math skills. Use of a calculator is permitted for all questions. A reference sheet, calculator, and these directions can be accessed throughout the test.</p><p><b>For multiple-choice questions,</b> solve each problem and choose the correct answer from the choices provided. <b>For student-produced response questions,</b> solve each problem and enter your answer. If you find more than one correct answer, enter only one. You can enter up to 5 characters for a positive answer and up to 6 for a negative answer. Enter fractions or decimals, not mixed numbers.</p>':'<p>The questions in this section address a number of important reading and writing skills. Each question includes one or more passages, which may include a table or graph. Read each passage and question carefully, and then choose the best answer to the question based on the passage(s).</p><p>All questions in this section are multiple-choice with four answer choices. Each question has a single best answer.</p>'}<div style="text-align:right"><button class="ex-blue" id="dirX">Close</button></div></div>`; }
 function choicesHTML(q){
   const st=EX.struck[q.id]||new Set(); const a=EX.answers[q.id]; const chk=EX.mode==='practice'&&EX.checked[q.id];
-  return (q.choices||[]).map((c,i)=>{ const L='ABCD'[i]; let cls='choice'; if(a===L) cls+=' sel'; if(st.has(L)) cls+=' struck';
+  const lettersOnly=(q.choices||[]).every((c,i)=>String(c).trim()==='ABCD'[i]);
+  return (lettersOnly?'<div class="letters-row">':'')+(q.choices||[]).map((c,i)=>{ const L='ABCD'[i]; let cls='choice'; if(a===L) cls+=' sel'; if(st.has(L)) cls+=' struck';
     if(chk){ if(L===String(q.answer).toUpperCase()) cls+=' right'; else if(a===L) cls+=' wrong'; }
-    return `<div class="choice-row"><button class="${cls}" data-ch="${L}" ${chk?'disabled':''}><span class="lt">${L}</span><span class="ct">${String(c).trim()===L?'':fmt(c)}</span></button>${EX.elim?(st.has(L)?`<button class="strike-btn undo" data-st="${L}">Undo</button>`:`<button class="strike-btn" data-st="${L}" aria-label="Cross out ${L}">${L}</button>`):''}</div>`; }).join('');
+    return `<div class="choice-row"><button class="${cls}" data-ch="${L}" ${chk?'disabled':''}><span class="lt">${L}</span><span class="ct">${String(c).trim()===L?'':fmt(c)}</span></button>${EX.elim?(st.has(L)?`<button class="strike-btn undo" data-st="${L}">Undo</button>`:`<button class="strike-btn" data-st="${L}" aria-label="Cross out ${L}">${L}</button>`):''}</div>`; }).join('')+(lettersOnly?'</div>':'');
 }
 function sprHTML(q){ const a=EX.answers[q.id]||''; const chk=EX.mode==='practice'&&EX.checked[q.id];
   return `<div class="spr"><input id="sprIn" inputmode="decimal" maxlength="6" value="${esc(a)}" aria-label="Your answer" ${chk?'disabled':''} style="${chk?(isCorrect(q,a)?'border-color:#12A877;background:#EAFBF3':'border-color:#D6334B;background:#FDECEF'):''}"><small>Answer preview: <b id="sprPrev">${esc(a)}</b></small></div>`; }
 function explainHTML(q){
   if(!(EX.mode==='practice'&&EX.checked[q.id])) return '';
-  const ok=isCorrect(q,EX.answers[q.id]);
-  return `<div class="explain"><b style="color:${ok?'#0B8A62':'#C62828'}">${ok?'Correct.':'Not quite. The correct answer is '+esc(q.answer)+'.'}</b>${q.explanation?fmt(q.explanation):'<span style="color:#666">No explanation added for this question yet.</span>'}
-    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="ex-blue" id="askAI" style="background:#5B3DF5;padding:8px 18px;font-size:14px">✦ Ask Zina AI to explain${plan().ai?'':' (Pro)'}</button></div><button class="ex-blue ghost" id="discussQ" style="padding:8px 18px;font-size:14px">Discuss</button></div><div id="aiOut" style="margin-top:12px;white-space:pre-wrap"></div></div>`;
+  const ok=isCorrect(q,EX.answers[q.id]); const cached=q.explanation||LS.get('expl:'+q.id,'');
+  return `<div class="explain">
+    <div class="ex-verdict ${ok?'ok':'no'}">${ok?'✓ Correct':'✕ Not quite · correct answer: <b>'+esc(q.answer)+'</b>'}</div>
+    <div class="ex-exp" id="expBody">${cached?fmt(cached):'<span class="ex-gen"><i></i>Zina is writing the explanation…</span>'}</div>
+    <div class="ex-actions"><button class="ex-blue" id="askAI">✦ Ask Zina a follow-up</button><button class="ex-blue ghost" id="discussQ">💬 Discuss with others</button></div>
+    <div id="aiOut" class="ex-ai"></div></div>`;
+}
+const dataURLtoBlob = u => fetch(u).then(r=>r.blob());
+async function autoExplain(q){                  // written once per question, then shared with every student
+  const box=()=>$('#expBody'); if(q.explanation || LS.get('expl:'+q.id,'')) return;
+  let text='';
+  if(S.caps.db){ try{ const d=await docOnce('explains/'+q.id); if(d&&d.text) text=d.text; }catch(e){} }
+  if(!text){
+    const sample=S.caps.sample; if(!sample){ if(box()) box().innerHTML='<span class="faint">Explanations appear on the live site.</span>'; return; }
+    const prompt=`You are Zina, an expert Digital SAT tutor. Write a clear explanation for this ${q.section==='M'?'Math':'Reading and Writing'} question. The correct answer is ${q.answer}. Explain in 3–6 short sentences why it is right${q.type==='mcq'?' and why the other choices are wrong':''}. Plain text, no headings. ${q.image?'The question is in the attached picture(s).':''}\n\n${q.passage?'Passage: '+q.passage+'\n':''}Question: ${q.scan?(q.ocr||''):q.stem}\n${q.type==='mcq'&&!q.scan?q.choices.map((c,i)=>'ABCD'[i]+') '+c).join('\n'):''}`;
+    try{ const images=[]; if(q.image2) images.push(await dataURLtoBlob(q.image2)); if(q.image) images.push(await dataURLtoBlob(q.image));
+      const r=await sample(prompt,{ modelTier:'quick', images:images.length?images:undefined, _kind:'explain', onText:({text})=>{ if(box()) box().textContent=text; } }); text=r.text.trim();
+      if(S.caps.db && text){ try{ await S.caps.db.doc('explains/'+q.id).set({ text, ts:Date.now() }); }catch(e){} } }
+    catch(e){ if(box()) box().innerHTML=`<span class="faint">${e.code==='not_configured'?(S.isAdmin?'Add ANTHROPIC_API_KEY in Vercel to turn on explanations.':'Explanation coming soon.'):'Couldn’t write the explanation right now.'}</span>`; return; }
+  }
+  if(text){ LS.set('expl:'+q.id,text); if(box()) box().innerHTML=fmt(text); }
 }
 function practiceSummary(mod){ const done=mod.qs.filter(q=>EX.answers[q.id]!=null&&EX.answers[q.id]!==''); const c=mod.qs.filter(q=>isCorrect(q,EX.answers[q.id])).length;
   return `<div style="margin-top:24px;font-size:18px"><b>${c}</b> correct out of ${mod.qs.length}${done.length<mod.qs.length?` (${mod.qs.length-done.length} unanswered)`:''} in ${clock(EX.elapsed)}</div>`; }
@@ -2392,6 +2462,7 @@ function bindExam(){
   on('#nextQ',()=>{ EX.popup=null; if(EX.qi<mod.qs.length-1){ EX.qi++; } else EX.screen='review'; renderExam(); });
   on('#checkQ',()=>{ EX.checked[q.id]=true; renderExam(); });
   on('#askAI',()=>explainWithAI(q));
+  if(EX.mode==='practice'&&EX.checked[q.id]) autoExplain(q);
   on('#discussQ',()=>{ recordPractice(); closeExam(); location.hash='#/community?q='+q.id; });
   // highlighter
   const pas=$('#passage',el);
@@ -3084,47 +3155,60 @@ function bindAdminPayments(){
 <script>
 /* ================= ZINA VOICE (Elite): hands-free, answers in the language you speak ================= */
 const EMO = {
-  calm:       { c:'#7B5CFF', pitch:1.0,  rate:1.0  },
-  happy:      { c:'#FF5A7A', pitch:1.1,  rate:1.04 },
-  excited:    { c:'#FFB547', pitch:1.18, rate:1.1  },
-  encouraging:{ c:'#12B886', pitch:1.06, rate:1.02 },
-  thinking:   { c:'#5B8CFF', pitch:.98,  rate:.98  },
-  surprised:  { c:'#FF8FB1', pitch:1.15, rate:1.05 },
-  concerned:  { c:'#8A93B8', pitch:.94,  rate:.95  },
-  angry:      { c:'#E8485C', pitch:.9,   rate:1.08 }
+  calm:       { c1:'#8B6CFF', c2:'#5B3DF5', pitch:1.0,  rate:1.0  },
+  happy:      { c1:'#A07BFF', c2:'#6A4DFF', pitch:1.1,  rate:1.04 },
+  laughing:   { c1:'#FFB547', c2:'#FF7A45', pitch:1.2,  rate:1.1  },
+  excited:    { c1:'#FFCF5A', c2:'#FF9F1C', pitch:1.18, rate:1.1  },
+  encouraging:{ c1:'#34D399', c2:'#0E9F6E', pitch:1.06, rate:1.02 },
+  love:       { c1:'#FF8FB1', c2:'#E8487A', pitch:1.12, rate:1.0  },
+  proud:      { c1:'#7C9CFF', c2:'#3F5BD8', pitch:1.02, rate:.98  },
+  thinking:   { c1:'#6FA8FF', c2:'#3B6FE0', pitch:.98,  rate:.98  },
+  surprised:  { c1:'#FFA3C4', c2:'#E86A9A', pitch:1.16, rate:1.05 },
+  concerned:  { c1:'#A3A9C9', c2:'#6E76A3', pitch:.95,  rate:.95  },
+  sad:        { c1:'#8FB8E8', c2:'#4F7FC0', pitch:.9,   rate:.9   },
+  crying:     { c1:'#79B6FF', c2:'#3A7BD5', pitch:.88,  rate:.88  },
+  angry:      { c1:'#FF6B6B', c2:'#D62839', pitch:.9,   rate:1.08 },
+  scolding:   { c1:'#FF8A5B', c2:'#E0413A', pitch:.92,  rate:1.12 },
+  sleepy:     { c1:'#B7A6FF', c2:'#7F6BD6', pitch:.9,   rate:.85  }
 };
 const VZ = { el:null, state:'idle', emo:'happy', rec:null, said:'', heard:'', hist:[], busy:false, paused:false, lang:(navigator.language||'en-US') };
 
-/* a capsule face: big eyes that look around and blink, a tiny mouth, a staircase antenna */
+/* Zina: a soft, wobbling blob with a staircase antenna and a very expressive face */
 function zinaFaceSVG(emo, state){
-  const c=(EMO[emo]||EMO.calm).c;
-  const eyes = emo==='happy'||emo==='encouraging'
-      ? `<path d="M76 86 Q90 66 104 86" class="eye-arc"/><path d="M136 86 Q150 66 164 86" class="eye-arc"/>`
-    : emo==='angry'
-      ? `<path d="M72 62 L104 74" class="brow"/><path d="M168 62 L136 74" class="brow"/><ellipse cx="90" cy="86" rx="12" ry="9" class="eye"/><ellipse cx="150" cy="86" rx="12" ry="9" class="eye"/>`
-    : emo==='surprised'
-      ? `<ellipse cx="90" cy="80" rx="15" ry="20" class="eye"/><ellipse cx="150" cy="80" rx="15" ry="20" class="eye"/><circle cx="95" cy="73" r="4.5" fill="#fff"/><circle cx="155" cy="73" r="4.5" fill="#fff"/>`
-    : emo==='concerned'
-      ? `<path d="M74 66 L104 60" class="brow"/><path d="M166 66 L136 60" class="brow"/><ellipse cx="90" cy="84" rx="11" ry="15" class="eye"/><ellipse cx="150" cy="84" rx="11" ry="15" class="eye"/>`
-    : emo==='excited'
-      ? `<path d="M90 64 l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z" class="star"/><path d="M150 64 l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z" class="star"/>`
-      : `<g class="eyes-look"><ellipse cx="90" cy="82" rx="13" ry="18" class="eye"/><ellipse cx="150" cy="82" rx="13" ry="18" class="eye"/><circle cx="95" cy="75" r="4" fill="#fff"/><circle cx="155" cy="75" r="4" fill="#fff"/></g>`;
-  const mouth = state==='speaking' ? `<ellipse cx="120" cy="112" rx="12" ry="8" class="talk"/>`
-    : emo==='angry' ? `<path d="M106 116 Q120 106 134 116" class="mouth"/>`
-    : emo==='concerned' ? `<path d="M108 116 Q120 110 132 116" class="mouth"/>`
-    : emo==='surprised' ? `<ellipse cx="120" cy="114" rx="7" ry="9" class="talk"/>`
-    : emo==='thinking' ? `<path d="M110 113 L130 111" class="mouth"/>`
-    : `<path d="M106 108 Q120 122 134 108" class="mouth"/>`;
-  return `<svg class="vz-face" viewBox="0 0 240 170" data-state="${state}" data-emo="${emo}" style="--fc:${c}" aria-hidden="true">
+  const e=EMO[emo]||EMO.calm, D='#1B1446';
+  const E=(x,rx=21,ry=25,px=0,py=0,pr=11)=>`<ellipse cx="${x}" cy="104" rx="${rx}" ry="${ry}" fill="#fff"/><g class="pupil"><circle cx="${x+px}" cy="${106+py}" r="${pr}" fill="${D}"/><circle cx="${x+px+4}" cy="${101+py}" r="4" fill="#fff"/></g>`;
+  const arcUp=x=>`<path d="M${x-17} 108 Q${x} 88 ${x+17} 108" class="ln"/>`;
+  const arcDn=x=>`<path d="M${x-17} 100 Q${x} 116 ${x+17} 100" class="ln"/>`;
+  let eyes, brows='', mouth, extra='';
+  switch(emo){
+    case 'happy': case 'encouraging': eyes=arcUp(88)+arcUp(152); mouth=`<path d="M96 138 Q120 166 144 138 Z" fill="${D}"/><path d="M108 150 Q120 160 132 150 Q120 146 108 150Z" fill="#FF7A9C"/>`; break;
+    case 'laughing': eyes=`<path d="M72 96 L100 106 L72 116" class="ln"/><path d="M168 96 L140 106 L168 116" class="ln"/>`; mouth=`<path d="M88 132 Q120 186 152 132 Z" fill="${D}"/><path d="M104 158 Q120 176 136 158 Q120 150 104 158Z" fill="#FF7A9C"/>`;
+      extra=`<text x="190" y="70" class="ha">HA</text><text x="18" y="84" class="ha h2">HA</text><path d="M60 118 q-6 10 0 18" class="tearj"/><path d="M180 118 q6 10 0 18" class="tearj"/>`; break;
+    case 'excited': eyes=[88,152].map(x=>`<path d="M${x} 84 l6 13 14 1-11 9 4 14-13-8-13 8 4-14-11-9 14-1z" class="star"/>`).join(''); mouth=`<path d="M96 136 Q120 164 144 136 Z" fill="${D}"/>`; break;
+    case 'love': eyes=[88,152].map(x=>`<path class="heart" d="M${x} 118 C${x-26} 102 ${x-16} 82 ${x} 94 C${x+16} 82 ${x+26} 102 ${x} 118Z"/>`).join(''); mouth=`<path d="M104 140 Q120 154 136 140" class="ln"/>`; extra=`<ellipse cx="62" cy="130" rx="12" ry="7" fill="#FF8FB1" opacity=".7"/><ellipse cx="178" cy="130" rx="12" ry="7" fill="#FF8FB1" opacity=".7"/>`; break;
+    case 'proud': eyes=`<path d="M62 94 H114 V106 Q112 120 96 120 Q80 120 76 106 Z" fill="${D}"/><path d="M126 94 H178 V106 Q176 120 160 120 Q144 120 140 106 Z" fill="${D}"/><path d="M114 98 H126" class="ln"/>`; mouth=`<path d="M104 142 Q126 152 142 136" class="ln"/>`; break;
+    case 'thinking': eyes=E(88,21,25,6,-8,10)+E(152,21,25,6,-8,10); brows=`<path d="M70 70 L104 76" class="ln"/><path d="M136 72 L170 66" class="ln"/>`; mouth=`<path d="M110 144 Q124 140 138 146" class="ln"/>`; extra=`<g class="dots"><circle cx="190" cy="56" r="6"/><circle cx="206" cy="40" r="4.5"/><circle cx="218" cy="26" r="3"/></g>`; break;
+    case 'surprised': eyes=E(88,24,29,0,0,8)+E(152,24,29,0,0,8); brows=`<path d="M68 62 Q88 50 108 62" class="ln"/><path d="M132 62 Q152 50 172 62" class="ln"/>`; mouth=`<ellipse cx="120" cy="148" rx="11" ry="14" fill="${D}"/>`; break;
+    case 'concerned': eyes=E(88,20,24,0,2,10)+E(152,20,24,0,2,10); brows=`<path d="M68 78 L106 68" class="ln"/><path d="M172 78 L134 68" class="ln"/>`; mouth=`<path d="M104 150 Q120 140 136 150" class="ln"/>`; break;
+    case 'sad': eyes=E(88,19,22,0,4,10)+E(152,19,22,0,4,10); brows=`<path d="M70 80 L106 70" class="ln"/><path d="M170 80 L134 70" class="ln"/>`; mouth=`<path d="M102 154 Q120 138 138 154" class="ln"/>`; extra=`<path class="tear t1" d="M76 128 q-7 12 0 18 q7-6 0-18z"/>`; break;
+    case 'crying': eyes=arcDn(88)+arcDn(152); brows=`<path d="M70 78 L106 68" class="ln"/><path d="M170 78 L134 68" class="ln"/>`; mouth=`<path d="M98 158 Q120 132 142 158 Q120 150 98 158Z" fill="${D}"/>`;
+      extra=`<path class="stream s1" d="M76 110 v70"/><path class="stream s2" d="M164 110 v70"/><path class="tear t1" d="M76 118 q-7 12 0 18 q7-6 0-18z"/><path class="tear t2" d="M164 118 q-7 12 0 18 q7-6 0-18z"/>`; break;
+    case 'angry': eyes=E(88,19,16,0,2,9)+E(152,19,16,0,2,9); brows=`<path d="M64 74 L108 92" class="ln thick"/><path d="M176 74 L132 92" class="ln thick"/>`; mouth=`<rect x="98" y="138" width="44" height="16" rx="6" fill="#fff" stroke="${D}" stroke-width="5"/><path d="M109 138 v16 M120 138 v16 M131 138 v16" stroke="${D}" stroke-width="3"/>`;
+      extra=`<g class="steam"><path d="M40 60 q-10-14 2-24 q10-8 2-20"/><path d="M200 60 q10-14-2-24 q-10-8-2-20"/></g>`; break;
+    case 'scolding': eyes=E(88,19,15,0,3,9)+E(152,19,15,0,3,9); brows=`<path d="M64 72 L108 92" class="ln thick"/><path d="M176 72 L132 92" class="ln thick"/>`; mouth=`<path d="M98 136 Q120 170 142 136 Z" fill="${D}"/>`;
+      extra=`<g class="grawl"><path d="M160 160 q40-4 58-26 q6 20-10 36 q-20 10-48 4z" fill="#fff" stroke="${D}" stroke-width="4"/><text x="172" y="160" class="gr">#@%!</text></g>`; break;
+    case 'sleepy': eyes=`<path d="M70 106 H106" class="ln"/><path d="M134 106 H170" class="ln"/>`; mouth=`<ellipse cx="120" cy="146" rx="9" ry="7" fill="${D}"/>`; extra=`<text x="176" y="64" class="zz">z</text><text x="192" y="44" class="zz z2">Z</text>`; break;
+    default: eyes=`<g class="look">${E(88)}${E(152)}</g>`; mouth=`<path d="M100 138 Q120 158 140 138" class="ln"/>`;
+  }
+  if(state==='speaking') mouth=`<ellipse cx="120" cy="146" rx="15" ry="11" fill="${D}" class="talk"/><ellipse cx="120" cy="152" rx="8" ry="4" fill="#FF7A9C" class="talk"/>`;
+  return `<svg class="vz-face blob" viewBox="0 0 240 220" data-state="${state}" data-emo="${emo}" aria-hidden="true">
+    <defs><radialGradient id="zb-${emo}" cx=".35" cy=".3" r=".85"><stop offset="0" stop-color="${e.c1}"/><stop offset="1" stop-color="${e.c2}"/></radialGradient></defs>
     <g class="vz-body">
-      <path class="vz-steps" d="M170 40 v-9 h10 v-9 h10 v-9 h12" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="208" cy="12" r="7" fill="#FFB547"/>
-      <rect x="14" y="38" width="212" height="112" rx="56" fill="${c}"/>
-      <rect x="26" y="50" width="188" height="88" rx="44" fill="#fff"/>
-      <g class="vz-eyes">${eyes}</g>
-      <ellipse cx="62" cy="106" rx="11" ry="6" fill="#FF8FB1" opacity="${emo==='angry'?0:.55}"/><ellipse cx="178" cy="106" rx="11" ry="6" fill="#FF8FB1" opacity="${emo==='angry'?0:.55}"/>
-      ${mouth}
-      ${state==='thinking'?'<g class="vz-dots"><circle cx="196" cy="30" r="4"/><circle cx="210" cy="22" r="3"/><circle cx="220" cy="14" r="2"/></g>':''}
+      <path d="M120 30 v-8 h9 v-8 h9 v-8 h11" fill="none" stroke="${e.c2}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="154" cy="6" r="6" fill="#FFB547"/>
+      <path fill="url(#zb-${emo})" d="M120 28 C176 26 220 62 218 116 C216 170 176 206 120 206 C64 206 22 172 22 116 C22 62 64 30 120 28Z">
+        <animate attributeName="d" dur="6s" repeatCount="indefinite" values="M120 28 C176 26 220 62 218 116 C216 170 176 206 120 206 C64 206 22 172 22 116 C22 62 64 30 120 28Z;M120 32 C182 30 214 66 220 114 C222 176 170 202 120 204 C60 206 26 166 20 114 C18 58 70 34 120 32Z;M120 28 C176 26 220 62 218 116 C216 170 176 206 120 206 C64 206 22 172 22 116 C22 62 64 30 120 28Z"/></path>
+      <ellipse cx="86" cy="56" rx="30" ry="14" fill="#fff" opacity=".22" transform="rotate(-18 86 56)"/>
+      <g class="brows">${brows}</g><g class="vz-eyes">${eyes}</g>${mouth}${extra}
     </g></svg>`;
 }
 function zinaFaceMini(){ return `<span class="vz-mini" aria-hidden="true"><i></i><i></i></span>`; }
@@ -3174,7 +3258,7 @@ async function vzAsk(text){
   const sample=S.caps.sample; if(!sample){ VZ.said='My voice connects on the live site.'; return vzSet('idle','calm'); }
   VZ.lang=langOf(text)||VZ.lang;
   VZ.busy=true; bump('ai','d'); vzSet('thinking','thinking');
-  const u=S.user; const sys=`You are Zina, a lively, funny, warm Digital SAT coach talking out loud with ${u.name||'a student'} (goal ${u.target||''}${u.examDate?', exam '+u.examDate:''}). Talk like a real human friend: short natural sentences, real feelings, under 60 words, no lists, no markdown, no emojis. ALWAYS reply in exactly the same language the student just used. Begin with exactly one tag for how you feel: [calm], [happy], [excited], [encouraging], [thinking], [surprised], [concerned] or [angry] (use [angry] only playfully, e.g. when they skip practice or give up). Never invent official SAT questions.`;
+  const u=S.user; const sys=`You are Zina, a lively, funny, warm Digital SAT coach talking out loud with ${u.name||'a student'} (goal ${u.target||''}${u.examDate?', exam '+u.examDate:''}). Talk like a real human friend: short natural sentences, real feelings, under 60 words, no lists, no markdown, no emojis. ALWAYS reply in exactly the same language the student just used. Begin with exactly one tag for how you feel, chosen honestly for the moment: [calm], [happy], [laughing], [excited], [encouraging], [love], [proud], [thinking], [surprised], [concerned], [sad], [crying], [angry], [scolding] or [sleepy]. Laugh at jokes, get sad or even cry (playfully) when they give up, get angry or scold them (kindly, never rude, no swearing) when they skip practice, show love and pride when they improve. Never invent official SAT questions.`;
   VZ.hist.push({ role:'user', content:text }); VZ.hist=VZ.hist.slice(-10);
   const turns=VZ.hist.map((m,i)=>({ role:m.role, content:i===0?sys+'\n\n'+m.content:m.content }));
   let out='';
@@ -3296,18 +3380,35 @@ function binarize(c,th=158){ const o=cropCanvas(c,0,c.width); const g=o.getConte
 function findDivider(c){ const g=c.getContext('2d'); const w=c.width, h=c.height; const y0=Math.round(h*.18), y1=Math.round(h*.95); const cw=Math.round(w*.3); const d=g.getImageData(Math.round(w*.35),y0,cw,y1-y0).data;
   let best=-1, bestF=0; for(let x=0;x<cw;x+=1){ let dark=0, n=0; for(let y=0;y<y1-y0;y+=4){ const i=(y*cw+x)*4; if(d[i]<128) dark++; n++; } const f=dark/n; if(f>bestF){ bestF=f; best=x; } }
   return bestF>0.6 ? Math.round(w*.35)+best : -1; }
+/* page → exact pictures of the passage and the question (1:1, graphs included) + a quick read of the header, number and question text */
+function cleanCanvas(src){ const o=cropCanvas(src,0,src.width); const g=o.getContext('2d'); const im=g.getImageData(0,0,o.width,o.height); const d=im.data;
+  for(let i=0;i<d.length;i+=4){ const l=.3*d[i]+.59*d[i+1]+.11*d[i+2]; const sat=Math.max(d[i],d[i+1],d[i+2])-Math.min(d[i],d[i+1],d[i+2]); if(l>150 && sat<40){ d[i]=d[i+1]=d[i+2]=255; } } g.putImageData(im,0,0); return o; }   // grey watermark out, colours and ink kept
+function picture(src){ const bb=contentBox(src); const c=cropCanvas(src,bb.x,bb.w,bb.y,bb.h); const s=Math.min(1,1000/c.width); const o=document.createElement('canvas'); o.width=Math.max(1,Math.round(c.width*s)); o.height=Math.max(1,Math.round(c.height*s));
+  const g=o.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,o.width,o.height); g.imageSmoothingQuality='high'; g.drawImage(c,0,0,o.width,o.height);
+  let url=o.toDataURL('image/png'); if(url.length>115000){ let q=.8; url=o.toDataURL('image/jpeg',q); while(url.length>115000 && q>.4){ q-=.1; url=o.toDataURL('image/jpeg',q); } } return url; }
 async function ocrPage(pdf,i){ const page=await pdf.getPage(i); const v=page.getViewport({scale:1}); const s=Math.min(3,2900/v.width); const vp=page.getViewport({scale:s});
   const full=document.createElement('canvas'); full.width=vp.width; full.height=vp.height; const g=full.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,full.width,full.height);
   await page.render({ canvasContext:g, viewport:vp }).promise;
-  const bb=contentBox(full); const gray=cropCanvas(full,bb.x,bb.w,bb.y,bb.h); const c=binarize(gray);    // just the screenshot, watermark gone
-  const x=findDivider(c); let out, area=gray, areaBin=c;
-  const numP=readNumBox(x>0?cropCanvas(c,x+6,c.width-x-6):c).catch(()=>null);
-  if(x>0){ const [L,R]=await Promise.all([ocrCanvas(cropCanvas(c,0,x-4)), ocrCanvas(areaBin=cropCanvas(c,x+6,c.width-x-6))]); area=cropCanvas(gray,x+6,gray.width-x-6); out=L+'\n<<<COL>>>\n'+R; out+=await sparseChoices(R,areaBin); }   // passage | question
-  else { const F=await ocrCanvas(c); out=F+await sparseChoices(F,c); }
-  const num=await numP; if(num) out+='\n<<<NUM>>>'+num+'\n';
-  const isMathPage=/section\s*\d?,?\s*module\s*\d\s*:?\s*math|\bmath\b.{0,20}\n|calculator\s+reference/i.test(out.slice(0,400));
-  if(isMathPage && x<0) out+='\n<<<IMG>>>'+snapshot(cropCanvas(gray,Math.round(gray.width*.22),Math.round(gray.width*.56),Math.round(gray.height*.15),Math.round(gray.height*.68)),true);
-  else out+='\n<<<IMG>>>'+snapshot(area);   // a picture of the question column, used when its text can't be trusted
+  const bb=contentBox(full); const gray=cropCanvas(full,bb.x,bb.w,bb.y,bb.h); const c=binarize(gray); const clean=cleanCanvas(gray);
+  const W=c.width, H=c.height, top=Math.round(H*.12), bodyH=H-top;
+  const x=findDivider(c);
+  const headP=ocrCanvas(cropCanvas(c,0,W,0,top));                                     // "Section 1, Module 2: Reading and Writing"
+  let out='', img='', img2='';
+  if(x>0){
+    const Rb=cropCanvas(c,x+6,W-x-6,top,bodyH), Lb=cropCanvas(c,0,x-4,top,bodyH);
+    const numP=readNumBox(Rb).catch(()=>null);
+    const [head,R,Lh]=await Promise.all([headP, ocrCanvas(Rb), ocrCanvas(cropCanvas(Lb,0,Lb.width,0,Math.round(Lb.height*.3)))]);
+    out=head+'\n'+Lh+'\n<<<COL>>>\n'+R; const num=await numP; if(num) out+='\n<<<NUM>>>'+num+'\n';
+    const nb=findNumBox(Rb); const qTop=nb?Math.min(bodyH*.5,nb.y+nb.h+Math.round(nb.h*.3)):Math.round(bodyH*.06);   // start under the "3 ▢ Mark for Review" bar
+    const rw=W-x-6; img=picture(cropCanvas(clean,x+6,Math.round(rw*.975),top+qTop,Math.round(bodyH*.9)-qTop));
+    img2=picture(cropCanvas(clean,Math.round((x-4)*.02),Math.round((x-4)*.96),top+Math.round(bodyH*.04),Math.round(bodyH*.88)));
+  } else {
+    const Bb=cropCanvas(c,0,W,top,bodyH); const numP=readNumBox(Bb).catch(()=>null);
+    const [head,F]=await Promise.all([headP, ocrCanvas(Bb)]); out=head+'\n'+F; const num=await numP; if(num) out+='\n<<<NUM>>>'+num+'\n';
+    const nb=findNumBox(Bb); const qTop=nb?Math.min(bodyH*.5,nb.y+nb.h+Math.round(nb.h*.3)):0;
+    img=picture(cropCanvas(clean,Math.round(W*.18),Math.round(W*.64),top+qTop,Math.round(bodyH*.9)-qTop));
+  }
+  if(img) out+='\n<<<IMG>>>'+img; if(img2) out+='\n<<<IMG2>>>'+img2;
   return out; }
 function snapshot(src,whole){ const y0=whole?0:Math.round(src.height*.1), h=whole?src.height:Math.round(src.height*.8); const s=Math.min(1,900/src.width); const o=document.createElement('canvas'); o.width=Math.round(src.width*s); o.height=Math.round(h*s);
   const g=o.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,o.width,o.height); g.drawImage(src,0,y0,src.width,h,0,0,o.width,o.height);
@@ -3386,49 +3487,23 @@ async function readPdfPages(pdf, name, progress){
 /* Bluebook-style PDFs put one question on each page: header, number box, "Mark for Review", passage, question, four choices */
 const BB_NOISE=/^[A-Za-z]{0,3}$|^[^\w$\-−]{0,3}$|^questio\w*$|^hi(de)?$|^\d{1,2}\s*of\s*\d{2}\b|mark\s*for\s*review|question\s*\d+\s*of\s*\d+|^section\s*\d|module\s*\d|^directions|^hide$|annotate|highlights?\s*(&|and)?\s*notes|^more$|^calculator$|^reference$|^back$|^next$|elitexsat|bluebook|@\w{3,}|^\d{1,2}:\d{2}(:\d{2})?$|^[^A-Za-z0-9$]*$/i;
 function parseBBPage(txt, st){
-  if(/reference\s+sheet/i.test(txt) && !/m[ae][cr]k\s*f[o0]r\s*rev/i.test(txt)) return null;
-  if(/reading\s*(and|&)\s*writing/i.test(txt)) st.sec='RW'; else if(/\bmath\b/i.test(txt) && /module|section/i.test(txt)) st.sec='M';
-  const mm=txt.match(/module\s*([12])\b/i); if(mm) st.mod=(st.sec||'RW')+mm[1];
-  let boxNum=null; txt=txt.replace(/\n<<<NUM>>>(\d+)\n/,(m,d)=>{ boxNum=+d; return '\n'; });
-  const [body,img]=txt.split('<<<IMG>>>'); const [main,sparse]=body.split('<<<SPARSE>>>');
-  const qm=main.match(/(?:questio\w*\s*)?\b(\d{1,2})\s*of\s*(2[27]|\d{2})\b/i);
-  const [leftRaw,rightRaw]=main.includes('<<<COL>>>')?main.split('<<<COL>>>'):['',main];
-  const clean=s=>s.replace(/\r/g,'').split('\n').map(l=>l.replace(/\s+/g,' ').trim()).filter(Boolean);
-  let left=clean(leftRaw), right=clean(rightRaw);
-  let n=boxNum || (qm?+qm[1]:null); const nb=right.findIndex(l=>/^\d{1,2}$/.test(l)); if(n==null && nb>=0 && +right[nb]<=27) n=+right[nb];
-  if(n==null){ const ml=right.find(l=>/mark\s*for\s*review/i.test(l)); const mm2=ml&&ml.match(/(\d{1,2})\s*\W{0,3}\s*(?:[|\[\]()]\s*)?mark\s*for/i); if(mm2 && +mm2[1]<=27) n=+mm2[1]; }
-  left=left.filter(l=>!BB_NOISE.test(l)); right=right.filter((l,i)=>i!==nb && !BB_NOISE.test(l));
-  const MARK=/^\s*(?:[(\[]\s*([A-D])\s*[)\]]|([A-D])\s*[).:\]|}]|([A-D])\s+(?=\S)|([@©®]\)?))\s*/;
-  // the question is the last line on the right that asks something; the choices are what follows it
-  let qi=-1; for(let k=right.length-1;k>=0;k--){ if(/\?\s*$|complete[s]? the text|most logical|^which choice|^what\b|^how\b|^based on|^according/i.test(right[k])){ qi=k; break; } }
-  let stemLines, rest;
-  if(qi>=0){ let s0=qi; while(s0>0 && !/[.?!:"”]$/.test(right[s0-1]) && qi-s0<3) s0--; stemLines=right.slice(s0,qi+1); rest=right.slice(qi+1); const extra=right.slice(0,s0); if(extra.length) left=left.concat(extra); }
-  else { const mk=right.findIndex(l=>MARK.test(l)); stemLines=right.slice(0,mk>0?mk:right.length); rest=mk>0?right.slice(mk):[]; }
-  // a wrapped choice continues on a line that starts in lower case; glue it back first
-  rest=rest.reduce((a,l)=>{ if(a.length && /^[a-z(]/.test(l) && !MARK.test(l)) a[a.length-1]+=' '+l; else a.push(l); return a; },[]);
-  let choices=[];
-  if(rest.length>=4){ const marked=rest.map((l,i)=>MARK.test(l)?i:-1).filter(i=>i>=0);
-    if(marked.length===4 && rest.length>4){ choices=marked.map((ix,j)=>rest.slice(ix, j<3?marked[j+1]:rest.length).join(' ')); }
-    else choices=rest.slice(0,4); }
-  if(choices.length<4 && sparse){ const sl=clean(sparse).filter(l=>!BB_NOISE.test(l) || /^-?[\d.\/]+$/.test(l)); const qk=sl.map(l=>/\?\s*$/.test(l)).lastIndexOf(true); const after=(qk>=0?sl.slice(qk+1):sl).filter(l=>!/^\d{1,2}\s*of/i.test(l) && !/next|back/i.test(l)); if(after.length>=4) choices=after.slice(0,4); }
-  choices=choices.map(c=>c.replace(MARK,'').replace(/^[\s|®©@()\[\]{}'‘’"“”.,:;&-]+/,'').replace(/^[A-Za-z]{1,2}[)\]}|]\s*/,'').replace(/^[A-D][).:\]]\s+/,'').replace(/[\s|]+$/,'').trim());
-  let stem=stemLines.join(' ').replace(/^.*?m[ae][cr]k\s*f[o0]r\s*rev\w*\s*/i,'').trim().replace(/^[^A-Za-z"“(]*(?=[A-Z"“(])/,'').replace(/^(?:[A-Za-z]{1,2}\s+|[|\d]+\s+){1,4}(?=(Which|What|How|Based|According|As used|The |In |If |A |An ))/,'');
-  { const m=stem.match(/\b(Which|What|As used|Based on|According|How|If|In the|The|A|An|For|Suppose|Given)\b/); if(m && m.index>0 && m.index<32) stem=stem.slice(m.index); }
-  if(!stem || (n==null && choices.length<4 && !img)) return null;
-  while(left.length && (left[left.length-1].replace(/[^A-Za-z]/g,'').length<4)) left.pop();                 // stray OCR crumbs at the end
-  while(left.length && (left[0].replace(/[^A-Za-z]/g,'').length<3)) left.shift();
-  let passage=left.join('\n');
-  const sec = st.sec==='M' || (!st.sec && /=|\bx\b|\bf\(/.test(stem)) ? 'M' : 'RW';
-  const all=passage+' '+stem+' '+choices.join(' ');
-  const isSPR = /student[- ]produced\s+response/i.test(txt);        // the left pane holds the typed-answer directions
-  if(isSPR){ choices=[]; left=[]; }
-  const junk = choices.length===4 && choices.some(c=>!/[A-Za-z0-9]{1}/.test(c) || c.length>160);
-  const isM = st.sec==='M' || isSPR;
-  const useImg = img && img.startsWith('data:image') && (choices.length<4 || junk || isM);
-  if(isSPR) passage='';
-  if(useImg && !isSPR && (choices.length<4 || junk)) choices=['A','B','C','D'];
-  const r=normalizeQ({ section:sec, domain:guessDomain(all,sec), difficulty:'Medium', tier:'free', passage:sec==='M'?'':passage, question:sec==='M'&&passage?passage+'\n'+stem:stem, choices:choices.length===4?choices:[], answer:'', explanation:'' });
-  if(useImg && r.q){ r.q.image=img.trim(); r.q.scan=true; }   // math is shown as the original picture, so every formula stays exact
+  const [pre2,img2]=txt.split('<<<IMG2>>>'); const [pre1,img]=pre2.split('<<<IMG>>>');
+  let boxNum=null; const body=pre1.replace(/\n<<<NUM>>>(\d+)\n/,(m,d)=>{ boxNum=+d; return '\n'; });
+  if(/reference\s+sheet/i.test(body) && !/m[ae][cr]k\s*f[o0]r\s*rev/i.test(body)) return null;
+  if(/reading\s*(and|&)\s*writing/i.test(body)) st.sec='RW'; else if(/\bmath\b/i.test(body) && /module|section/i.test(body)) st.sec='M';
+  const mm=body.match(/module\s*([12])\b/i); if(mm) st.mod=(st.sec||'RW')+mm[1];
+  const [leftRaw,rightRaw]=body.includes('<<<COL>>>')?body.split('<<<COL>>>'):['',body];
+  const clean=s=>s.replace(/\r/g,'').split('\n').map(l=>l.replace(/\s+/g,' ').trim()).filter(l=>l && !BB_NOISE.test(l));
+  const right=clean(rightRaw);
+  let n=boxNum; if(n==null){ const qm=body.match(/\b(\d{1,2})\s*of\s*(2[27])\b/); if(qm) n=+qm[1]; }
+  const qi=right.map(l=>/\?\s*$|complete[s]? the text|most logical|^which choice|^what\b|^how\b/i.test(l)).lastIndexOf(true);
+  const stem=(qi>=0?right.slice(Math.max(0,qi-3),qi+1):right.slice(0,4)).join(' ').replace(/^.*?m[ae][cr]k\s*f[o0]r\s*rev\w*\s*/i,'').trim();
+  if(!img && !stem) return null;
+  if(n==null && !img) return null;
+  const isSPR=/student[- ]produced\s+response/i.test(leftRaw+' '+rightRaw);
+  const sec = st.sec==='M' || isSPR ? 'M' : 'RW';
+  const r=normalizeQ({ section:sec, domain:guessDomain(stem+' '+right.join(' '),sec), difficulty:'Medium', tier:'free', passage:'', question:stem||'Question', choices:isSPR?[]:['A','B','C','D'], answer:'', explanation:'' });
+  if(r.q){ r.q.scan=true; if(img) r.q.image=img.trim(); if(img2 && sec==='RW' && !isSPR) r.q.image2=img2.trim(); r.q.ocr=right.join(' ').slice(0,600); }
   r.n=n; r.mod=st.mod||'?'; return r;
 }
 function questionsFromPages(pages){
@@ -3535,7 +3610,7 @@ function realQueueHTML(){
     ${REALQ.running?`<button class="btn btn-ghost" id="rqStop" style="width:100%;margin-top:12px">Stop after this exam</button>`:`<button class="btn btn-primary" id="rqDone" style="width:100%;margin-top:12px">Open Full-length tests</button>`}
     <p class="faint" style="font-size:12.5px;margin:10px 0 0">Keep this tab open while it works. Drafts open in Full-length tests, where you can fix answers and publish.</p></div>`;
 }
-function recheckReal(it){ const r=normalizeQ({ ...it.q, question:it.q.stem }); r.q.id=it.q.id; it.q=r.q; it.errs=r.errs; }
+function recheckReal(it){ const r=keepExtras(normalizeQ({ ...it.q, question:it.q.stem }),it.q); r.q.id=it.q.id; it.q=r.q; it.errs=r.errs; }
 function applyKey(mod,text){ const pairs=[...String(text).matchAll(/(\d{1,2})\s*[.)\-:]?\s*([A-D]|-?[\d.\/]+)\b/gi)]; let n=0;
   pairs.forEach(([,num,ans])=>{ const it=REAL.items.find(x=>x.mod===mod && x.n===+num); if(it){ it.q.answer=ans.toUpperCase(); recheckReal(it); n++; } }); return n; }
 function realBuilderHTML(busy){
@@ -3769,7 +3844,7 @@ async function bulkImport(files){
         if(pdf){ const pages=await readPdfPages(pdf,f.name,say); const joined=pages.join('\n\n');
           if(looksLikeKey(joined,f.name)){ (bankKeys[examBase(f.name)]=bankKeys[examBase(f.name)]||[]).push(...keyPairs(joined)); continue; }
           const r=questionsFromPages(pages); const found=r.items; (pages.keys||[]).forEach(k=>r.keys.push(k));
-          r.keys.forEach(k=>{ const it=found.find(x=>x.q && x.n===k.n && (k.module==='?'||x.mod===k.module) && !x.q.answer); if(it){ it.q.answer=k.answer; const z=normalizeQ({ ...it.q, question:it.q.stem }); z.q.id=it.q.id; it.q=z.q; it.errs=z.errs; } });
+          r.keys.forEach(k=>{ const it=found.find(x=>x.q && x.n===k.n && (k.module==='?'||x.mod===k.module) && !x.q.answer); if(it){ it.q.answer=k.answer; const z=keepExtras(normalizeQ({ ...it.q, question:it.q.stem }),it.q); z.q.id=it.q.id; it.q=z.q; it.errs=z.errs; } });
           if(!found.length){ const chars=joined.replace(/\s/g,'').length; failed.push(`${f.name}: ${chars<50?`no readable text on ${pdf.numPages} pages`:`read ${pdf.numPages} pages, but no questions matched (${chars} characters)`}`); continue; }
           found.forEach(x=>x.src=f.name); all=all.concat(found); continue; } }
       const text=await extractText(f,say); if(!text||!text.trim()){ failed.push(`${f.name}: no text found`); continue; }
@@ -3777,12 +3852,12 @@ async function bulkImport(files){
       let found;
       if(/\.json$/i.test(f.name)) found=parseImport(text);
       else { const r=parseExamText(text); found=[...r];                       // strips "Module 1" headers, reads answer-key pages
-        r.keys.forEach(k=>{ const it=found.find(x=>x.q && x.n===k.n && (k.module==='?'||x.mod===k.module) && !x.q.answer); if(it){ it.q.answer=k.answer; const z=normalizeQ({ ...it.q, question:it.q.stem }); z.q.id=it.q.id; it.q=z.q; it.errs=z.errs; } }); }
+        r.keys.forEach(k=>{ const it=found.find(x=>x.q && x.n===k.n && (k.module==='?'||x.mod===k.module) && !x.q.answer); if(it){ it.q.answer=k.answer; const z=keepExtras(normalizeQ({ ...it.q, question:it.q.stem }),it.q); z.q.id=it.q.id; it.q=z.q; it.errs=z.errs; } }); }
       found.forEach(x=>x.src=f.name); all=all.concat(found);
     }catch(e){ failed.push(readFail(f,e)); }
   }
   Object.entries(bankKeys).forEach(([base,pairs])=>{ const mine=all.filter(x=>x.q && examBase(x.src)===base); const pool=mine.length?mine:all.filter(x=>x.q);
-    pairs.forEach(k=>{ const it=pool.find(x=>x.n===k.n && !x.q.answer); if(it){ it.q.answer=k.answer; const r=normalizeQ({ ...it.q, question:it.q.stem }); r.q.id=it.q.id; it.q=r.q; it.errs=r.errs; } }); });
+    pairs.forEach(k=>{ const it=pool.find(x=>x.n===k.n && !x.q.answer); if(it){ it.q.answer=k.answer; const r=keepExtras(normalizeQ({ ...it.q, question:it.q.stem }),it.q); r.q.id=it.q.id; it.q=r.q; it.errs=r.errs; } }); });
   const before=all.length; all=markDups(all); skipped=before-all.length; all.forEach(x=>{}); 
   IMPORT_PREVIEW=all; IMP_FILTER=all.some(x=>!x.q||x.errs.length)?'bad':'all'; IMP_SHOW=40;
   window.BULK_LOG=`<div class="bulk-status done"><b>✓ ${files.length-failed.length} file${files.length-failed.length===1?'':'s'} read · ${all.length} questions</b>${skipped?`<span>${skipped} duplicates skipped</span>`:''}${failed.length?`<span class="bad">${failed.map(esc).join('<br>')}</span>`:''}</div>`; if(log) log.innerHTML=window.BULK_LOG;
@@ -3896,7 +3971,8 @@ function viewAdmin(params){
   }
   if(AT==='payments'){ body=adminPaymentsHTML(); }
   if(AT==='ai'){
-    body=`<div class="card pad" style="max-width:760px"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:20px"><div><b style="font-size:17px">Allow Zina AI to draft new questions</b><p class="muted" style="margin:6px 0 0;font-size:14px">Off = AI never creates questions.</p></div><button class="switch ${S.settings.aiDrafting?'on':''}" id="aiToggle" aria-label="Allow AI drafting"></button></div></div>
+    body=`<div class="card pad ai-check" style="max-width:760px;margin-bottom:16px"><div class="row" style="justify-content:space-between;gap:14px;flex-wrap:wrap"><div><b style="font-size:17px">Is Zina AI working?</b><p class="muted" style="margin:4px 0 0;font-size:14px">Checks the key, the server and a real answer.</p></div><button class="btn btn-primary btn-sm" id="aiTest">Check now</button></div><div id="aiTestOut"></div></div>
+      <div class="card pad" style="max-width:760px"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:20px"><div><b style="font-size:17px">Allow Zina AI to draft new questions</b><p class="muted" style="margin:6px 0 0;font-size:14px">Off = AI never creates questions.</p></div><button class="switch ${S.settings.aiDrafting?'on':''}" id="aiToggle" aria-label="Allow AI drafting"></button></div></div>
       <h3 style="font-size:20px;margin:26px 0 12px">Drafts waiting for review (${S.drafts.length})</h3>
       ${S.drafts.length?S.drafts.map(d=>`<div class="card pad" style="margin-bottom:12px"><div class="row" style="justify-content:space-between;flex-wrap:wrap"><span class="pill">${esc(d.domain)}, ${d.difficulty}</span><div class="row"><button class="btn btn-sm btn-ghost" data-drej="${d.id}">Reject</button><button class="btn btn-sm btn-ghost" data-dedit="${d.id}">Edit</button><button class="btn btn-sm btn-primary" data-dok="${d.id}">Approve</button></div></div>${d.passage?`<p style="font-family:var(--serif);margin:12px 0 6px">${fmt(d.passage)}</p>`:''}<p style="font-weight:600;margin:10px 0">${fmt(d.stem)}</p>${(d.choices||[]).map((c,i)=>`<div style="font-size:14px;${'ABCD'[i]===d.answer?'color:var(--mint);font-weight:700':''}">${'ABCD'[i]}) ${fmt(c)}</div>`).join('')}${d.explanation?`<p class="muted" style="font-size:13.5px;margin-top:8px">${fmt(d.explanation)}</p>`:''}</div>`).join(''):'<p class="muted">Nothing to review.</p>'}`;
   }
@@ -3904,6 +3980,7 @@ function viewAdmin(params){
     <div class="tabs">${tabs.map(([k,l])=>`<button data-at="${k}" class="${AT===k?'on':''}">${l}</button>`).join('')}</div>${body}`);
 }
 let IMP_SHOW=40, IMP_FILTER='all';
+function keepExtras(r,old){ if(r&&r.q&&old){ ['scan','image','image2','ocr','examOnly','exam'].forEach(k=>{ if(old[k]!=null && r.q[k]==null) r.q[k]=old[k]; }); } return r; }
 function importPreviewHTML(){ const P=IMPORT_PREVIEW; const good=x=>x.q&&!x.errs.length; const ready=P.filter(good).length;
   const nRW=P.filter(x=>x.q&&x.q.section==='RW').length, nM=P.filter(x=>x.q&&x.q.section==='M').length, bad=P.length-ready, dup=P.filter(x=>x.dup).length;
   const opt=(arr,v)=>arr.map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('');
@@ -3921,7 +3998,7 @@ function importPreviewHTML(){ const P=IMPORT_PREVIEW; const good=x=>x.q&&!x.errs
       ${shown.length>IMP_SHOW?`<button class="btn btn-ghost" id="impMore" style="width:100%">Show ${Math.min(40,shown.length-IMP_SHOW)} more of ${shown.length-IMP_SHOW}</button>`:''}</div>
     <div id="saveBar"></div>
     <button class="btn btn-primary btn-lg" id="impSave" style="width:100%;margin-top:14px" ${ready?'':'disabled'}>Save ${ready} question${ready===1?'':'s'}</button></div>`; }
-function recheck(i){ const x=IMPORT_PREVIEW[i]; const r=normalizeQ({...x.q, question:x.q.stem}); r.q.id=x.q.id; IMPORT_PREVIEW[i]=r; }
+function recheck(i){ const x=IMPORT_PREVIEW[i]; const r=keepExtras(normalizeQ({...x.q, question:x.q.stem}),x.q); r.q.id=x.q.id; IMPORT_PREVIEW[i]=r; }
 function bindPreview(){
   $$('[data-ir]').forEach(row=>{ const i=+row.dataset.ir;
     $$('[data-f]',row).forEach(el=>el.onchange=()=>{ const q=IMPORT_PREVIEW[i].q; q[el.dataset.f]=el.value; if(el.dataset.f==='section') q.domain=DOMAINS[q.section][0]; recheck(i); $('#impPrev').innerHTML=importPreviewHTML(); bindPreview(); }); });
@@ -4032,6 +4109,11 @@ async function draftSimilar(q){
 function bindAdmin(){
   $('#exportQ')?.addEventListener('click',()=>{ const json=JSON.stringify(S.questions); const m=modal(`<h2 style="font-size:22px">Export ${S.questions.length} questions</h2><p class="muted" style="margin:8px 0 12px">Copy this and paste it into Upload on your new site.</p><textarea class="textarea" style="min-height:260px;font-size:12px" readonly>${esc(json)}</textarea><button class="btn btn-primary" id="cpy" style="width:100%;margin-top:12px">Copy</button>`,{wide:true}); $('#cpy',m).onclick=async()=>{ const ta=$('textarea',m); ta.select(); try{ await navigator.clipboard.writeText(json); }catch(e){ document.execCommand('copy'); } toast('Copied'); }; });
   bindShell(); if(!S.isAdmin) return;
+  $('#aiTest')?.addEventListener('click',async()=>{ const out=$('#aiTestOut'); const say=(ok,msg)=>out.insertAdjacentHTML('beforeend',`<div class="aic-row ${ok?'ok':'no'}"><b>${ok?'✓':'✕'}</b>${msg}</div>`); out.innerHTML='';
+    if(window.ZINA){ try{ const h=await fetch(ZINA.config.aiEndpoint||'/api/ai').then(r=>r.json()); say(h.anthropic,h.anthropic?'Anthropic key is set in Vercel':'ANTHROPIC_API_KEY is missing in Vercel → Settings → Environment Variables, then Redeploy'); say(h.supabase,h.supabase?'Server can reach Supabase':'SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is missing in Vercel'); if(!h.anthropic||!h.supabase) return; }catch(e){ return say(false,'The /api/ai server did not answer. Check that the api folder was uploaded to GitHub.'); } }
+    if(!S.caps.sample) return say(false,'AI is not available on this page.');
+    try{ const r=await S.caps.sample('Reply with just the word OK.',{ modelTier:'quick' }); say(true,'Zina answered: “'+esc(r.text.trim().slice(0,40))+'”'); }
+    catch(e){ say(false,'Zina did not answer: '+esc(e.message||e.code||'unknown')+(/upstream/.test(e.message||'')?' (Anthropic refused: check the key and that the account has credit)':'')); } });
   $$('[data-rpx]').forEach(b=>b.onclick=async()=>{ try{ await Data.del('reports',b.dataset.rpx); }catch(e){} route(); });
   if(AT==='payments') bindAdminPayments();
   if(AT==='mocks') bindRealExams();

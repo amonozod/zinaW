@@ -118,6 +118,12 @@ create policy own_state on public.docs for all to authenticated
   using (collection = 'data/users/' || auth.uid()::text)
   with check (collection = 'data/users/' || auth.uid()::text);
 
+-- explanations Zina writes once per question, shared with everyone
+drop policy if exists explains_write on public.docs;
+create policy explains_write on public.docs for insert to authenticated with check (collection = 'explains');
+drop policy if exists explains_update on public.docs;
+create policy explains_update on public.docs for update to authenticated using (collection = 'explains') with check (collection = 'explains');
+
 -- students can flag a broken question; only the owner reads the flags
 drop policy if exists reports_insert on public.docs;
 create policy reports_insert on public.docs for insert to authenticated

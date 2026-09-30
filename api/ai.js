@@ -12,6 +12,8 @@ function effectivePlan(e) {   // entitlement written by the owner when a payment
 }
 
 export default async function handler(req) {
+  if (req.method === 'GET') return json({ ok: true, anthropic: !!process.env.ANTHROPIC_API_KEY, supabase: !!(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) }, 200);   // health check, no secrets
+  if (req.method === 'GET') return json({ anthropic: !!process.env.ANTHROPIC_API_KEY, supabase: !!(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY), model: MODEL_QUICK }, 200);   // health check for the owner
   if (req.method !== 'POST') return json({ code: 'method' }, 405);
   const SB = process.env.SUPABASE_URL, SRK = process.env.SUPABASE_SERVICE_ROLE_KEY, KEY = process.env.ANTHROPIC_API_KEY;
   if (!SB || !SRK || !KEY) return json({ code: 'not_configured' }, 500);
@@ -23,14 +25,14 @@ export default async function handler(req) {
 
   const H = { apikey: SRK, Authorization: 'Bearer ' + SRK, 'content-type': 'application/json' };
   const [en, ad] = await Promise.all([
-    fetch(`${SB}/rest/v1/docs?path=eq.entitlements/${user.id}&select=data`, { headers: H }).then(r => r.json()),
+    fetch(`${SB}/rest/v1/docs?path=eq.${encodeURIComponent('entitlements/' + user.id)}&select=data`, { headers: H }).then(r => r.json()),
     fetch(`${SB}/rest/v1/admins?user_id=eq.${user.id}&select=user_id`, { headers: H }).then(r => r.json())
   ]);
   const isAdmin = Array.isArray(ad) && ad.length > 0;
   const plan = effectivePlan((en && en[0] && en[0].data) || {});
 
   let body; try { body = await req.json(); } catch { return json({ code: 'bad_request' }, 400); }
-  const kind = body.kind === 'json' ? 'json' : 'chat';
+  const kind = body.kind === 'json' ? 'json' : body.kind === 'explain' ? 'explain' : 'chat';
   if (kind === 'json' && !isAdmin) return json({ code: 'forbidden' }, 403);   // question sorting/drafting is owner-only
 
   const messages = (Array.isArray(body.messages) ? body.messages : [])
@@ -38,7 +40,7 @@ export default async function handler(req) {
     .slice(-14).map(m => ({ role: m.role, content: m.content.slice(0, kind === 'json' ? 30000 : 8000) }));
   if (!messages.length || messages[0].role !== 'user') return json({ code: 'bad_request' }, 400);
   // page images (owner only: reading scanned exams) ride along with the last user turn
-  const imgs = (kind === 'json' && Array.isArray(body.images) ? body.images : []).slice(0, 6)
+  const imgs = ((kind === 'json' || kind === 'explain') && Array.isArray(body.images) ? body.images : []).slice(0, kind === 'explain' ? 3 : 6)
     .filter(i => i && /^image\/(jpeg|png|webp|gif)$/.test(i.media_type) && typeof i.data === 'string' && i.data.length < 5_500_000);
   if (imgs.length) {
     const last = messages[messages.length - 1];
@@ -46,8 +48,8 @@ export default async function handler(req) {
   }
 
   if (!isAdmin) {
-    const ok = await fetch(`${SB}/rest/v1/rpc/bump_ai`, { method: 'POST', headers: H, body: JSON.stringify({ p_user: user.id, p_limit: LIMIT[plan] || 0 }) }).then(r => r.json());
-    if (ok !== true) return json({ code: plan === 'free' ? 'forbidden' : 'limit' }, plan === 'free' ? 403 : 429);
+    const ok = await fetch(`${SB}/rest/v1/rpc/bump_ai`, { method: 'POST', headers: H, body: JSON.stringify({ p_user: user.id, p_limit: (LIMIT[plan] || 0) + (kind === 'explain' ? 40 : 0) }) }).then(r => r.json());
+    if (ok !== true) return json({ code: plan === 'free' && kind !== 'explain' ? 'forbidden' : 'limit' }, plan === 'free' && kind !== 'explain' ? 403 : 429);
   }
 
   const model = (isAdmin || plan === 'elite' || body.tier === 'default') ? MODEL_SMART : MODEL_QUICK;
