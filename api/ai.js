@@ -32,6 +32,20 @@ export default async function handler(req) {
   const plan = effectivePlan((en && en[0] && en[0].data) || {});
 
   let body; try { body = await req.json(); } catch { return json({ code: 'bad_request' }, 400); }
+  if (body.diag) {                                             // owner-only self test: one short, non-streamed call per model, full error text
+    if (!isAdmin) return json({ code: 'forbidden', detail: 'Only admins can run the check (add yourself to the admins table).' }, 403);
+    const out = [];
+    for (const m of [...new Set([MODEL_QUICK, MODEL_SMART, 'claude-haiku-4-5-20251001', 'claude-sonnet-4-5'])]) {
+      const t0 = Date.now();
+      try {
+        const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'x-api-key': KEY.trim(), 'anthropic-version': '2023-06-01', 'content-type': 'application/json' }, body: JSON.stringify({ model: m, max_tokens: 10, messages: [{ role: 'user', content: 'Reply with just OK.' }] }) });
+        const j = await r.json().catch(() => ({}));
+        out.push({ model: m, ok: r.ok, status: r.status, ms: Date.now() - t0, text: r.ok ? (j.content && j.content[0] && j.content[0].text) || '' : (j.error && (j.error.message || j.error.type)) || 'HTTP ' + r.status });
+        if (r.ok) break;
+      } catch (e) { out.push({ model: m, ok: false, status: 0, ms: Date.now() - t0, text: String(e && e.message || e) }); }
+    }
+    return json({ ok: out.some(x => x.ok), results: out, keyStart: KEY.trim().slice(0, 10) + '…' }, 200);
+  }
   const kind = body.kind === 'json' ? 'json' : body.kind === 'explain' ? 'explain' : 'chat';
   if (kind === 'json' && !isAdmin) return json({ code: 'forbidden' }, 403);   // question sorting/drafting is owner-only
 

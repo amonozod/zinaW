@@ -1405,6 +1405,45 @@ s.was{font-size:.42em;font-weight:600;opacity:.45;margin-right:8px;letter-spacin
 .exam .rv-head .nav-h{font-size:22px}
 @media (max-width:1100px){.exam .ex-passage,.exam .ex-passage p{font-size:20px}.exam .qstem{font-size:20px}.exam .choice{font-size:19px}}
 .exam .rv-head .ex-legend{border-bottom:0;margin-bottom:0}
+
+/* exam v6: bluecorn scale */
+.exam .ex-passage,.exam .ex-passage p{font-size:26px;line-height:1.72}
+.exam .qstem{font-size:25px;line-height:1.65}
+.exam .choice{font-size:24px;min-height:80px;padding:14px 20px}
+.exam .choice .lt{width:36px;height:36px;font-size:17px}
+.exam .ex-title{font-size:26px}
+.exam .ex-dir{font-size:18px}
+.exam .ex-timer b{font-size:30px;min-height:38px}
+.exam .ex-tool{font-size:15px}.exam .ex-tool svg{width:26px;height:26px}
+.exam .qnum{font-size:20px;padding:8px 14px}
+.exam .mfr,.exam .mark-btn{font-size:18px}
+.exam .ex-bot .ex-blue,.exam #nextQ,.exam #prevQ{font-size:19px;padding:12px 28px}
+.exam #navBtn{font-size:19px;padding:12px 20px}
+@media (max-width:1300px){.exam .ex-passage,.exam .ex-passage p{font-size:22px}.exam .qstem{font-size:22px}.exam .choice{font-size:21px}}
+.exam .ex-single{max-width:1000px}
+.exam .mfr-bar,.exam .ex-qhead{font-size:17px}
+
+/* review page + navigator legend at bluecorn scale */
+.exam .nav-h{font-size:26px;line-height:1.35}
+.exam .ex-legend{gap:48px;padding:10px 0 18px;font-size:19px}
+.exam .lg{gap:10px;font-size:19px}
+.exam .lg svg{width:22px;height:22px}.exam .lg-un{width:20px;height:20px;border-width:2px}
+.exam .rv-head{padding:18px 0 4px;border-bottom:1.5px solid #1a1a1a}
+.exam .ex-review-card,.exam .rv-card{max-width:1100px;width:100%}
+/* highlighter */
+.hl-bar{padding:8px 10px;gap:8px}
+.hl-bar button{width:32px;height:32px}
+.hl-bar .on{box-shadow:0 0 0 3px #fff}
+.hc-n{background:#333;font-size:15px}
+.exam mark.has-note{border-bottom:3px dotted #C8102E}
+.exam mark{cursor:pointer}
+.exam .rv-title{font-size:34px;margin:10px 0 6px}.exam .rv-sub{font-size:18px;color:#444;margin:0}
+.exam .rv-card{border:1px solid #D6D9E0;border-radius:14px;padding:26px 44px 34px;margin-top:22px;width:min(1000px,100%);box-shadow:0 4px 18px rgba(0,0,0,.06);background:#fff}
+.exam .rv-card .ex-grid{gap:14px;justify-content:center}
+.exam .rv-head .nav-h{font-size:26px}
+.exam .rv-card .ex-grid > *{min-width:46px;height:46px;font-size:19px}
+.all-drop{border-style:solid;border-color:color-mix(in srgb,var(--p) 55%,var(--line));background:radial-gradient(400px 200px at 50% 0%,color-mix(in srgb,var(--p) 14%,transparent),transparent 70%),var(--glass)}
+.all-drop .bd-ic{background:linear-gradient(135deg,var(--sun-hi),var(--sun));color:var(--on-sun)}
 </style>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect x=%271%27 y=%271%27 width=%2730%27 height=%2730%27 rx=%279%27 fill=%27%235B3DF5%27/%3E%3Cpath d=%27M8 9h15.5v4h-4.5v4h-4.5v4h-4.5v2.5H24%27 fill=%27none%27 stroke=%27%23fff%27 stroke-width=%272.6%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3Ccircle cx=%2723.6%27 cy=%278.9%27 r=%272.6%27 fill=%27%23FFB547%27/%3E%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1696,7 +1735,7 @@ const I = {
   bookmark:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg>',
   pen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>',
   calc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>',
-  ref:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 10v4"/></svg>',
+  ref:'<svg viewBox="0 0 28 24" fill="currentColor"><text x="1" y="20" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="20">x</text><text x="15" y="11" font-family="Georgia,serif" font-weight="700" font-size="11">2</text></svg>',
   more:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
   chev:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>',
   up:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 15l6-6 6 6"/></svg>',
@@ -2355,8 +2394,8 @@ function renderExam(){
     return;
   }
   if(EX.screen==='review'){
-    body = `<div class="ex-center"><h2>Check your work</h2><p style="max-width:560px;color:#444">Tap any question to go back to it.</p>
-      <div style="border:1px solid #ddd;border-radius:14px;padding:22px;margin-top:20px;width:min(640px,100%)">
+    body = `<div class="ex-center"><h2 class="rv-title">Check Your Work</h2><p class="rv-sub">Tap any question to go back to it.</p>
+      <div class="rv-card">
         <div class="rv-head"><div class="nav-h">${esc(mod.title.replace(/,\s*Module\s*\d+/i,''))}<br>Questions</div><div class="ex-legend">${legend()}</div></div>
         <div class="ex-grid">${gridCells(mod,true)}</div>
       </div>
@@ -2382,20 +2421,31 @@ function renderExam(){
   updTimer(); bindExam(); typeset(el);
 }
 /* highlighter: select words → a small bar with colors, underline, and remove */
+/* Bluebook-style highlighter: select words and they turn yellow at once; tap a highlight to recolor, underline, add a note or remove it */
+function hlSave(pas,q){ EX.hl[q.id]=pas.innerHTML; }
+function hlBar(mk,pas,q){
+  $('#hlBar')?.remove(); const r=mk.getBoundingClientRect(); const b=document.createElement('div'); b.id='hlBar'; b.className='hl-bar';
+  b.innerHTML=`${['yellow','blue','pink'].map(c=>`<button data-hc="${c}" class="hc hc-${c} ${mk.classList.contains('hl-'+c)?'on':''}" aria-label="${c}"></button>`).join('')}<button data-hc="u" class="hc-u ${mk.classList.contains('hl-u')?'on':''}" aria-label="Underline"><u>U</u></button><button data-hc="n" class="hc-n" aria-label="Add a note">✎</button><button data-hc="x" class="hc-x" aria-label="Delete">🗑</button>`;
+  b.style.left=Math.max(8,Math.min(innerWidth-270,r.left+r.width/2-125))+'px'; b.style.top=Math.max(8,r.top-54)+'px'; document.body.appendChild(b);
+  b.onmousedown=e=>e.preventDefault();
+  b.onclick=e=>{ const c=e.target.closest('[data-hc]')?.dataset.hc; if(!c) return;
+    if(c==='x'){ mk.replaceWith(...mk.childNodes); hlSave(pas,q); b.remove(); return; }
+    if(c==='n'){ const note=prompt('Note', mk.dataset.note||''); if(note!==null){ mk.dataset.note=note.trim(); mk.title=note.trim(); mk.classList.toggle('has-note',!!note.trim()); hlSave(pas,q); } b.remove(); return; }
+    mk.classList.remove('hl-yellow','hl-blue','hl-pink','hl-u'); mk.classList.add(c==='u'?'hl-u':'hl-'+c); hlSave(pas,q); b.remove(); };
+}
 function bindHighlighter(pas,q){
-  const bar=()=>$('#hlBar');
   pas.onmouseup=pas.ontouchend=()=>setTimeout(()=>{
-    const sel=getSelection(); bar()?.remove(); if(!sel.rangeCount||sel.isCollapsed) return; const r=sel.getRangeAt(0); if(!pas.contains(r.commonAncestorContainer)) return;
+    const sel=getSelection(); $('#hlBar')?.remove(); if(!sel.rangeCount||sel.isCollapsed) return; const r=sel.getRangeAt(0).cloneRange(); if(!pas.contains(r.commonAncestorContainer)) return;
     const rect=r.getBoundingClientRect(); const b=document.createElement('div'); b.id='hlBar'; b.className='hl-bar';
-    b.innerHTML=`${['yellow','blue','pink'].map(c=>`<button data-hc="${c}" class="hc hc-${c}" aria-label="Highlight ${c}"></button>`).join('')}<button data-hc="u" class="hc-u" aria-label="Underline"><u>U</u></button><button data-hc="x" class="hc-x" aria-label="Remove highlight">✕</button>`;
-    b.style.left=Math.max(8,Math.min(innerWidth-220,rect.left+rect.width/2-100))+'px'; b.style.top=Math.max(8,rect.top-52)+'px'; document.body.appendChild(b);
+    b.innerHTML=['yellow','blue','pink'].map(c=>`<button data-hc="${c}" class="hc hc-${c}" aria-label="Highlight ${c}"></button>`).join('');
+    b.style.left=Math.max(8,Math.min(innerWidth-150,rect.left+rect.width/2-60))+'px'; b.style.top=Math.max(8,rect.top-52)+'px'; document.body.appendChild(b);
     b.onmousedown=e=>e.preventDefault();
-    b.onclick=e=>{ const c=e.target.closest('[data-hc]')?.dataset.hc; if(!c) return;
-      if(c==='x'){ const m=r.commonAncestorContainer.nodeType===1?r.commonAncestorContainer.closest('mark'):r.commonAncestorContainer.parentElement?.closest('mark'); if(m) m.replaceWith(...m.childNodes); }
-      else { const mk=document.createElement('mark'); mk.className=c==='u'?'hl-u':'hl-'+c; try{ mk.appendChild(r.extractContents()); r.insertNode(mk); }catch(err){} }
-      EX.hl[q.id]=pas.innerHTML; sel.removeAllRanges(); b.remove(); };
+    b.onclick=e=>{ const c=e.target.closest('[data-hc]')?.dataset.hc; if(!c) return; const mk=document.createElement('mark'); mk.className='hl-'+c;
+      try{ mk.appendChild(r.extractContents()); r.insertNode(mk); }catch(err){} getSelection().removeAllRanges(); hlSave(pas,q); b.remove(); };
   },10);
-  document.addEventListener('mousedown',e=>{ if(!e.target.closest('#hlBar')) bar()?.remove(); },{once:true});
+  pas.ondblclick=e=>{ const mk=e.target.closest('mark'); if(mk && pas.contains(mk)){ mk.replaceWith(...mk.childNodes); getSelection().removeAllRanges(); hlSave(pas,q); } };   // double-click removes
+  pas.onclick=null;
+  document.addEventListener('mousedown',e=>{ if(!e.target.closest('#hlBar')) $('#hlBar')?.remove(); });
 }
 function reportModal(q){
   const m=modal(`<h2 style="font-size:22px">Report a problem</h2><p class="muted" style="margin:6px 0 14px">What's wrong with question ${EX.qi+1}?</p>
@@ -3498,6 +3548,7 @@ async function tableKeys(pdf, pno, fname){                 // "2025 June Int-A |
 async function readPdfPages(pdf, name, progress){
   const pages=[]; pages.keys=[];
   for(let p=1;p<=pdf.numPages;p++) pages.push(await pageTextTyped(pdf,p).catch(()=> ''));
+  window.__coverText=(pages[0]||'')+'\n'+(pages[1]||'');
   const skip=new Set();
   for(let p=1;p<=pdf.numPages;p++){ const tx=pages[p-1]; if(tx.length>200 && /M\s*1/.test(tx) && /M\s*2/.test(tx)){ try{ const k=await tableKeys(pdf,p,name); if(k){ pages.keys.push(...k); pages[p-1]=''; skip.add(p); } }catch(e){} } }
   const typed=pages.join('').replace(/\s/g,'').length;
@@ -3583,7 +3634,9 @@ async function readExamFiles(files, progress){
   let mi=-1, prevN=1e9; const order=['RW1','RW2','M1','M2'];
   keys.forEach(k=>{ if(!order.includes(k.module)){ if(+k.n<=prevN) mi=Math.min(3,mi+1); k.module=order[Math.max(0,mi)]; } prevN=+k.n; });
   keys.forEach(k=>{ const it=good.find(x=>x.mod===k.module && x.n===+k.n); if(it && k.answer && !it.q.answer){ it.q.answer=String(k.answer).trim(); recheckReal(it); } });
-  return { items:good, fail };
+  // the cover says which Module 2 this student got: (Hard) or (Easy); scoring uses the right curve
+  const cover=(window.__coverText||''); const m2={ RW:/module\s*2[^\n(]*?(reading|writing|english)[^\n(]*\((hard|easy)/i.exec(cover)?.[2]?.toLowerCase()||'hard', M:/module\s*2[^\n(]*?math[^\n(]*\((hard|easy)/i.exec(cover)?.[1]?.toLowerCase()||'hard' };
+  return { items:good, fail, m2 };
 }
 async function saveRealExam(name, items, m2, publish){
   const qs=items.map(x=>({ ...x.q, examOnly:true, exam:name, tier:'free' }));
@@ -3596,7 +3649,21 @@ async function saveRealExam(name, items, m2, publish){
 const examComplete = items => MOD_KEYS.every(([k,,,exp])=>items.filter(x=>x.mod===k).length===exp) && items.every(x=>x.q.answer);
 
 /* ---------- one exam → builder you review; many exams → a queue that builds them all ---------- */
-let REALQ=null; let REAL_ENGINE=LS.get('realEngine','free');
+let REALQ=null;
+async function looksLikeExam(f){
+  if(!/\.pdf$/i.test(f.name)) return MONTH_RE.test(f.webkitRelativePath||f.relPath||f.name);
+  if(MONTH_RE.test(f.webkitRelativePath||f.relPath||f.name)) return true;
+  try{ const pdf=await pdfPages(f); const first=await pageTextTyped(pdf,1).catch(()=> ''); const last=pdf.numPages>1?await pageTextTyped(pdf,pdf.numPages).catch(()=> ''):'';
+    return /actual\s*test|full[- ]length|module\s*1[\s\S]{0,200}module\s*2|读写\s*M1|数学\s*M1/i.test(first+'\n'+last) || pdf.numPages>=80; }catch(e){ return false; }
+}
+async function importEverything(files){
+  files=[...files].filter(f=>/\.(pdf|docx|txt|md|csv|json|jpe?g|png|webp)$/i.test(f.name)); if(!files.length) return toast('No PDF, Word, text or image files found');
+  toast('Sorting files: full exams → Full-length tests, the rest → question bank');
+  const exams=[], bank=[]; for(const f of files) ((await looksLikeExam(f))?exams:bank).push(f);
+  window.__afterExams = bank.length ? ()=>{ AT='import'; location.hash='#/admin?tab=import'; setTimeout(()=>bulkImport(bank),200); } : null;
+  if(exams.length){ AT='mocks'; location.hash='#/admin?tab=mocks'; setTimeout(()=>realBatch(groupExams(exams)),200); }
+  else if(bank.length){ AT='import'; location.hash='#/admin?tab=import'; setTimeout(()=>bulkImport(bank),200); }
+} let REAL_ENGINE=LS.get('realEngine','free');
 async function realExamImport(files){
   files=[...files].filter(f=>/\.(pdf|docx|txt|md|jpe?g|png|webp)$/i.test(f.name));
   if(!files.length) return toast('No PDF, Word, text or image files found');
@@ -3621,11 +3688,11 @@ async function realBatch(groups){
       if(/AI key is missing|not allowed/.test(row.note)){ REALQ.rows.filter(r=>r.status==='wait').forEach(r=>{ r.status='fail'; r.note='stopped: '+row.note; }); break; } continue; }
     const complete=examComplete(res.items);
     row.status='saving'; row.note=`saving ${res.items.length} questions…`; draw();
-    try{ await saveRealExam(row.name,res.items,{RW:'hard',M:'hard'},complete); row.status=complete?'done':'draft'; row.note=complete?'live in Full-length tests':`saved as draft: ${res.items.filter(x=>!x.q.answer).length} answers missing${res.fail.length?' · '+res.fail[0]:''}`; }
+    try{ await saveRealExam(row.name,res.items,res.m2||{RW:'hard',M:'hard'},complete); row.status=complete?'done':'draft'; row.note=complete?'live in Full-length tests':`saved as draft: ${res.items.filter(x=>!x.q.answer).length} answers missing${res.fail.length?' · '+res.fail[0]:''}`; }
     catch(e){ row.status='fail'; row.note='could not save'; }
     draw();
   }
-  REALQ.running=false; draw(); toast('Real exams finished');
+  REALQ.running=false; draw(); toast('Real exams finished'); if(window.__afterExams){ const go=window.__afterExams; window.__afterExams=null; setTimeout(go,800); }
 }
 function realQueueHTML(){
   if(!REALQ) return '';
@@ -3956,6 +4023,8 @@ function viewAdmin(params){
   if(AT==='import'){
     body=`<div class="imp-wrap">
       <div class="imp-col">
+        <label class="bulk-drop all-drop" id="allDrop"><div class="bd-ic">🗂</div><b>One folder for everything</b><span>Full exams become full-length tests (27 · 27 · 22 · 22). Everything else goes into the question bank.</span>
+          <div class="row" style="gap:8px;margin-top:14px;justify-content:center"><span class="btn btn-primary btn-sm">Choose folder<input type="file" id="allFolder" webkitdirectory directory multiple hidden></span><span class="btn btn-ghost btn-sm">Choose files<input type="file" id="allFiles" multiple accept=".pdf,.docx,.txt,.md,.csv,.json,.jpg,.jpeg,.png,.webp" hidden></span></div></label>
         <label class="bulk-drop" id="bulkDrop">
           <div class="bd-ic">⇪</div>
           <b>Drop files or a whole folder</b>
@@ -4137,6 +4206,14 @@ function bindAdmin(){
   bindShell(); if(!S.isAdmin) return;
   $('#aiTest')?.addEventListener('click',async()=>{ const out=$('#aiTestOut'); const say=(ok,msg)=>out.insertAdjacentHTML('beforeend',`<div class="aic-row ${ok?'ok':'no'}"><b>${ok?'✓':'✕'}</b>${msg}</div>`); out.innerHTML='';
     if(window.ZINA){ try{ const h=await fetch(ZINA.config.aiEndpoint||'/api/ai').then(r=>r.json()); say(h.anthropic,h.anthropic?'Anthropic key is set in Vercel':'ANTHROPIC_API_KEY is missing in Vercel → Settings → Environment Variables, then Redeploy'); say(h.supabase,h.supabase?'Server can reach Supabase':'SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is missing in Vercel'); if(!h.anthropic||!h.supabase) return; }catch(e){ return say(false,'The /api/ai server did not answer. Check that the api folder was uploaded to GitHub.'); } }
+    if(window.ZINA){ try{ const s=(await ZINA.sb.auth.getSession()).data.session;
+        const ctl=new AbortController(); const tm=setTimeout(()=>ctl.abort(),30000);
+        const r=await fetch(ZINA.config.aiEndpoint||'/api/ai',{ method:'POST', signal:ctl.signal, headers:{'content-type':'application/json', Authorization:'Bearer '+(s&&s.access_token)}, body:JSON.stringify({ diag:true, messages:[{role:'user',content:'hi'}] }) }); clearTimeout(tm);
+        const j=await r.json().catch(()=>({}));
+        if(!r.ok) return say(false,'Server said: '+esc(j.detail||j.code||('HTTP '+r.status)));
+        (j.results||[]).forEach(x=>say(x.ok, x.ok?`Anthropic answered with ${esc(x.model)} in ${x.ms} ms`:`${esc(x.model)}: ${esc(x.text)} (HTTP ${x.status})`));
+        if(!j.ok) return say(false,'Anthropic refused every model. Key starts with '+esc(j.keyStart||'?')+'. Check Billing (credit) and that this is an API key from console.anthropic.com.');
+      }catch(e){ return say(false, e.name==='AbortError'?'No answer in 30 seconds: the /api/ai function timed out on Vercel.':'Could not reach /api/ai: '+esc(e.message||e)); } }
     if(!S.caps.sample) return say(false,'AI is not available on this page.');
     try{ const r=await S.caps.sample('Reply with just the word OK.',{ modelTier:'quick' }); say(true,'Zina answered: “'+esc(r.text.trim().slice(0,40))+'”'); }
     catch(e){ say(false,'Zina did not answer: '+esc(e.message||e.code||'unknown')+(/upstream/.test(e.message||'')?' (Anthropic refused: check the key and that the account has credit)':'')); } });
@@ -4155,6 +4232,10 @@ function bindAdmin(){
   $$('[data-delq]').forEach(b=>b.onclick=async()=>{ if(!confirm('Delete this question? Tests that use it will skip it.')) return; await Data.del('questions',b.dataset.delq); route(); });
   $$('[data-draft]').forEach(b=>b.onclick=()=>draftSimilar(S.questions.find(x=>x.id===b.dataset.draft)));
   // import
+  $('#allFolder')?.addEventListener('change',e=>importEverything(e.target.files));
+  $('#allFiles')?.addEventListener('change',e=>importEverything(e.target.files));
+  { const dz=$('#allDrop'); if(dz){ ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{ e.preventDefault(); dz.classList.add('over'); })); ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{ e.preventDefault(); dz.classList.remove('over'); }));
+    dz.addEventListener('drop',async e=>{ const items=[...(e.dataTransfer.items||[])]; const files=[]; const walk=async en=>{ if(!en) return; if(en.isFile){ const f=await new Promise(r=>en.file(r)); f.relPath=en.fullPath; files.push(f); } else if(en.isDirectory){ const rd=en.createReader(); let b; do{ b=await new Promise(r=>rd.readEntries(r)); for(const x of b) await walk(x); }while(b.length); } }; if(items.length&&items[0].webkitGetAsEntry){ for(const it of items) await walk(it.webkitGetAsEntry()); } else files.push(...e.dataTransfer.files); importEverything(files); }); } }
   $('#bulkFiles')?.addEventListener('change',e=>bulkImport(e.target.files));
   $('#bulkFolder')?.addEventListener('change',e=>bulkImport(e.target.files));
   $('#pickFolder')?.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); $('#bulkFolder').click(); });
