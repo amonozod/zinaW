@@ -53,12 +53,23 @@ export default async function handler(req) {
   }
 
   const model = (isAdmin || plan === 'elite' || body.tier === 'default') ? MODEL_SMART : MODEL_QUICK;
-  const ar = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'x-api-key': KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-    body: JSON.stringify({ model, max_tokens: kind === 'json' ? 8000 : 900, stream: true, messages })
-  });
-  if (!ar.ok || !ar.body) return json({ code: 'upstream', status: ar.status }, 502);
+  // try the chosen model, then fall back if this account can't use it; pass Anthropic's own error back so the owner can see it
+  const tries = [...new Set([model, MODEL_QUICK, 'claude-haiku-4-5-20251001', 'claude-sonnet-4-5', 'claude-3-5-haiku-latest'])];
+  let ar = null, lastErr = null;
+  for (const m of tries) {
+    ar = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'x-api-key': KEY.trim(), 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      body: JSON.stringify({ model: m, max_tokens: kind === 'json' ? 8000 : 900, stream: true, messages })
+    });
+    if (ar.ok && ar.body) break;
+    let msg = ''; try { const j = await ar.json(); msg = (j.error && (j.error.message || j.error.type)) || JSON.stringify(j).slice(0, 200); } catch (_) { msg = 'HTTP ' + ar.status; }
+    lastErr = { status: ar.status, detail: `${m}: ${msg}` };
+    const modelProblem = ar.status === 404 || /model/i.test(msg);
+    if (!modelProblem) break;                                   // key, credit or rate problems won't be fixed by another model
+    ar = null;
+  }
+  if (!ar || !ar.ok || !ar.body) return json({ code: 'upstream', status: lastErr && lastErr.status, detail: lastErr && lastErr.detail }, 502);
 
   const reader = ar.body.getReader(), enc = new TextEncoder(), dec = new TextDecoder(); let buf = '';
   const stream = new ReadableStream({

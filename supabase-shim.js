@@ -135,9 +135,9 @@
       body: JSON.stringify({ messages, images, tier: opts.modelTier || 'quick', kind: opts._kind || 'chat' })
     });
     if (!r.ok) {
-      let server = ''; try { server = (await r.json()).code || ''; } catch (_) {}
+      let server = '', detail = ''; try { const j = await r.json(); server = j.code || ''; detail = j.detail || ''; } catch (_) {}
       const code = server === 'not_configured' ? 'not_configured' : r.status === 429 ? 'rate_limited' : r.status === 403 || r.status === 401 ? 'not_granted' : 'unavailable';
-      throw Object.assign(new Error(server || code), { code });
+      throw Object.assign(new Error(detail ? `${server || code} (${detail})` : (server || code)), { code, detail });
     }
     const rd = r.body.getReader(), dec = new TextDecoder(); let text = '';
     for (;;) { const { done, value } = await rd.read(); if (done) break; text += dec.decode(value, { stream: true }); opts.onText && opts.onText({ text }); }
