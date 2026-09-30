@@ -2308,7 +2308,7 @@ function bindResults(params){
 const EX = { active:false };
 const getQ = id => S.questions.find(q=>q.id===id);
 function fmt(s){ // teacher text: escape, then **bold**, *italic*, line breaks. $math$ passes through for MathJax.
-  return esc(s||'').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(^|[^*])\*(?!\s)(.+?)\*(?!\*)/g,'$1<em>$2</em>').replace(/_{3,}/g,m=>'<span style="letter-spacing:-1px">'+m+'</span>').replace(/\n/g,'<br>');
+  return esc(s||'').replace(/&lt;u&gt;([\s\S]+?)&lt;\/u&gt;/g,'<u>$1</u>').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(^|[^*])\*(?!\s)(.+?)\*(?!\*)/g,'$1<em>$2</em>').replace(/_{3,}/g,m=>'<span style="letter-spacing:-1px">'+m+'</span>').replace(/\n/g,'<br>');
 }
 function isCorrect(q, ans){
   if(ans==null||ans==='') return false;
@@ -2907,8 +2907,8 @@ async function sendAI(text){
   const sample=S.caps.sample;
   const u=S.user; const ctx=`Student: ${u.name}. Target score ${u.target}. ${u.examDate?'Exam date '+u.examDate+'.':''} ${lastScore()?'Latest practice test estimate '+lastScore()+'.':''}`;
   const sys=`You are Zina AI, an expert, encouraging Digital SAT tutor inside the Zina prep platform. Be concise (under 200 words unless asked for more), concrete, and structured with short paragraphs or simple dashes. Never write fake official SAT questions or claim to be the College Board. If asked for practice questions, suggest the student use the Zina question bank instead. ${ctx}`;
-  const turns=S.chat.slice(-12).map((m,i,arr)=>({ role:m.role, content: i===0 ? sys+'\n\n'+m.content : m.content }));
-  if(turns[0].role!=='user') turns.shift();
+  const recent=S.chat.slice(-12); while(recent.length && recent[0].role!=='user') recent.shift();
+  const turns=recent.map((m,i)=>({ role:m.role, content: i===0 ? sys+'\n\n'+m.content : m.content }));
   let reply='';
   if(!sample){ reply='Zina AI connects when this page is opened in Claude with AI access granted. Your message was saved.'; }
   else { try{ const r=await sample(turns,{ cache:false, modelTier: planKey()==='elite'?'default':'quick', onText:({text})=>{ bubble.textContent=text; logEl.scrollTop=logEl.scrollHeight; } }); reply=r.text; }
@@ -3340,7 +3340,7 @@ async function vzAsk(text){
   VZ.hist.push({ role:'user', content:text }); VZ.hist=VZ.hist.slice(-10);
   const turns=VZ.hist.map((m,i)=>({ role:m.role, content:i===0?sys+'\n\n'+m.content:m.content }));
   let out='';
-  try{ const r=await sample(turns,{ cache:false, modelTier:'default', onText:({text})=>{ const m=text.match(/^\s*\[(\w+)\]\s*/); if(m&&EMO[m[1]]) VZ.emo=m[1]; const body=text.replace(/^\s*\[\w+\]\s*/,''); if(VZ.state==='thinking'&&body){ VZ.state='idle'; vzRender(); } VZ.said=body; const c=$('.vz-cap p',VZ.el); if(c) c.textContent=body; } }); out=r.text; }
+  try{ const r=await sample(turns,{ cache:false, modelTier:'quick', onText:({text})=>{ const m=text.match(/^\s*\[(\w+)\]\s*/); if(m&&EMO[m[1]]) VZ.emo=m[1]; const body=text.replace(/^\s*\[\w+\]\s*/,''); if(VZ.state==='thinking'&&body){ VZ.state='idle'; vzRender(); } VZ.said=body; const c=$('.vz-cap p',VZ.el); if(c) c.textContent=body; } }); out=r.text; }
   catch(e){ VZ.busy=false; VZ.said = e.code==='not_configured' ? (S.isAdmin?'Add ANTHROPIC_API_KEY in Vercel, then redeploy.':'I’m offline for a moment.') : 'Something went wrong on my side. Say it again?'; vzSet('idle','concerned'); return setTimeout(vzListen,1500); }
   VZ.busy=false;
   const m=out.match(/^\s*\[(\w+)\]\s*/); const emo=m&&EMO[m[1]]?m[1]:'happy'; const said=out.replace(/^\s*\[\w+\]\s*/,'').trim();
@@ -3658,7 +3658,23 @@ async function looksLikeExam(f){
   try{ const pdf=await pdfPages(f); const first=await pageTextTyped(pdf,1).catch(()=> ''); const last=pdf.numPages>1?await pageTextTyped(pdf,pdf.numPages).catch(()=> ''):'';
     return /actual\s*test|full[- ]length|module\s*1[\s\S]{0,200}module\s*2|读写\s*M1|数学\s*M1/i.test(first+'\n'+last) || pdf.numPages>=80; }catch(e){ return false; }
 }
+async function importTestPackage(f){
+  let pkg; try{ pkg=JSON.parse(await f.text()); }catch(e){ return { fail:`${f.name}: not valid JSON` }; }
+  if(!pkg || !Array.isArray(pkg.modules)) return null;
+  const name=String(pkg.name||cleanExamName(f.name)); const qsAll=[]; const mods={};
+  for(const m of pkg.modules){ const sec=/^m/i.test(m.section)?'M':'RW'; const n=+m.module||1; const lvl=/hard/i.test(m.level)?'hard':/easy/i.test(m.level)?'easy':'';
+    const ids=[]; (m.questions||[]).forEach((o,i)=>{ const r=normalizeQ({ section:sec, difficulty:o.difficulty||(lvl==='hard'?'Hard':lvl==='easy'?'Easy':'Medium'), tier:'free', ...o }); if(!r.q) return; r.q.examOnly=true; r.q.exam=name; r.q.n=i+1; qsAll.push(r.q); ids.push(r.q.id); });
+    const key=sec+n; mods[key]=mods[key]||{ section:sec, n, minutes:sec==='M'?35:32, ids:[] };
+    if(n===2 && lvl==='hard') mods[key].hardIds=ids; else mods[key].ids=ids; }
+  const q=qsAll.slice(); const work=async()=>{ while(q.length){ const x=q.shift(); try{ await Data.put('questions',x); }catch(e){} } }; await Promise.all(Array.from({length:6},work));
+  const modules=['RW1','RW2','M1','M2'].map(k=>mods[k]).filter(Boolean).map(m=>{ if(m.n===2 && m.hardIds && !m.ids.length){ m.ids=m.hardIds; delete m.hardIds; } return m; });
+  await Data.put('mocks',{ id:'m_'+uid(), name, status:'draft', real:false, created:Date.now(), modules });
+  return { name, count:qsAll.length };
+}
 async function importEverything(files){
+  { const pk=[...files].filter(f=>/\.json$/i.test(f.name)); const done=[];
+    for(const f of pk){ const r=await importTestPackage(f); if(r&&r.name){ done.push(r); files=[...files].filter(x=>x!==f); } }
+    if(done.length) toast(`Added ${done.length} full-length test${done.length>1?'s':''} (${done.reduce((s,d)=>s+d.count,0)} questions). Rename and publish them in Full-length tests.`); }
   files=[...files].filter(f=>/\.(pdf|docx|txt|md|csv|json|jpe?g|png|webp)$/i.test(f.name)); if(!files.length) return toast('No PDF, Word, text or image files found');
   toast('Sorting files: full exams → Full-length tests, the rest → question bank');
   const exams=[], bank=[]; for(const f of files) ((await looksLikeExam(f))?exams:bank).push(f);
@@ -3667,8 +3683,9 @@ async function importEverything(files){
   else if(bank.length){ AT='import'; location.hash='#/admin?tab=import'; setTimeout(()=>bulkImport(bank),200); }
 } let REAL_ENGINE=LS.get('realEngine','free');
 async function realExamImport(files){
+  { const pk=[...files].filter(f=>/\.json$/i.test(f.name)); let n=0; for(const f of pk){ const r=await importTestPackage(f); if(r&&r.name){ n++; files=[...files].filter(x=>x!==f); } } if(n){ toast(`Added ${n} test package${n>1?'s':''} as drafts`); route(); if(!files.length) return; } }
   files=[...files].filter(f=>/\.(pdf|docx|txt|md|jpe?g|png|webp)$/i.test(f.name));
-  if(!files.length) return toast('No PDF, Word, text or image files found');
+  if(!files.length) return;
   const groups=groupExams(files);
   if(groups.length>1) return realBatch(groups);
   REAL={ name:groups[0].name, items:[], m2:{RW:'hard',M:'hard'}, log:'' }; route();
@@ -3735,7 +3752,7 @@ function realExamsHTML(){
         <div class="bd-ic">📚</div><b>Drop exam PDFs or a folder</b>
         <span>Each PDF becomes its own full-length test. Nothing goes into the question bank.</span>
         <div class="row" style="gap:8px;margin-top:14px;justify-content:center">
-          <span class="btn btn-primary btn-sm">Choose files<input type="file" id="realFiles" multiple accept=".pdf,.docx,.txt,.md,.jpg,.jpeg,.png,.webp" hidden></span>
+          <span class="btn btn-primary btn-sm">Choose files<input type="file" id="realFiles" multiple accept=".pdf,.docx,.txt,.md,.json,.jpg,.jpeg,.png,.webp" hidden></span>
           <span class="btn btn-ghost btn-sm" id="realPickFolder">Choose folder</span></div>
         <input type="file" id="realFolder" webkitdirectory directory multiple hidden>
       </label>
@@ -3945,7 +3962,7 @@ async function bulkImport(files){
       const text=await extractText(f,say); if(!text||!text.trim()){ failed.push(`${f.name}: no text found`); continue; }
       if(!/\.json$/i.test(f.name) && looksLikeKey(text,f.name)){ (bankKeys[examBase(f.name)]=bankKeys[examBase(f.name)]||[]).push(...keyPairs(text)); continue; }
       let found;
-      if(/\.json$/i.test(f.name)) found=parseImport(text);
+      if(/\.json$/i.test(f.name)){ let j=null; try{ j=JSON.parse(text); }catch(e){} if(j && Array.isArray(j.modules)){ const r=await importTestPackage(f); if(r&&r.name){ toast(`“${r.name}” added to Full-length tests (${r.count} questions)`); continue; } } found=parseImport(text); }
       else { const r=parseExamText(text); found=[...r];                       // strips "Module 1" headers, reads answer-key pages
         r.keys.forEach(k=>{ const it=found.find(x=>x.q && x.n===k.n && (k.module==='?'||x.mod===k.module) && !x.q.answer); if(it){ it.q.answer=k.answer; const z=keepExtras(normalizeQ({ ...it.q, question:it.q.stem }),it.q); z.q.id=it.q.id; it.q=z.q; it.errs=z.errs; } }); }
       found.forEach(x=>x.src=f.name); all=all.concat(found);
@@ -3972,7 +3989,7 @@ async function aiSort(raw){
 }
 function parseImport(text){
   text=text.trim(); if(!text) return [];
-  if(text[0]==='['||text[0]==='{'){ try{ const j=JSON.parse(text); return (Array.isArray(j)?j:[j]).map(normalizeQ); }catch(e){ return [{q:null,errs:['JSON could not be read: '+e.message]}]; } }
+  if(text[0]==='['||text[0]==='{'){ try{ const j=JSON.parse(text); const list=Array.isArray(j)?j:Array.isArray(j.questions)?j.questions:Array.isArray(j.modules)?j.modules.flatMap(m=>(m.questions||[]).map(q=>({ section:m.section, ...q }))):[j]; return list.map(normalizeQ); }catch(e){ return [{q:null,errs:['JSON could not be read: '+e.message]}]; } }
   if(!/^\s*(question|q|stem)\s*:/im.test(text)) return smartParse(text);
   return text.split(/\n\s*-{3,}\s*\n/).map(block=>{
     const o={}; let last=null;
@@ -4050,7 +4067,7 @@ function viewAdmin(params){
     body=`${realExamsHTML()}
       <div class="row" style="justify-content:space-between;flex-wrap:wrap;margin:26px 0 16px"><h3 style="margin:0;font-size:20px">Your tests (${S.mocks.length})</h3><div class="row" style="gap:10px"><span class="muted" style="font-size:13px">Bank: ${c('RW')} R&W · ${c('M')} Math</span><button class="btn btn-ghost btn-sm" id="newMock">Build from the bank</button></div></div>
       ${S.mocks.length?`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))">${S.mocks.map(m=>`<div class="card test-card"><div class="row" style="justify-content:space-between"><h3>${esc(m.name)}</h3><span class="pill ${m.status==='published'?'mint':'gray'}">${m.status==='published'?'Published':'Draft'}</span></div>
-        <div class="row" style="flex-wrap:wrap"><button class="btn btn-sm ${m.status==='published'?'btn-ghost':'btn-primary'}" data-pub="${m.id}">${m.status==='published'?'Unpublish':'Publish to students'}</button><button class="btn btn-sm btn-ghost" data-medit="${m.id}">Edit questions</button><button class="btn btn-sm btn-ghost" data-mdel="${m.id}" style="color:var(--rose)">Delete</button></div></div>`).join('')}</div>`
+        <div class="row" style="flex-wrap:wrap"><button class="btn btn-sm ${m.status==='published'?'btn-ghost':'btn-primary'}" data-pub="${m.id}">${m.status==='published'?'Unpublish':'Publish to students'}</button><button class="btn btn-sm btn-ghost" data-mren="${m.id}">Rename</button><button class="btn btn-sm btn-ghost" data-medit="${m.id}">Edit questions</button><button class="btn btn-sm btn-ghost" data-mdel="${m.id}" style="color:var(--rose)">Delete</button></div></div>`).join('')}</div>`
       :`<div class="card empty"><div class="ic">⏱</div><h3>No tests yet</h3><p>Build a full-length adaptive test from your question pool in one click, then fine-tune it by hand.</p></div>`}`;
   }
   if(AT==='vocab'){
@@ -4068,7 +4085,7 @@ function viewAdmin(params){
   }
   if(AT==='payments'){ body=adminPaymentsHTML(); }
   if(AT==='ai'){
-    body=`<div class="card pad ai-check" style="max-width:760px;margin-bottom:16px"><div class="row" style="justify-content:space-between;gap:14px;flex-wrap:wrap"><div><b style="font-size:17px">Is Zina AI working?</b><p class="muted" style="margin:4px 0 0;font-size:14px">Checks the key, the server and a real answer.</p></div><button class="btn btn-primary btn-sm" id="aiTest">Check now</button></div><div id="aiTestOut"></div></div>
+    body=`<div class="card pad ai-check" style="max-width:760px;margin-bottom:16px"><div class="row" style="justify-content:space-between;gap:14px;flex-wrap:wrap"><div><b style="font-size:17px">Is Zina AI working?</b><p class="muted" style="margin:4px 0 0;font-size:14px">Checks the key, the server and a real answer.</p></div><div class="row" style="gap:8px"><button class="btn btn-ghost btn-sm" id="aiCopy">Copy result</button><div class="row" style="gap:8px"><button class="btn btn-ghost btn-sm" id="aiCopy">Copy result</button><button class="btn btn-primary btn-sm" id="aiTest">Check now</button></div></div></div><div id="aiTestOut"></div></div>
       <div class="card pad" style="max-width:760px"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:20px"><div><b style="font-size:17px">Allow Zina AI to draft new questions</b><p class="muted" style="margin:6px 0 0;font-size:14px">Off = AI never creates questions.</p></div><button class="switch ${S.settings.aiDrafting?'on':''}" id="aiToggle" aria-label="Allow AI drafting"></button></div></div>
       <h3 style="font-size:20px;margin:26px 0 12px">Drafts waiting for review (${S.drafts.length})</h3>
       ${S.drafts.length?S.drafts.map(d=>`<div class="card pad" style="margin-bottom:12px"><div class="row" style="justify-content:space-between;flex-wrap:wrap"><span class="pill">${esc(d.domain)}, ${d.difficulty}</span><div class="row"><button class="btn btn-sm btn-ghost" data-drej="${d.id}">Reject</button><button class="btn btn-sm btn-ghost" data-dedit="${d.id}">Edit</button><button class="btn btn-sm btn-primary" data-dok="${d.id}">Approve</button></div></div>${d.passage?`<p style="font-family:var(--serif);margin:12px 0 6px">${fmt(d.passage)}</p>`:''}<p style="font-weight:600;margin:10px 0">${fmt(d.stem)}</p>${(d.choices||[]).map((c,i)=>`<div style="font-size:14px;${'ABCD'[i]===d.answer?'color:var(--mint);font-weight:700':''}">${'ABCD'[i]}) ${fmt(c)}</div>`).join('')}${d.explanation?`<p class="muted" style="font-size:13.5px;margin-top:8px">${fmt(d.explanation)}</p>`:''}</div>`).join(''):'<p class="muted">Nothing to review.</p>'}`;
@@ -4206,6 +4223,8 @@ async function draftSimilar(q){
 function bindAdmin(){
   $('#exportQ')?.addEventListener('click',()=>{ const json=JSON.stringify(S.questions); const m=modal(`<h2 style="font-size:22px">Export ${S.questions.length} questions</h2><p class="muted" style="margin:8px 0 12px">Copy this and paste it into Upload on your new site.</p><textarea class="textarea" style="min-height:260px;font-size:12px" readonly>${esc(json)}</textarea><button class="btn btn-primary" id="cpy" style="width:100%;margin-top:12px">Copy</button>`,{wide:true}); $('#cpy',m).onclick=async()=>{ const ta=$('textarea',m); ta.select(); try{ await navigator.clipboard.writeText(json); }catch(e){ document.execCommand('copy'); } toast('Copied'); }; });
   bindShell(); if(!S.isAdmin) return;
+  $('#aiCopy')?.addEventListener('click',async()=>{ const txt=[...document.querySelectorAll('#aiTestOut .aic-row')].map(r=>r.innerText.replace(/\s+/g,' ').trim()).join('\n')||'Press Check now first'; try{ await navigator.clipboard.writeText(txt); toast('Copied. Paste it in the chat with Claude.'); }catch(e){ prompt('Copy this:',txt); } });
+  $('#aiCopy')?.addEventListener('click',async()=>{ const txt=[...document.querySelectorAll('#aiTestOut .aic-row')].map(r=>r.textContent.trim()).join('\n')||'Press Check now first'; try{ await navigator.clipboard.writeText(txt); toast('Copied. Paste it in the chat.'); }catch(e){ prompt('Copy this:',txt); } });
   $('#aiTest')?.addEventListener('click',async()=>{ const out=$('#aiTestOut'); const say=(ok,msg)=>out.insertAdjacentHTML('beforeend',`<div class="aic-row ${ok?'ok':'no'}"><b>${ok?'✓':'✕'}</b>${msg}</div>`); out.innerHTML='';
     if(window.ZINA){ try{ const h=await fetch(ZINA.config.aiEndpoint||'/api/ai').then(r=>r.json()); say(h.anthropic,h.anthropic?'Anthropic key is set in Vercel':'ANTHROPIC_API_KEY is missing in Vercel → Settings → Environment Variables, then Redeploy'); say(h.supabase,h.supabase?'Server can reach Supabase':'SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is missing in Vercel'); if(!h.anthropic||!h.supabase) return; }catch(e){ return say(false,'The /api/ai server did not answer. Check that the api folder was uploaded to GitHub.'); } }
     if(window.ZINA){ try{ const s=(await ZINA.sb.auth.getSession()).data.session;
@@ -4249,6 +4268,7 @@ function bindAdmin(){
   bindPreview();
   // mocks
   on('#newMock',mockBuilder);
+  $$('[data-mren]').forEach(b=>b.onclick=async()=>{ const m=S.mocks.find(x=>x.id===b.dataset.mren); const name=prompt('Test name',m.name); if(name&&name.trim()){ await Data.put('mocks',{...m,name:name.trim()}); toast('Renamed'); route(); } });
   $$('[data-pub]').forEach(b=>b.onclick=async()=>{ const m=S.mocks.find(x=>x.id===b.dataset.pub); await Data.put('mocks',{...m,status:m.status==='published'?'draft':'published'}); toast(m.status==='published'?'Test unpublished':'Test published to students'); route(); });
   $$('[data-medit]').forEach(b=>b.onclick=()=>mockEditor(S.mocks.find(x=>x.id===b.dataset.medit)));
   $$('[data-mdel]').forEach(b=>b.onclick=async()=>{ if(!confirm('Delete this test? Student results stay.')) return; await Data.del('mocks',b.dataset.mdel); route(); });
