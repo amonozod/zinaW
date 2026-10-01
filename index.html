@@ -3468,20 +3468,158 @@ async function vzAsk(text){
 }
 function vzVoice(lang){ const vs=speechSynthesis.getVoices(); const L=lang.toLowerCase(), l2=L.slice(0,2);
   return vs.find(v=>v.lang.toLowerCase()===L && /natural|neural|google|premium|enhanced/i.test(v.name)) || vs.find(v=>v.lang.toLowerCase()===L) || vs.find(v=>v.lang.toLowerCase().startsWith(l2)) || null; }
-function vzSpeak(text, emo){
-  if(!('speechSynthesis' in window) || !text){ setTimeout(vzListen,300); return; }
-  try{ speechSynthesis.cancel(); }catch(e){}
-  const lang=langOf(text), v=vzVoice(lang), ee=EMO[emo]||EMO.calm;
-  const parts=(text.match(/[^.!?…]+[.!?…]*\s*/g)||[text]).map(s=>s.trim()).filter(Boolean);
-  VZ.queue=parts.slice(); clearInterval(VZ.keep); clearTimeout(VZ.safety);
-  const done=()=>{ clearInterval(VZ.keep); clearTimeout(VZ.safety); if(!VZ.el || VZ.state==='listening') return; vzSet('idle'); setTimeout(vzListen,250); };
-  const next=()=>{ if(!VZ.el) return; const s=VZ.queue.shift(); if(!s) return done();
-    const u=new SpeechSynthesisUtterance(s); u.lang=lang; if(v) u.voice=v; u.pitch=ee.pitch; u.rate=ee.rate;
-    window.__vzUtt=u; u.onend=next; u.onerror=next; speechSynthesis.speak(u);
-    clearTimeout(VZ.safety); VZ.safety=setTimeout(()=>{ try{ speechSynthesis.cancel(); }catch(e){} next(); }, 3000 + s.length*90); };
-  vzSet('speaking'); next();
-  VZ.keep=setInterval(()=>{ if(speechSynthesis.speaking){ speechSynthesis.pause(); speechSynthesis.resume(); } },9000);   // Chrome stops long speech after ~15 s otherwise
-  setTimeout(()=>{ if(!speechSynthesis.speaking && !speechSynthesis.pending && VZ.el && VZ.state==='speaking') done(); },1500);  // no voice installed
+async function vzSpeak(text, emo){
+  if(!text || !VZ.el){
+    setTimeout(vzListen,300);
+    return;
+  }
+
+  try{
+    if(VZ.audio){
+      VZ.audio.pause();
+      VZ.audio.currentTime = 0;
+      VZ.audio.src = "";
+    }
+    if(VZ.audioUrl){
+      URL.revokeObjectURL(VZ.audioUrl);
+      VZ.audioUrl = "";
+    }
+  }catch(e){}
+
+  clearTimeout(VZ.safety);
+  vzSet('speaking', emo || 'happy');
+
+  const parts = (text.match(/[^.!?…]+[.!?…]*\s*/g) || [text])
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  let index = 0;
+
+  const done = () => {
+    clearTimeout(VZ.safety);
+
+    try{
+      if(VZ.audio){
+        VZ.audio.pause();
+        VZ.audio.currentTime = 0;
+      }
+      if(VZ.audioUrl){
+        URL.revokeObjectURL(VZ.audioUrl);
+        VZ.audioUrl = "";
+      }
+    }catch(e){}
+
+    VZ.audio = null;
+
+    if(!VZ.el) return;
+    if(VZ.state !== 'listening'){
+      vzSet('idle', emo || 'happy');
+      setTimeout(vzListen,250);
+    }
+  };
+
+  const playNext = async () => {
+    if(!VZ.el) return done();
+
+    const sentence = parts[index++];
+
+    if(!sentence){
+      return done();
+    }
+
+    try{
+      const response = await fetch('/api/tts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          text: sentence,
+          lang: langOf(sentence),
+          emo: emo || 'happy'
+        })
+      });
+
+      if(!response.ok){
+        let message = `Speech request failed (${response.status})`;
+
+        try{
+          const data = await response.json();
+          if(data?.error) message = data.error;
+        }catch(e){}
+
+        throw new Error(message);
+      }
+
+      const blob = await response.blob();
+
+      if(!blob || !blob.size){
+        throw new Error('Azure returned empty audio');
+      }
+
+      VZ.audioUrl = URL.createObjectURL(blob);
+      VZ.audio = new Audio(VZ.audioUrl);
+      VZ.audio.preload = 'auto';
+      VZ.audio.volume = 1.0;
+
+      VZ.audio.onended = () => {
+        try{
+          if(VZ.audioUrl){
+            URL.revokeObjectURL(VZ.audioUrl);
+          }
+        }catch(e){}
+
+        VZ.audioUrl = "";
+        VZ.audio = null;
+
+        setTimeout(playNext, 20);
+      };
+
+      VZ.audio.onerror = () => {
+        console.error("Azure audio playback failed");
+        done();
+      };
+
+      VZ.safety = setTimeout(() => {
+        try{
+          VZ.audio?.pause();
+        }catch(e){}
+        playNext();
+      }, 5000 + sentence.length * 100);
+
+      await VZ.audio.play();
+
+    }catch(error){
+      console.error("Azure TTS error:", error);
+
+      VZ.err = error?.message || "Voice playback failed.";
+      vzSet('idle','concerned');
+
+      setTimeout(() => {
+        if(VZ.el){
+          VZ.err = '';
+
+          try{
+            if('speechSynthesis' in window && text){
+              const u = new SpeechSynthesisUtterance(text);
+              u.lang = langOf(text);
+              u.onend = () => setTimeout(vzListen,250);
+
+              speechSynthesis.cancel();
+              speechSynthesis.speak(u);
+
+              vzSet('speaking', emo || 'happy');
+              return;
+            }
+          }catch(e){}
+
+          vzListen();
+        }
+      }, 1200);
+    }
+  };
+
+  await playNext();
 }
 if('speechSynthesis' in window){ try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=()=>{}; }catch(e){} }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape' && VZ.el) closeVoice(); });
