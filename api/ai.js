@@ -13,7 +13,6 @@ function effectivePlan(e) {   // entitlement written by the owner when a payment
 
 export default async function handler(req) {
   if (req.method === 'GET') return json({ ok: true, anthropic: !!process.env.ANTHROPIC_API_KEY, supabase: !!(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) }, 200);   // health check, no secrets
-  if (req.method === 'GET') return json({ anthropic: !!process.env.ANTHROPIC_API_KEY, supabase: !!(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY), model: MODEL_QUICK }, 200);   // health check for the owner
   if (req.method !== 'POST') return json({ code: 'method' }, 405);
   const SB = process.env.SUPABASE_URL, SRK = process.env.SUPABASE_SERVICE_ROLE_KEY, KEY = process.env.ANTHROPIC_API_KEY;
   if (!SB || !SRK || !KEY) return json({ code: 'not_configured' }, 500);
@@ -87,15 +86,20 @@ export default async function handler(req) {
 
   const reader = ar.body.getReader(), enc = new TextEncoder(), dec = new TextDecoder(); let buf = '';
   const stream = new ReadableStream({
+    // keep reading until there is text to send: Anthropic's first events (message_start, ping) carry none,
+    // and a pull that enqueues nothing would leave the stream waiting forever
     async pull(ctrl) {
-      const { done, value } = await reader.read();
-      if (done) { ctrl.close(); return; }
-      buf += dec.decode(value, { stream: true });
-      let i;
-      while ((i = buf.indexOf('\n')) >= 0) {
-        const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
-        if (!line.startsWith('data:')) continue;
-        try { const ev = JSON.parse(line.slice(5)); if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta') ctrl.enqueue(enc.encode(ev.delta.text)); } catch {}
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) { ctrl.close(); return; }
+        buf += dec.decode(value, { stream: true });
+        let i, sent = false;
+        while ((i = buf.indexOf('\n')) >= 0) {
+          const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+          if (!line.startsWith('data:')) continue;
+          try { const ev = JSON.parse(line.slice(5)); if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta' && ev.delta.text) { ctrl.enqueue(enc.encode(ev.delta.text)); sent = true; } } catch {}
+        }
+        if (sent) return;
       }
     },
     cancel() { reader.cancel(); }

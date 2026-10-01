@@ -1444,6 +1444,25 @@ s.was{font-size:.42em;font-weight:600;opacity:.45;margin-right:8px;letter-spacin
 .exam .rv-card .ex-grid > *{min-width:46px;height:46px;font-size:19px}
 .all-drop{border-style:solid;border-color:color-mix(in srgb,var(--p) 55%,var(--line));background:radial-gradient(400px 200px at 50% 0%,color-mix(in srgb,var(--p) 14%,transparent),transparent 70%),var(--glass)}
 .all-drop .bd-ic{background:linear-gradient(135deg,var(--sun-hi),var(--sun));color:var(--on-sun)}
+
+/* voice v4: no subtitles, the room changes color with Zina's mood */
+.vz{background:#07061A}
+.vz-bg{position:absolute;inset:0;background:radial-gradient(700px 520px at 50% 42%,color-mix(in srgb,var(--c1) 55%,transparent),transparent 70%),radial-gradient(900px 600px at 50% 120%,color-mix(in srgb,var(--c2) 45%,transparent),transparent 70%),#07061A;transition:background .6s;z-index:0}
+.vz > *:not(.vz-bg){position:relative;z-index:1}
+.vz-stage{flex:1;display:grid;place-items:center;position:relative}
+.vz-halo{position:absolute;width:min(460px,80vw);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 62%);animation:halo 4s ease-in-out infinite}
+@keyframes halo{50%{transform:scale(1.08);opacity:.7}}
+.vz-speaking .vz-halo{animation-duration:1.2s}.vz-listening .vz-halo{animation-duration:2s}
+.vz-face.blob{width:min(400px,72vw)}
+.vz-wave{display:flex;gap:6px;align-items:center;justify-content:center;height:64px;margin-bottom:8px}
+.vz-wave i{width:6px;height:10%;border-radius:6px;background:rgba(255,255,255,.55);transition:height .3s}
+.vz-wave.vz-listening i{animation:wave .9s ease-in-out infinite;animation-delay:var(--d);background:#fff}
+.vz-wave.vz-speaking i{animation:wave .5s ease-in-out infinite;animation-delay:var(--d);background:#FFE7B0}
+.vz-wave.vz-thinking i{animation:wave 1.6s ease-in-out infinite;animation-delay:var(--d);opacity:.6}
+@keyframes wave{0%,100%{height:10%}50%{height:var(--h)}}
+.vz-pill{align-self:center;display:inline-flex;align-items:center;gap:10px;margin:0 auto 34px;padding:12px 22px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(12px);color:#fff;font-weight:700;font-size:16px}
+.vz-dot.paused{background:#8C86B8}
+.vz-cap,.vz-status{display:none}
 </style>
 <meta name="robots" content="noindex,nofollow">
 <script>window.ZINA_ADMIN=true</script>
@@ -1701,7 +1720,8 @@ let softTimer=null;
 function rerenderSoft(){ // re-render the current page when shared data arrives, but never mid-exam
   if(EX.active) return;
   const r=(location.hash.replace(/^#\/?/,'').split('?')[0]);
-  if(r===''||r==='auth'||(r==='checkout'&&window.CO_RECEIPT)) return;          // these pages don't show live data: never re-draw them under the student
+  if(r===''||r==='auth'||(r==='checkout'&&window.CO_RECEIPT)) return;
+  if(r==='ai' && typeof AI_BUSY!=='undefined' && AI_BUSY) return;            // never redraw the chat while Zina is typing          // these pages don't show live data: never re-draw them under the student
   clearTimeout(softTimer); softTimer=setTimeout(()=>{ if(!EX.active && !document.activeElement?.matches('input,textarea,select')) route(); }, 120);
 }
 
@@ -1782,7 +1802,7 @@ function upgradeModal(reason){
 }
 /* ---------- payments: card transfer → owner approves → plan unlocks ---------- */
 const PAY_DEFAULT = { card:'', holder:'', bank:'Humo / Uzcard', support:'', prices:{ 'pro:m':139000, 'pro:q':355000, 'elite:m':239000, 'elite:q':549000 } };
-const ZINA_VERSION='7.3';
+const ZINA_VERSION='7.4';
 const money = n => (+n)%1===0 ? String(+n) : (+n).toFixed(2);
 const CARD_TYPES = ['Humo','Uzcard','Visa','Mastercard'];
 const paySet = () => { const p={ ...PAY_DEFAULT, ...(S.settings.pay||{}), prices:{ ...PAY_DEFAULT.prices, ...((S.settings.pay||{}).prices||{}) } };
@@ -3293,12 +3313,16 @@ function zinaFaceSVG(emo, state){
 function zinaFaceMini(){ return `<span class="vz-mini" aria-hidden="true"><i></i><i></i></span>`; }
 const SR = () => window.SpeechRecognition || window.webkitSpeechRecognition;
 function voiceHTML(){
-  const status = VZ.paused ? 'Paused · tap Zina to talk again' : VZ.state==='listening' ? 'Listening…' : VZ.state==='thinking' ? 'Thinking…' : VZ.state==='speaking' ? 'Speaking…' : '';
-  const cap = VZ.state==='listening' && VZ.heard ? VZ.heard : (VZ.said || '');
-  return `<div class="vz-top"><button class="vz-x" id="vzX" aria-label="Close">✕</button><div class="vz-title"><b>Zina</b><span class="badge elite">ELITE</span></div><span style="width:40px"></span></div>
-    <button class="vz-stage vz-${VZ.state}" id="vzFace" aria-label="${VZ.paused?'Resume':'Pause'} conversation"><div class="vz-rings"><i></i><i></i><i></i></div>${zinaFaceSVG(VZ.emo, VZ.state)}</button>
-    <div class="vz-cap" aria-live="polite">${VZ.heard && VZ.state!=='listening' ? `<div class="vz-you">“${esc(VZ.heard)}”</div>`:''}<p>${esc(cap)}</p></div>
-    <div class="vz-status">${SR()?`<span class="vz-dot ${VZ.state}"></span>${esc(status)}`:'Voice works in Chrome or Edge.'}</div>`;
+  const st = VZ.paused ? 'paused' : VZ.state;
+  const label = VZ.paused ? 'Tap Zina to talk' : VZ.state==='listening' ? 'Listening' : VZ.state==='thinking' ? 'Thinking' : VZ.state==='speaking' ? 'Zina is talking' : 'Say something';
+  const e=EMO[VZ.emo]||EMO.calm;
+  return `<div class="vz-bg" style="--c1:${e.c1};--c2:${e.c2}"></div>
+    <div class="vz-top"><button class="vz-x" id="vzX" aria-label="Close">✕</button><div class="vz-title"><b>Zina</b><span class="badge elite">ELITE</span></div><span style="width:40px"></span></div>
+    <button class="vz-stage vz-${st}" id="vzFace" aria-label="${VZ.paused?'Resume':'Pause'} conversation">
+      <div class="vz-halo"></div>${zinaFaceSVG(VZ.emo, VZ.state)}
+    </button>
+    <div class="vz-wave vz-${st}" aria-hidden="true">${Array.from({length:24},(_,i)=>`<i style="--d:${(i%6)*.08}s;--h:${30+((i*37)%60)}%"></i>`).join('')}</div>
+    <div class="vz-pill" aria-live="polite">${SR()?`<span class="vz-dot ${st}"></span>${label}`:'Voice works in Chrome or Edge'}</div>`;
 }
 function vzRender(){ if(!VZ.el) return; VZ.el.innerHTML=voiceHTML(); vzBind(); }
 function vzSet(state, emo){ VZ.state=state; if(emo) VZ.emo=emo; vzRender(); }
@@ -3318,7 +3342,7 @@ function vzListen(){
   const R=SR(); if(!R || !VZ.el || VZ.paused || VZ.busy) return;
   try{ speechSynthesis.cancel(); }catch(e){}
   const r=new R(); VZ.rec=r; r.lang=VZ.lang; r.interimResults=true; r.continuous=false; VZ.heard=''; let got='';
-  r.onresult=ev=>{ got=[...ev.results].map(x=>x[0].transcript).join(' '); VZ.heard=got; const p=$('.vz-cap p',VZ.el); if(p) p.textContent=got; };
+  r.onresult=ev=>{ got=[...ev.results].map(x=>x[0].transcript).join(' '); VZ.heard=got; };
   r.onerror=ev=>{ if(ev.error==='not-allowed'||ev.error==='service-not-allowed'){ VZ.paused=true; VZ.said='Allow the microphone so I can hear you.'; vzSet('idle','concerned'); } };
   r.onend=()=>{ if(!VZ.el || VZ.paused) return; const t=got.trim(); if(t) vzAsk(t); else setTimeout(vzListen,250); };   // silence: keep listening
   vzSet('listening'); try{ r.start(); }catch(e){}
@@ -3341,7 +3365,7 @@ async function vzAsk(text){
   VZ.hist.push({ role:'user', content:text }); VZ.hist=VZ.hist.slice(-10);
   const turns=VZ.hist.map((m,i)=>({ role:m.role, content:i===0?sys+'\n\n'+m.content:m.content }));
   let out='';
-  try{ const r=await sample(turns,{ cache:false, modelTier:'quick', onText:({text})=>{ const m=text.match(/^\s*\[(\w+)\]\s*/); if(m&&EMO[m[1]]) VZ.emo=m[1]; const body=text.replace(/^\s*\[\w+\]\s*/,''); if(VZ.state==='thinking'&&body){ VZ.state='idle'; vzRender(); } VZ.said=body; const c=$('.vz-cap p',VZ.el); if(c) c.textContent=body; } }); out=r.text; }
+  try{ const r=await sample(turns,{ cache:false, modelTier:'quick', onText:({text})=>{ const m=text.match(/^\s*\[(\w+)\]\s*/); if(m&&EMO[m[1]]) VZ.emo=m[1]; const body=text.replace(/^\s*\[\w+\]\s*/,''); if(VZ.state==='thinking'&&body){ VZ.state='idle'; vzRender(); } VZ.said=body; } }); out=r.text; }
   catch(e){ VZ.busy=false; VZ.said = e.code==='not_configured' ? (S.isAdmin?'Add ANTHROPIC_API_KEY in Vercel, then redeploy.':'I’m offline for a moment.') : 'Something went wrong on my side. Say it again?'; vzSet('idle','concerned'); return setTimeout(vzListen,1500); }
   VZ.busy=false;
   const m=out.match(/^\s*\[(\w+)\]\s*/); const emo=m&&EMO[m[1]]?m[1]:'happy'; const said=out.replace(/^\s*\[\w+\]\s*/,'').trim();
