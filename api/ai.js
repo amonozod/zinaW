@@ -65,7 +65,7 @@ export default async function handler(req) {
     if (ok !== true) return json({ code: plan === 'free' && kind !== 'explain' ? 'forbidden' : 'limit' }, plan === 'free' && kind !== 'explain' ? 403 : 429);
   }
 
-  const model = (isAdmin || plan === 'elite' || body.tier === 'default') ? MODEL_SMART : MODEL_QUICK;
+  const model = body.tier === 'quick' ? MODEL_QUICK : (isAdmin || plan === 'elite' || body.tier === 'default') ? MODEL_SMART : MODEL_QUICK;   // 'quick' always means the cheap model
   // try the chosen model, then fall back if this account can't use it; pass Anthropic's own error back so the owner can see it
   const tries = [...new Set([model, MODEL_QUICK, 'claude-haiku-4-5-20251001', 'claude-sonnet-4-5', 'claude-3-5-haiku-latest'])];
   let ar = null, lastErr = null;
