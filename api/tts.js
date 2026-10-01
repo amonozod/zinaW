@@ -1,5 +1,3 @@
-// api/tts.js
-
 const VOICES = {
   "en-US": "en-US-JennyNeural",
   "uz-UZ": "uz-UZ-SardorNeural",
@@ -21,21 +19,24 @@ export default async function handler(req, res) {
   }
 
   const key = process.env.SPEECH_KEY;
-  const endpoint = process.env.SPEECH_ENDPOINT;
+
+  const endpoint =
+    process.env.SPEECH_ENDPOINT ||
+    "https://zinaspeech.cognitiveservices.azure.com/cognitiveservices/v1";
 
   if (!key) {
-    return res.status(500).json({ error: "SPEECH_KEY is missing" });
-  }
-
-  if (!endpoint) {
-    return res.status(500).json({ error: "SPEECH_ENDPOINT is missing" });
+    return res.status(500).json({
+      error: "SPEECH_KEY is missing"
+    });
   }
 
   const { text = "", lang = "en-US" } = req.body || {};
   const cleanText = String(text).trim();
 
   if (!cleanText) {
-    return res.status(400).json({ error: "Text is required" });
+    return res.status(400).json({
+      error: "Text is required"
+    });
   }
 
   const locale = VOICES[lang] ? lang : "en-US";
@@ -48,51 +49,62 @@ export default async function handler(req, res) {
   <voice name="${voice}">
     ${escapeXml(cleanText)}
   </voice>
-</speak>
-`.trim();
+</speak>`.trim();
 
   try {
+    console.log("Azure TTS endpoint:", endpoint);
+    console.log("Azure TTS locale:", locale);
+    console.log("Azure TTS voice:", voice);
+
     const azure = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Ocp-Apim-Subscription-Key": key,
         "Content-Type": "application/ssml+xml",
-        "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
+        "X-Microsoft-OutputFormat":
+          "audio-24khz-48kbitrate-mono-mp3",
         "User-Agent": "ZinaTTS"
       },
       body: ssml
     });
 
     if (!azure.ok) {
-      const errorText = await azure.text().catch(() => "");
+      const details = await azure.text().catch(() => "");
 
       console.error(
-        "AZURE ERROR:",
-        azure.status,
-        errorText
+        "AZURE STATUS:",
+        azure.status
       );
 
-      return res.status(azure.status).json({
+      console.error(
+        "AZURE BODY:",
+        details
+      );
+
+      return res.status(500).json({
         error: `Azure ${azure.status}`,
-        details: errorText
+        details
       });
     }
 
-    const audioBuffer = Buffer.from(
+    const buffer = Buffer.from(
       await azure.arrayBuffer()
     );
 
     res.setHeader("Content-Type", "audio/mpeg");
     res.setHeader(
       "Content-Length",
-      String(audioBuffer.length)
+      String(buffer.length)
     );
-    res.setHeader("Cache-Control", "no-store");
+    res.setHeader(
+      "Cache-Control",
+      "no-store"
+    );
 
-    return res.status(200).send(audioBuffer);
+    return res.status(200).send(buffer);
 
   } catch (error) {
-    console.error("FETCH ERROR:", error);
+    console.error("TTS ERROR:", error);
 
     return res.status(500).json({
       error: "TTS request failed",
