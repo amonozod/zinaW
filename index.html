@@ -1780,6 +1780,7 @@ function upgradeModal(reason){
 }
 /* ---------- payments: card transfer → owner approves → plan unlocks ---------- */
 const PAY_DEFAULT = { card:'', holder:'', bank:'Humo / Uzcard', support:'', prices:{ 'pro:m':139000, 'pro:q':355000, 'elite:m':239000, 'elite:q':549000 } };
+const ZINA_VERSION='7.3';
 const money = n => (+n)%1===0 ? String(+n) : (+n).toFixed(2);
 const CARD_TYPES = ['Humo','Uzcard','Visa','Mastercard'];
 const paySet = () => { const p={ ...PAY_DEFAULT, ...(S.settings.pay||{}), prices:{ ...PAY_DEFAULT.prices, ...((S.settings.pay||{}).prices||{}) } };
@@ -2044,7 +2045,7 @@ function adminShell(inner){
       <nav>${[['questions','Questions','bank'],['import','Upload','pen'],['mocks','Full-length tests','test'],['vocab','Vocabulary','vocab'],['payments','Payments'+(S.payments.filter(p=>p.status==='pending').length?` <span class="lock">${S.payments.filter(p=>p.status==='pending').length}</span>`:''),'card'],['ai','AI permissions','ai']].map(([k,l,ic])=>`<a href="#/admin?tab=${k}" class="${AT===k?'on':''}">${I[ic]||''}${l}</a>`).join('')}
         <div class="grp">Site</div><a href="/" target="_blank" rel="noopener">${I.home||''}Open Zina ↗</a></nav>
       <div style="flex:1"></div>
-      <div class="me"><div class="avatar">${esc((u?.name||'?')[0].toUpperCase())}</div><div style="min-width:0;flex:1"><div style="font-weight:600;font-size:14px">${esc(u?.name||'')}</div><div class="faint" style="font-size:12px">${S.isAdmin?'Owner':'Not admin yet'}</div></div><button class="btn btn-ghost btn-sm" id="logout">Exit</button></div>
+      <div class="me"><div class="avatar">${esc((u?.name||'?')[0].toUpperCase())}</div><div style="min-width:0;flex:1"><div style="font-weight:600;font-size:14px">${esc(u?.name||'')}</div><div class="faint" style="font-size:12px">${S.isAdmin?'Owner':'Not admin yet'} · v${ZINA_VERSION}</div></div><button class="btn btn-ghost btn-sm" id="logout">Exit</button></div>
     </aside>
     <main class="main">${inner}</main></div>`;
 }
