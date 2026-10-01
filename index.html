@@ -3547,7 +3547,7 @@ async function vzSpeak(text, emo){
         },
         body: JSON.stringify({
           text: sentence,
-          lang: langOf(sentence),
+          lang: VZ.lang || langOf(sentence),
           emo: emo || 'happy'
         })
       });
