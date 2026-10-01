@@ -21,17 +21,20 @@ export default async function handler(req, res) {
   }
 
   const key = process.env.SPEECH_KEY;
-  const endpoint =
-    process.env.SPEECH_ENDPOINT ||
-    "https://northeurope.tts.speech.microsoft.com/cognitiveservices/v1";
+  const endpoint = process.env.SPEECH_ENDPOINT;
 
   if (!key) {
     return res.status(500).json({ error: "SPEECH_KEY is missing" });
   }
 
-  const { text = "", lang = "en-US" } = req.body || {};
+  if (!endpoint) {
+    return res.status(500).json({ error: "SPEECH_ENDPOINT is missing" });
+  }
 
-  if (!String(text).trim()) {
+  const { text = "", lang = "en-US" } = req.body || {};
+  const cleanText = String(text).trim();
+
+  if (!cleanText) {
     return res.status(400).json({ error: "Text is required" });
   }
 
@@ -43,40 +46,57 @@ export default async function handler(req, res) {
   xmlns="http://www.w3.org/2001/10/synthesis"
   xml:lang="${locale}">
   <voice name="${voice}">
-    ${escapeXml(String(text))}
+    ${escapeXml(cleanText)}
   </voice>
-</speak>`.trim();
+</speak>
+`.trim();
 
   try {
-    const r = await fetch(endpoint, {
+    const azure = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Ocp-Apim-Subscription-Key": key,
         "Content-Type": "application/ssml+xml",
-        "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3"
+        "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
+        "User-Agent": "ZinaTTS"
       },
       body: ssml
     });
 
-    if (!r.ok) {
-      const err = await r.text().catch(() => "");
-      console.error("Azure TTS:", r.status, err);
+    if (!azure.ok) {
+      const errorText = await azure.text().catch(() => "");
 
-      return res.status(r.status).json({
-        error: `Azure TTS failed: ${r.status}`
+      console.error(
+        "AZURE ERROR:",
+        azure.status,
+        errorText
+      );
+
+      return res.status(azure.status).json({
+        error: `Azure ${azure.status}`,
+        details: errorText
       });
     }
 
-    const audio = Buffer.from(await r.arrayBuffer());
+    const audioBuffer = Buffer.from(
+      await azure.arrayBuffer()
+    );
 
     res.setHeader("Content-Type", "audio/mpeg");
-    res.setHeader("Content-Length", String(audio.length));
+    res.setHeader(
+      "Content-Length",
+      String(audioBuffer.length)
+    );
+    res.setHeader("Cache-Control", "no-store");
 
-    return res.status(200).send(audio);
-  } catch (err) {
-    console.error(err);
+    return res.status(200).send(audioBuffer);
+
+  } catch (error) {
+    console.error("FETCH ERROR:", error);
+
     return res.status(500).json({
-      error: "TTS request failed"
+      error: "TTS request failed",
+      details: error.message
     });
   }
 }
