@@ -1800,7 +1800,7 @@ function upgradeModal(reason){
 }
 /* ---------- payments: card transfer → owner approves → plan unlocks ---------- */
 const PAY_DEFAULT = { card:'', holder:'', bank:'Humo / Uzcard', support:'', prices:{ 'pro:m':139000, 'pro:q':355000, 'elite:m':239000, 'elite:q':549000 } };
-const ZINA_VERSION='7.4';
+const ZINA_VERSION='7.5';
 const money = n => (+n)%1===0 ? String(+n) : (+n).toFixed(2);
 const CARD_TYPES = ['Humo','Uzcard','Visa','Mastercard'];
 const paySet = () => { const p={ ...PAY_DEFAULT, ...(S.settings.pay||{}), prices:{ ...PAY_DEFAULT.prices, ...((S.settings.pay||{}).prices||{}) } };
@@ -3312,7 +3312,7 @@ function zinaFaceMini(){ return `<span class="vz-mini" aria-hidden="true"><i></i
 const SR = () => window.SpeechRecognition || window.webkitSpeechRecognition;
 function voiceHTML(){
   const st = VZ.paused ? 'paused' : VZ.state;
-  const label = VZ.paused ? 'Tap Zina to talk' : VZ.state==='listening' ? 'Listening' : VZ.state==='thinking' ? 'Thinking' : VZ.state==='speaking' ? 'Zina is talking' : 'Say something';
+  const label = VZ.paused ? 'Tap Zina and speak' : VZ.state==='listening' ? 'Listening' : VZ.state==='thinking' ? 'Thinking' : VZ.state==='speaking' ? 'Zina is talking' : 'Say something';
   const e=EMO[VZ.emo]||EMO.calm;
   return `<div class="vz-bg" style="--c1:${e.c1};--c2:${e.c2}"></div>
     <div class="vz-top"><button class="vz-x" id="vzX" aria-label="Close">✕</button><div class="vz-title"><b>Zina</b><span class="badge elite">ELITE</span></div><span style="width:40px"></span></div>
@@ -3334,14 +3334,15 @@ function openVoice(){
 function closeVoice(){ try{ speechSynthesis.cancel(); }catch(e){} try{ VZ.rec&&VZ.rec.abort(); }catch(e){} VZ.el?.remove(); VZ.el=null; VZ.state='idle'; document.body.style.overflow=''; }
 function vzBind(){
   $('#vzX',VZ.el).onclick=closeVoice;
-  $('#vzFace',VZ.el).onclick=()=>{ VZ.paused=!VZ.paused; if(VZ.paused){ try{ VZ.rec&&VZ.rec.abort(); }catch(e){} try{ speechSynthesis.cancel(); }catch(e){} vzSet('idle'); } else vzListen(); };
+  $('#vzFace',VZ.el).onclick=()=>{ VZ.paused=false; clearTimeout(VZ.safety); try{ speechSynthesis.cancel(); }catch(e){} if(VZ.state!=='listening' && !VZ.busy) vzListen(); };
 }
 function vzListen(){
   const R=SR(); if(!R || !VZ.el || VZ.paused || VZ.busy) return;
   try{ speechSynthesis.cancel(); }catch(e){}
   const r=new R(); VZ.rec=r; r.lang=VZ.lang; r.interimResults=true; r.continuous=false; VZ.heard=''; let got='';
   r.onresult=ev=>{ got=[...ev.results].map(x=>x[0].transcript).join(' '); VZ.heard=got; };
-  r.onerror=ev=>{ if(ev.error==='not-allowed'||ev.error==='service-not-allowed'){ VZ.paused=true; VZ.said='Allow the microphone so I can hear you.'; vzSet('idle','concerned'); } };
+  r.onerror=ev=>{ if(ev.error==='not-allowed'||ev.error==='service-not-allowed'){ VZ.paused=true; VZ.said='Allow the microphone so I can hear you.'; vzSet('idle','concerned'); }
+    else if(ev.error==='language-not-supported'){ VZ.lang='en-US'; } };
   r.onend=()=>{ if(!VZ.el || VZ.paused) return; const t=got.trim(); if(t) vzAsk(t); else setTimeout(vzListen,250); };   // silence: keep listening
   vzSet('listening'); try{ r.start(); }catch(e){}
 }
@@ -3375,10 +3376,13 @@ function vzSpeak(text, emo){
   if(!('speechSynthesis' in window) || !text){ setTimeout(vzListen,300); return; }
   try{ speechSynthesis.cancel(); const lang=langOf(text); const u=new SpeechSynthesisUtterance(text); u.lang=lang; const v=vzVoice(lang); if(v) u.voice=v;
     const e=EMO[emo]||EMO.calm; u.pitch=e.pitch; u.rate=e.rate;
+    window.__vzUtt=u; clearTimeout(VZ.safety);
+    const after=()=>{ clearTimeout(VZ.safety); if(!VZ.el || VZ.state==='listening') return; vzSet('idle'); setTimeout(vzListen,200); };
     u.onstart=()=>{ if(!VZ.el) return; VZ.state='speaking'; vzRender(); };
-    u.onend=()=>{ if(!VZ.el) return; vzSet('idle'); setTimeout(vzListen,250); };            // then listen again, no buttons
-    u.onerror=()=>{ if(VZ.el) setTimeout(vzListen,250); };
+    u.onend=after; u.onerror=after;                                                   // then listen again, no buttons
+    VZ.safety=setTimeout(()=>{ if(VZ.el && VZ.state!=='listening' && !VZ.busy){ try{ speechSynthesis.cancel(); }catch(e){} after(); } }, 2500 + text.length*85);
     speechSynthesis.speak(u);
+    setTimeout(()=>{ if(!speechSynthesis.speaking && VZ.el && VZ.state!=='listening') after(); }, 1200);   // no voice installed: don't wait
   }catch(e){ setTimeout(vzListen,300); }
 }
 if('speechSynthesis' in window){ try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=()=>{}; }catch(e){} }
@@ -3918,7 +3922,8 @@ function splitByKeys(text){ // a file can hold several sections, each ending wit
   return parts.length?parts:[text];
 }
 const normStem = s => String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().slice(0,160);
-function markDups(list){ const seen=new Set(S.questions.map(q=>normStem(q.passage+' '+q.stem))); return list.filter(x=>{ if(!x.q) return true; const k=normStem(x.q.passage+' '+x.q.stem); if(k.length>12 && seen.has(k)){ list.dupCount=(list.dupCount||0)+1; return false; } seen.add(k); return true; }); }
+const dupKey=q=>normStem(q.passage+' '+q.stem)+'|'+normStem((q.choices||[]).join(' '))+'|'+String(q.image||'').slice(-80);
+function markDups(list){ const seen=new Set(S.questions.map(dupKey)); return list.filter(x=>{ if(!x.q) return true; const k=dupKey(x.q); if(k.length>12 && seen.has(k)){ list.dupCount=(list.dupCount||0)+1; return false; } seen.add(k); return true; }); }
 /* ---------- answer keys: a key can be its own file, or pages at the end of a file ---------- */
 const PAIR_LINE=/^\s*(?:\(?\d{1,3}\)?\s*[.):\-]?\s*(?:[A-D]|-?[\d.\/]+)\s*[,;|]?\s*)+$/i;
 function keyPairs(text){ const out=[]; String(text).split('\n').forEach(l=>{ if(!PAIR_LINE.test(l)) return; for(const m of l.matchAll(/\(?(\d{1,3})\)?\s*[.):\-]?\s*([A-D]|-?[\d.\/]+)(?=\s|[,;|]|$)/gi)) out.push({ n:+m[1], answer:m[2].toUpperCase() }); }); return out; }
