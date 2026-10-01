@@ -3421,7 +3421,19 @@ function openVoice(){
   const l2=VZ.lang.slice(0,2); const hi={uz:'Salom! Men Zinaman. Nima haqida gaplashamiz?',ru:'Привет! Я Зина. О чём поговорим?',tr:'Merhaba! Ben Zina. Ne konuşalım?',kk:'Сәлем! Мен Зинамын.'}[l2]||"Hi! I'm Zina. What do you want to work on?";
   setTimeout(()=>{ if(!VZ.el) return; VZ.said=hi; vzRender(); vzSpeak(hi,'happy'); },300);
 }
-function closeVoice(){ try{ VZ.mic&&VZ.mic.s.getTracks().forEach(t=>t.stop()); VZ.mic&&VZ.mic.ac.close(); }catch(e){} VZ.mic=null; try{ speechSynthesis.cancel(); }catch(e){} try{ VZ.rec&&VZ.rec.abort(); }catch(e){} VZ.el?.remove(); VZ.el=null; VZ.state='idle'; document.body.style.overflow=''; }
+function closeVoice(){ try{ VZ.mic&&VZ.mic.s.getTracks().forEach(t=>t.stop()); VZ.mic&&VZ.mic.ac.close(); }catch(e){} try{
+  if(VZ.audio){
+    VZ.audio.pause();
+    VZ.audio.currentTime = 0;
+    VZ.audio.src = "";
+  }
+  if(VZ.audioUrl){
+    URL.revokeObjectURL(VZ.audioUrl);
+  }
+}catch(e){}
+
+VZ.audio = null;
+VZ.audioUrl = ""; VZ.mic=null; try{ speechSynthesis.cancel(); }catch(e){} try{ VZ.rec&&VZ.rec.abort(); }catch(e){} VZ.el?.remove(); VZ.el=null; VZ.state='idle'; document.body.style.overflow=''; }
 function vzBind(){
   $('#vzX',VZ.el).onclick=closeVoice;
   $('#vzFace',VZ.el).onclick=()=>{ VZ.paused=false; VZ.err=''; clearTimeout(VZ.safety); try{ speechSynthesis.cancel(); }catch(e){} if(VZ.state!=='listening' && !VZ.busy) vzListen(); };
