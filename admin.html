@@ -1508,6 +1508,51 @@ s.was{font-size:.42em;font-weight:600;opacity:.45;margin-right:8px;letter-spacin
 .capsule[data-emo="angry"],.capsule[data-emo="scolding"]{animation:shake .5s ease-in-out 2}
 .capsule[data-emo="laughing"]{animation:laughBob .35s ease-in-out 4 alternate}
 .orb{display:none}
+
+/* capsule v2: eyelids morph between moods */
+.capsule .rim{fill:var(--rim);transition:fill .45s}
+.capsule .iris{fill:#15123B;transform-box:fill-box;transform-origin:center;transition:transform .35s cubic-bezier(.3,1.4,.5,1),fill .3s}
+.capsule .lidT,.capsule .lidB{fill:#fff;transform-box:fill-box;transform-origin:center;transition:transform .35s cubic-bezier(.3,1.2,.5,1)}
+.capsule .lidT{transform:translateY(-14px)}.capsule .lidB{transform:translateY(14px)}
+.capsule .eyes{animation:capBlink 5s infinite}
+@keyframes capBlink{0%,94%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+.capsule .eyes{transform-box:fill-box;transform-origin:center}
+.capsule .mouth{fill:none;stroke:#15123B;stroke-width:6;stroke-linecap:round;transition:d .35s ease}
+.capsule .tear{fill:#7CC4FF;opacity:0}.capsule .blush{fill:#FF8FB1;opacity:0;transition:opacity .4s}
+.capsule .fx{font:900 20px var(--display);fill:#fff}
+/* moods */
+.capsule[data-emo="happy"] .lidB,.capsule[data-emo="encouraging"] .lidB{transform:translateY(-6px) scaleX(1.2)}
+.capsule[data-emo="happy"] .mouth,.capsule[data-emo="encouraging"] .mouth{d:path("M104 118 Q120 134 136 118")}
+.capsule[data-emo="happy"] .blush,.capsule[data-emo="love"] .blush,.capsule[data-emo="laughing"] .blush{opacity:.6}
+.capsule[data-emo="laughing"] .lidB{transform:translateY(-12px) scaleX(1.25)}.capsule[data-emo="laughing"] .lidT{transform:translateY(-2px)}
+.capsule[data-emo="laughing"] .mouth{d:path("M102 114 Q120 140 138 114");fill:#15123B}
+.capsule[data-emo="laughing"]{animation:laughBob .3s ease-in-out 6 alternate}
+.capsule[data-emo="angry"] .L .lidT,.capsule[data-emo="scolding"] .L .lidT{transform:translateY(-2px) rotate(22deg)}
+.capsule[data-emo="angry"] .R .lidT,.capsule[data-emo="scolding"] .R .lidT{transform:translateY(-2px) rotate(-22deg)}
+.capsule[data-emo="angry"] .mouth{d:path("M106 126 Q120 116 134 126")}
+.capsule[data-emo="scolding"] .mouth{d:path("M106 116 Q120 132 134 116");fill:#15123B}
+.capsule[data-emo="angry"],.capsule[data-emo="scolding"]{animation:shake .45s ease-in-out 2}
+.capsule[data-emo="sad"] .L .lidT,.capsule[data-emo="crying"] .L .lidT,.capsule[data-emo="concerned"] .L .lidT{transform:translateY(-4px) rotate(-18deg)}
+.capsule[data-emo="sad"] .R .lidT,.capsule[data-emo="crying"] .R .lidT,.capsule[data-emo="concerned"] .R .lidT{transform:translateY(-4px) rotate(18deg)}
+.capsule[data-emo="sad"] .mouth,.capsule[data-emo="crying"] .mouth{d:path("M106 128 Q120 116 134 128")}
+.capsule[data-emo="concerned"] .mouth{d:path("M108 126 Q120 120 132 126")}
+.capsule[data-emo="crying"] .tear,.capsule[data-emo="sad"] .tear:not(.t2){opacity:1;animation:drip 1.4s ease-in infinite}
+.capsule[data-emo="crying"] .tear.t2{animation-delay:.7s}
+.capsule[data-emo="surprised"] .iris,.capsule[data-emo="excited"] .iris{transform:scale(1.12,1.15)}
+.capsule[data-emo="surprised"] .mouth{d:path("M114 122 Q120 132 126 122 Q120 112 114 122");fill:#15123B}
+.capsule[data-emo="excited"] .mouth{d:path("M104 116 Q120 134 136 116");fill:#15123B}
+.capsule[data-emo="love"] .iris{fill:#E8487A;transform:scale(.9)}
+.capsule[data-emo="love"] .mouth{d:path("M108 120 Q120 130 132 120")}
+.capsule[data-emo="sleepy"] .lidT{transform:translateY(12px)}.capsule[data-emo="sleepy"] .mouth{d:path("M114 122 Q120 126 126 122")}
+.capsule[data-emo="proud"] .lidT{transform:translateY(-6px)}.capsule[data-emo="proud"] .lidB{transform:translateY(2px)}.capsule[data-emo="proud"] .mouth{d:path("M106 120 Q124 130 136 114")}
+.capsule[data-emo="thinking"] .iris{transform:translate(5px,-7px) scale(.92)}.capsule[data-emo="thinking"] .mouth{d:path("M110 124 L132 120")}
+.capsule[data-state="speaking"] .mouth{animation:capTalk .2s ease-in-out infinite alternate}
+@keyframes capTalk{from{d:path("M108 120 Q120 124 132 120")}to{d:path("M108 118 Q120 134 132 118")}}
+.capsule[data-state="listening"] .iris{animation:capListen2 1.8s ease-in-out infinite}
+@keyframes capListen2{50%{transform:scale(1.06)}}
+.capsule .tear{animation:none!important;opacity:0}
+.capsule[data-emo="crying"] .tear,.capsule[data-emo="sad"] .tear:not(.t2){opacity:1;animation:drip 1.4s ease-in infinite!important}
+.capsule[data-emo="crying"] .tear.t2{animation-delay:.7s!important}
 </style>
 <meta name="robots" content="noindex,nofollow">
 <script>window.ZINA_ADMIN=true</script>
@@ -1856,7 +1901,7 @@ function upgradeModal(reason){
 }
 /* ---------- payments: card transfer → owner approves → plan unlocks ---------- */
 const PAY_DEFAULT = { card:'', holder:'', bank:'Humo / Uzcard', support:'', prices:{ 'pro:m':139000, 'pro:q':355000, 'elite:m':239000, 'elite:q':549000 } };
-const ZINA_VERSION='7.8';
+const ZINA_VERSION='8.1';
 const money = n => (+n)%1===0 ? String(+n) : (+n).toFixed(2);
 const CARD_TYPES = ['Humo','Uzcard','Visa','Mastercard'];
 const paySet = () => { const p={ ...PAY_DEFAULT, ...(S.settings.pay||{}), prices:{ ...PAY_DEFAULT.prices, ...((S.settings.pay||{}).prices||{}) } };
@@ -2448,7 +2493,7 @@ function renderExam(){
   if(EX.screen==='intro'){ el.innerHTML = examIntro(); bindExam(); return; }
   if(EX.screen==='break') return el.innerHTML = examBreak(), bindExamSimple();
   const mod=EX.modules[EX.mi]; const q=mod.qs[EX.qi];
-  const isMath = mod.section==='M';
+  const isMath = mod.section==='M' || (mod.qs[EX.qi]&&mod.qs[EX.qi].section==='M');   // calculator for every math question, in tests and in the question bank
   const top = `<div class="ex-top">
       <div><div class="ex-title">${esc(mod.title)}</div><button class="ex-dir" data-pop="dir">Directions ${I.chev}</button></div>
       <div class="ex-timer">${EX.mode==='mock'||true?`<b id="exTime"></b><button id="hideT">${EX.hide?'Show':'Hide'}</button>`:''}</div>
@@ -3363,33 +3408,21 @@ function zinaFaceSVG(emo, state){
 }
 function zinaFaceMini(){ return `<span class="vz-mini" aria-hidden="true"><i></i><i></i></span>`; }
 const SR = () => window.SpeechRecognition || window.webkitSpeechRecognition;
-/* capsule face: white screen, thick colored rim, big expressive eyes */
+/* capsule face: white screen, thick colored rim, robot eyes with eyelids that morph smoothly between moods */
 function capsuleSVG(emo,state){
-  const e=EMO[emo]||EMO.calm, rim=e.c2, D='#15123B';
-  const oval=(x,ry=20,rx=13,dy=0)=>`<ellipse cx="${x}" cy="${88+dy}" rx="${rx}" ry="${ry}" fill="${D}"/><circle cx="${x+4}" cy="${80+dy}" r="4" fill="#fff"/>`;
-  const arcUp=x=>`<path d="M${x-15} 94 Q${x} 72 ${x+15} 94" class="cl"/>`, arcDn=x=>`<path d="M${x-15} 86 Q${x} 102 ${x+15} 86" class="cl"/>`;
-  let eyes, mouth='', extra='';
-  switch(emo){
-    case 'happy': case 'encouraging': eyes=arcUp(92)+arcUp(148); mouth=`<path d="M108 112 Q120 126 132 112" class="cl"/>`; break;
-    case 'laughing': eyes=`<path d="M80 80 L104 90 L80 100" class="cl"/><path d="M160 80 L136 90 L160 100" class="cl"/>`; mouth=`<path d="M104 108 Q120 136 136 108 Z" fill="${D}"/>`; break;
-    case 'excited': eyes=oval(92,24,15)+oval(148,24,15); mouth=`<path d="M106 110 Q120 128 134 110 Z" fill="${D}"/>`; extra=`<text x="196" y="40" class="spark">✦</text><text x="30" y="48" class="spark s2">✦</text>`; break;
-    case 'love': eyes=[92,148].map(x=>`<path d="M${x} 102 C${x-22} 88 ${x-14} 70 ${x} 81 C${x+14} 70 ${x+22} 88 ${x} 102Z" fill="#E8487A"/>`).join(''); mouth=`<path d="M110 114 Q120 122 130 114" class="cl"/>`; break;
-    case 'proud': eyes=`<path d="M77 92 Q92 84 107 92" class="cl"/><path d="M133 92 Q148 84 163 92" class="cl"/>`; mouth=`<path d="M108 114 Q124 122 136 108" class="cl"/>`; break;
-    case 'thinking': eyes=oval(96,18,12,-6)+oval(152,18,12,-6); mouth=`<path d="M112 116 L132 113" class="cl"/>`; extra=`<g class="dots"><circle cx="200" cy="30" r="5"/><circle cx="214" cy="18" r="3.5"/></g>`; break;
-    case 'surprised': eyes=oval(92,24,16)+oval(148,24,16); mouth=`<ellipse cx="120" cy="118" rx="8" ry="10" fill="${D}"/>`; break;
-    case 'concerned': eyes=`<path d="M78 68 L106 74" class="cl"/><path d="M162 68 L134 74" class="cl"/>`+oval(92,17,12,4)+oval(148,17,12,4); mouth=`<path d="M108 120 Q120 112 132 120" class="cl"/>`; break;
-    case 'sad': eyes=`<path d="M78 70 L106 64" class="cl"/><path d="M162 70 L134 64" class="cl"/>`+oval(92,16,12,6)+oval(148,16,12,6); mouth=`<path d="M106 122 Q120 110 134 122" class="cl"/>`; extra=`<path class="tear" d="M84 108 q-6 10 0 15 q6-5 0-15z"/>`; break;
-    case 'crying': eyes=arcDn(92)+arcDn(148); mouth=`<path d="M104 124 Q120 104 136 124 Z" fill="${D}"/>`; extra=`<path class="tear" d="M84 100 q-6 10 0 15 q6-5 0-15z"/><path class="tear t2" d="M156 100 q-6 10 0 15 q6-5 0-15z"/>`; break;
-    case 'angry': case 'scolding': eyes=`<path d="M74 66 L108 80" class="cl thick"/><path d="M166 66 L132 80" class="cl thick"/>`+oval(92,13,13,6)+oval(148,13,13,6); mouth= emo==='scolding'?`<path d="M106 110 Q120 128 134 110 Z" fill="${D}"/>`:`<path d="M106 120 Q120 108 134 120" class="cl"/>`; if(emo==='scolding') extra=`<text x="180" y="44" class="grawl">#@%!</text>`; break;
-    case 'sleepy': eyes=`<path d="M78 92 H106" class="cl"/><path d="M134 92 H162" class="cl"/>`; mouth=`<ellipse cx="120" cy="116" rx="6" ry="5" fill="${D}"/>`; extra=`<text x="190" y="40" class="zz">z</text>`; break;
-    default: eyes=`<g class="look">${oval(92)}${oval(148)}</g>`; mouth=`<path d="M110 112 Q120 120 130 112" class="cl"/>`;
-  }
-  if(state==='speaking') mouth=`<ellipse cx="120" cy="116" rx="11" ry="7" fill="${D}" class="talk"/>`;
-  return `<svg class="capsule" viewBox="0 0 240 180" data-emo="${emo}" data-state="${state}" aria-hidden="true">
-    <rect x="10" y="30" width="220" height="120" rx="60" fill="${rim}"/>
-    <rect x="22" y="42" width="196" height="96" rx="48" fill="#fff"/>
-    <g class="eyes">${eyes}</g>${mouth}${extra}</svg>`;
+  const e=EMO[emo]||EMO.calm;
+  const eye=(x,side)=>`<g class="eye ${side}" style="--ox:${x}px"><rect class="iris" x="${x-17}" y="64" width="34" height="46" rx="15"/><rect class="lidT" x="${x-24}" y="34" width="48" height="34"/><rect class="lidB" x="${x-24}" y="108" width="48" height="34"/></g>`;
+  return `<svg class="capsule" viewBox="0 0 240 180" data-emo="${emo}" data-state="${state}" aria-hidden="true" style="--rim:${e.c2}">
+    <rect class="rim" x="10" y="30" width="220" height="120" rx="60"/>
+    <rect class="screen" x="22" y="42" width="196" height="96" rx="48" fill="#fff"/>
+    <clipPath id="scr"><rect x="22" y="42" width="196" height="96" rx="48"/></clipPath>
+    <g clip-path="url(#scr)"><g class="eyes">${eye(92,'L')}${eye(148,'R')}</g>
+      <path class="mouth" d="M108 122 Q120 128 132 122"/>
+      <path class="tear" d="M80 112 q-6 10 0 15 q6-5 0-15z"/><path class="tear t2" d="M160 112 q-6 10 0 15 q6-5 0-15z"/>
+      <ellipse class="blush" cx="54" cy="116" rx="11" ry="6"/><ellipse class="blush" cx="186" cy="116" rx="11" ry="6"/></g>
+    <text class="fx" x="200" y="36"></text></svg>`;
 }
+const FX={ scolding:'#@%!', excited:'✦', sleepy:'z', love:'♥', thinking:'…', laughing:'ha' };
 /* a living orb, like the voice modes of modern study assistants: color = mood, size = sound */
 function orbHTML(emo,state){ const e=EMO[emo]||EMO.calm;
   return `<div class="orb" data-emo="${emo}" data-state="${state}" style="--c1:${e.c1};--c2:${e.c2}"><i class="o1"></i><i class="o2"></i><i class="o3"></i><i class="core"></i><i class="gloss"></i></div>`; }
@@ -3414,21 +3447,69 @@ async function vzMic(){
       requestAnimationFrame(tick); }; tick(); return true; }
   catch(e){ VZ.err = e.name==='NotAllowedError' ? 'Microphone is blocked. Click the 🔒 in the address bar and allow it.' : e.name==='NotFoundError' ? 'No microphone found on this device.' : 'Could not open the microphone.'; VZ.paused=true; vzRender(); return false; }
 }
-function vzRender(){ if(!VZ.el) return; VZ.el.innerHTML=voiceHTML(); vzBind(); }
+function vzRender(){ if(!VZ.el) return;
+  const cap=VZ.el.querySelector('.capsule');
+  if(!cap){ VZ.el.innerHTML=voiceHTML(); vzBind(); }
+  const c=VZ.el.querySelector('.capsule'), st=VZ.paused?'paused':VZ.state, e=EMO[VZ.emo]||EMO.calm;
+  c.dataset.emo=VZ.emo; c.dataset.state=st; c.style.setProperty('--rim',e.c2); c.querySelector('.fx').textContent=FX[VZ.emo]||'';
+  const bg=VZ.el.querySelector('.vz-bg'); bg.style.setProperty('--c1',e.c1); bg.style.setProperty('--c2',e.c2);
+  VZ.el.querySelector('.vz-mood').textContent=VZ.emo;
+  const label = VZ.err ? VZ.err : VZ.paused ? 'Tap Zina and speak' : VZ.state==='listening' ? 'Listening…' : VZ.state==='thinking' ? 'Thinking…' : VZ.state==='speaking' ? 'Zina is speaking' : 'Connecting…';
+  const pill=VZ.el.querySelector('.vz-pill'); pill.classList.toggle('err',!!VZ.err); pill.innerHTML=`<span class="vz-dot ${st}"></span>${esc(label)}`;
+}
 function vzSet(state, emo){ const same = VZ.state===state && (!emo || VZ.emo===emo); VZ.state=state; if(emo) VZ.emo=emo; if(!same) vzRender(); }
+async function vzAuth(){ const s=(await ZINA.sb.auth.getSession()).data.session; return 'Bearer '+(s&&s.access_token); }
+function wavFrom(chunks, rate){                       // Float32 chunks → 16 kHz 16-bit mono WAV
+  let len=chunks.reduce((s,c)=>s+c.length,0), all=new Float32Array(len), o=0; chunks.forEach(c=>{ all.set(c,o); o+=c.length; });
+  const ratio=rate/16000, n=Math.floor(all.length/ratio), pcm=new Int16Array(n); for(let i=0;i<n;i++){ const v=Math.max(-1,Math.min(1,all[Math.floor(i*ratio)])); pcm[i]=v<0?v*0x8000:v*0x7fff; }
+  const buf=new ArrayBuffer(44+pcm.length*2), dv=new DataView(buf), w=(o,s)=>[...s].forEach((ch,i)=>dv.setUint8(o+i,ch.charCodeAt(0)));
+  w(0,'RIFF'); dv.setUint32(4,36+pcm.length*2,true); w(8,'WAVE'); w(12,'fmt '); dv.setUint32(16,16,true); dv.setUint16(20,1,true); dv.setUint16(22,1,true); dv.setUint32(24,16000,true); dv.setUint32(28,32000,true); dv.setUint16(32,2,true); dv.setUint16(34,16,true); w(36,'data'); dv.setUint32(40,pcm.length*2,true);
+  new Int16Array(buf,44).set(pcm); return new Blob([buf],{type:'audio/wav'});
+}
+async function vzListenCloud(){
+  if(!VZ.el || VZ.paused || VZ.busy) return;
+  let stream; try{ stream=await navigator.mediaDevices.getUserMedia({ audio:{ echoCancellation:true, noiseSuppression:true } }); }
+  catch(e){ VZ.paused=true; VZ.err=e.name==='NotAllowedError'?'Microphone is blocked. Click the 🔒 in the address bar and allow it.':'No microphone found.'; return vzRender(); }
+  const ac=new (window.AudioContext||window.webkitAudioContext)(); const src=ac.createMediaStreamSource(stream); const proc=ac.createScriptProcessor(4096,1,1);
+  const chunks=[]; let spoke=false, quiet=0, total=0, finished=false; vzSet('listening');
+  const stop=async()=>{ if(finished) return; finished=true; try{ proc.disconnect(); src.disconnect(); stream.getTracks().forEach(t=>t.stop()); ac.close(); }catch(e){}
+    VZ.el?.querySelector('.capsule')?.classList.remove('hear');
+    if(!spoke || !VZ.el){ if(VZ.el && !VZ.paused) setTimeout(vzListenCloud,200); return; }
+    vzSet('thinking','thinking');
+    try{ const langs=[VZ.lastLang,'uz-UZ','en-US','ru-RU'].filter((v,i,a)=>v&&a.indexOf(v)===i).slice(0,3).join(',');
+      const r=await fetch('/api/speech?op=stt&langs='+langs,{ method:'POST', headers:{ Authorization:await vzAuth() }, body:wavFrom(chunks,ac.sampleRate) }); const j=await r.json();
+      if(j.text){ VZ.lastLang=j.lang; VZ.heard=j.text; vzAsk(j.text,j.lang); } else { vzSet('idle'); setTimeout(vzListenCloud,200); } }
+    catch(e){ VZ.err='Could not reach the speech service.'; vzSet('idle'); setTimeout(vzListenCloud,1500); } };
+  proc.onaudioprocess=ev=>{ if(finished) return; const d=ev.inputBuffer.getChannelData(0); let s=0; for(let i=0;i<d.length;i+=4) s+=d[i]*d[i]; const rms=Math.sqrt(s/(d.length/4));
+    const dt=d.length/ac.sampleRate; total+=dt;
+    if(rms>0.02){ spoke=true; quiet=0; VZ.el?.querySelector('.capsule')?.classList.add('hear'); } else if(spoke) quiet+=dt;
+    if(spoke) chunks.push(new Float32Array(d));
+    if((spoke && quiet>1.1) || total>18 || (!spoke && total>12)) stop(); };
+  src.connect(proc); proc.connect(ac.destination);
+}
+async function vzSpeakCloud(text, emo){
+  try{ const r=await fetch('/api/speech?op=tts',{ method:'POST', headers:{ 'content-type':'application/json', Authorization:await vzAuth() }, body:JSON.stringify({ text, lang:(VZ.replyLang||langOf(text)), emo }) });
+    if(!r.ok){ const j=await r.json().catch(()=>({})); if(S.isAdmin){ VZ.err='Voice error: '+(j.detail||j.code||r.status); vzRender(); } throw new Error('tts'); }
+    const url=URL.createObjectURL(await r.blob()); const a=new Audio(url); VZ.audio=a;
+    a.onplay=()=>vzSet('speaking'); a.onended=()=>{ URL.revokeObjectURL(url); if(VZ.el){ vzSet('idle'); setTimeout(vzListen,200); } };
+    a.onerror=()=>{ if(VZ.el){ vzSet('idle'); setTimeout(vzListen,200); } }; await a.play();
+  }catch(e){ VZ.cloud=false; vzSpeak(text,emo); }
+}
 function openVoice(){
   if(planKey()!=='elite') return upgradeModal('Talk to Zina out loud. Only on Elite');
   if(VZ.el) return; VZ.el=document.createElement('div'); VZ.el.className='vz'; VZ.el.setAttribute('role','dialog'); VZ.el.setAttribute('aria-label','Talk to Zina');
-  document.body.appendChild(VZ.el); document.body.style.overflow='hidden'; VZ.said=''; VZ.heard=''; VZ.paused=false; VZ.err=''; VZ.emo='happy'; vzSet('idle');
+  document.body.appendChild(VZ.el); document.body.style.overflow='hidden'; VZ.said=''; VZ.heard=''; VZ.paused=false; VZ.err=''; VZ.emo='happy'; VZ.cloud=false; vzSet('idle');
+  if(window.ZINA) fetch('/api/speech').then(r=>r.json()).then(j=>{ VZ.cloud=!!j.configured; }).catch(()=>{});
   const l2=VZ.lang.slice(0,2); const hi={uz:'Salom! Men Zinaman. Nima haqida gaplashamiz?',ru:'Привет! Я Зина. О чём поговорим?',tr:'Merhaba! Ben Zina. Ne konuşalım?',kk:'Сәлем! Мен Зинамын.'}[l2]||"Hi! I'm Zina. What do you want to work on?";
   setTimeout(()=>{ if(!VZ.el) return; VZ.said=hi; vzRender(); vzSpeak(hi,'happy'); },300);
 }
-function closeVoice(){ try{ VZ.mic&&VZ.mic.s.getTracks().forEach(t=>t.stop()); VZ.mic&&VZ.mic.ac.close(); }catch(e){} VZ.mic=null; try{ speechSynthesis.cancel(); }catch(e){} try{ VZ.rec&&VZ.rec.abort(); }catch(e){} VZ.el?.remove(); VZ.el=null; VZ.state='idle'; document.body.style.overflow=''; }
+function closeVoice(){ try{ VZ.audio&&VZ.audio.pause(); }catch(e){} try{ VZ.mic&&VZ.mic.s.getTracks().forEach(t=>t.stop()); VZ.mic&&VZ.mic.ac.close(); }catch(e){} VZ.mic=null; try{ speechSynthesis.cancel(); }catch(e){} try{ VZ.rec&&VZ.rec.abort(); }catch(e){} VZ.el?.remove(); VZ.el=null; VZ.state='idle'; document.body.style.overflow=''; }
 function vzBind(){
   $('#vzX',VZ.el).onclick=closeVoice;
   $('#vzFace',VZ.el).onclick=()=>{ VZ.paused=false; VZ.err=''; clearTimeout(VZ.safety); try{ speechSynthesis.cancel(); }catch(e){} if(VZ.state!=='listening' && !VZ.busy) vzListen(); };
 }
 function vzListen(){
+  if(VZ.cloud) return vzListenCloud();
   const R=SR(); if(!R || !VZ.el || VZ.paused || VZ.busy) return;
   try{ speechSynthesis.cancel(); }catch(e){}
   const r=new R(); VZ.rec=r; r.lang=VZ.lang; r.interimResults=true; r.continuous=false; VZ.heard=''; let got='';
@@ -3446,31 +3527,41 @@ function vzListen(){
 }
 /* guess the language of a sentence, so Zina's voice matches it */
 function langOf(t){ t=String(t||'');
-  if(/[\u0400-\u04FF]/.test(t)) return /[әғқңөұүһі]/i.test(t)?'kk-KZ':'ru-RU';
+  if(/[\u0400-\u04FF]/.test(t)) return /[әғқңөұүһі]/i.test(t)?'kk-KZ':(/[ўқғҳ]/i.test(t)?'uz-UZ':'ru-RU');
   if(/[\u0600-\u06FF]/.test(t)) return 'ar-SA'; if(/[\u0900-\u097F]/.test(t)) return 'hi-IN'; if(/[\u3040-\u30FF]/.test(t)) return 'ja-JP'; if(/[\uAC00-\uD7AF]/.test(t)) return 'ko-KR'; if(/[\u4E00-\u9FFF]/.test(t)) return 'zh-CN';
-  if(/o‘|g‘|o'|g'|\b(men|sen|nima|qanday|uchun|bilan|yaxshi|savol|javob|kerak|salom)\b/i.test(t)) return 'uz-UZ';
-  if(/[ğış]/i.test(t) || /\b(ve|bir|için|nasıl)\b/i.test(t)) return 'tr-TR';
-  if(/[ñ¿¡]/.test(t)||/\b(que|los|para|una|hola)\b/i.test(t)) return 'es-ES'; if(/\b(les|des|est|pour|une|bonjour)\b/i.test(t)) return 'fr-FR'; if(/\b(der|die|und|ist|nicht)\b/i.test(t)) return 'de-DE';
-  return 'en-US'; }
-async function vzAsk(text){
+  const w=t.toLowerCase();
+  const uz=(w.match(/\b(va|bu|uchun|bilan|emas|siz|sen|men|biz|qanday|nima|kerak|yaxshi|mumkin|savol|javob|keling|rahmat|ham|lekin|chunki|juda|bor|yo'q|yoʻq|edi|ekan|qil|qiling|bo'ladi|boʻladi|bo'lsa|boʻlsa|endi|hozir|keyin|test|imtihon|ball|yana|qanaqa|shu|unda|menga|sizga)\b/g)||[]).length + (/[oʻgʻ]ʻ|o'|g'|oʻ|gʻ|o‘|g‘/.test(w)?3:0);
+  const tr=(w.match(/\b(ve|bir|için|nasıl|değil|çok|ama|şey|ben|sen)\b/g)||[]).length + (/[ğış]/.test(w)?3:0);
+  const es=(w.match(/\b(que|los|para|una|hola|pero|como|muy)\b/g)||[]).length + (/[ñ¿¡]/.test(w)?3:0);
+  const fr=(w.match(/\b(les|des|est|pour|une|bonjour|mais|avec|très)\b/g)||[]).length;
+  const de=(w.match(/\b(der|die|und|ist|nicht|ich|sehr|aber)\b/g)||[]).length + (/[äöüß]/.test(w)?2:0);
+  const best=[['uz-UZ',uz],['tr-TR',tr],['es-ES',es],['fr-FR',fr],['de-DE',de]].sort((a,b)=>b[1]-a[1])[0];
+  return best[1]>=2 ? best[0] : 'en-US'; }
+async function vzAsk(text, heardLang){
   if(VZ.busy) return;
   const p=plan(); if(usage('ai','d')>=p.ai){ VZ.said='That’s all for today. Talk tomorrow!'; return vzSet('idle','concerned'); }
   const sample=S.caps.sample; if(!sample){ VZ.said='My voice connects on the live site.'; return vzSet('idle','calm'); }
-  VZ.lang=langOf(text)||VZ.lang;
+  VZ.lang=heardLang||langOf(text)||VZ.lang; VZ.replyLang=heardLang||langOf(text);
   VZ.busy=true; bump('ai','d'); vzSet('thinking','thinking');
-  const u=S.user; const sys=`You are Zina, a lively, funny, warm Digital SAT coach talking out loud with ${u.name||'a student'} (goal ${u.target||''}${u.examDate?', exam '+u.examDate:''}). Talk like a real human friend: short natural sentences, real feelings, under 60 words, no lists, no markdown, no emojis. ALWAYS reply in exactly the same language the student just used. Begin with exactly one tag for how you feel, chosen honestly for the moment: [calm], [happy], [laughing], [excited], [encouraging], [love], [proud], [thinking], [surprised], [concerned], [sad], [crying], [angry], [scolding] or [sleepy]. Laugh at jokes, get sad or even cry (playfully) when they give up, get angry or scold them (kindly, never rude, no swearing) when they skip practice, show love and pride when they improve. Never invent official SAT questions.`;
+  const u=S.user; const sys=`You are Zina, a lively, funny, warm Digital SAT coach talking out loud with ${u.name||'a student'} (goal ${u.target||''}${u.examDate?', exam '+u.examDate:''}). Talk like a real human friend: short natural sentences, real feelings, under 60 words, no lists, no markdown, no emojis. ALWAYS reply in exactly the same language the student just used (if they speak Uzbek, answer in natural, correct Uzbek using Latin script). Begin with exactly one tag for how you feel, chosen honestly for the moment: [calm], [happy], [laughing], [excited], [encouraging], [love], [proud], [thinking], [surprised], [concerned], [sad], [crying], [angry], [scolding] or [sleepy]. Laugh at jokes, get sad or even cry (playfully) when they give up, get angry or scold them (kindly, never rude, no swearing) when they skip practice, show love and pride when they improve. Never invent official SAT questions.`;
   VZ.hist.push({ role:'user', content:text }); VZ.hist=VZ.hist.slice(-10);
   const turns=VZ.hist.map((m,i)=>({ role:m.role, content:i===0?sys+'\n\n'+m.content:m.content }));
   let out='';
-  try{ const r=await sample(turns,{ cache:false, modelTier:'quick', onText:({text})=>{ const m=text.match(/^\s*\[(\w+)\]\s*/); if(m&&EMO[m[1]]) VZ.emo=m[1]; const body=text.replace(/^\s*\[\w+\]\s*/,''); if(VZ.state==='thinking'&&body){ VZ.state='idle'; vzRender(); } VZ.said=body; } }); out=r.text; }
+  try{ const r=await sample(turns,{ cache:false, modelTier:(String(VZ.lang).startsWith('en')?'quick':'default'), onText:({text})=>{ const m=text.match(/^\s*\[(\w+)\]\s*/); if(m&&EMO[m[1]]) VZ.emo=m[1]; const body=text.replace(/^\s*\[\w+\]\s*/,''); if(VZ.state==='thinking'&&body){ VZ.state='idle'; vzRender(); } VZ.said=body; } }); out=r.text; }
   catch(e){ VZ.busy=false; VZ.said = e.code==='not_configured' ? (S.isAdmin?'Add ANTHROPIC_API_KEY in Vercel, then redeploy.':'I’m offline for a moment.') : 'Something went wrong on my side. Say it again?'; vzSet('idle','concerned'); return setTimeout(vzListen,1500); }
   VZ.busy=false;
   const m=out.match(/^\s*\[(\w+)\]\s*/); const emo=m&&EMO[m[1]]?m[1]:'happy'; const said=out.replace(/^\s*\[\w+\]\s*/,'').trim();
   VZ.hist.push({ role:'assistant', content:said }); VZ.said=said; VZ.emo=emo; vzRender(); vzSpeak(said, emo);
 }
+/* one smooth voice everywhere: Edge's "Multilingual" natural voices speak every language in the same voice */
 function vzVoice(lang){ const vs=speechSynthesis.getVoices(); const L=lang.toLowerCase(), l2=L.slice(0,2);
-  return vs.find(v=>v.lang.toLowerCase()===L && /natural|neural|google|premium|enhanced/i.test(v.name)) || vs.find(v=>v.lang.toLowerCase()===L) || vs.find(v=>v.lang.toLowerCase().startsWith(l2)) || null; }
+  const natural=v=>/natural|neural|online/i.test(v.name);
+  return vs.find(v=>v.lang.toLowerCase().startsWith(l2) && natural(v))
+      || vs.find(v=>v.lang.toLowerCase()===L && /google/i.test(v.name))
+      || vs.find(v=>v.lang.toLowerCase().startsWith(l2))
+      || vs.find(v=>/multilingual/i.test(v.name)) || null; }
 function vzSpeak(text, emo){
+  if(VZ.cloud) return vzSpeakCloud(text, emo);
   if(!('speechSynthesis' in window) || !text){ setTimeout(vzListen,300); return; }
   try{ speechSynthesis.cancel(); }catch(e){}
   const lang=langOf(text), v=vzVoice(lang), ee=EMO[emo]||EMO.calm;
@@ -4422,6 +4513,10 @@ function bindAdmin(){
         (j.results||[]).forEach(x=>say(x.ok, x.ok?`Anthropic answered with ${esc(x.model)} in ${x.ms} ms`:`${esc(x.model)}: ${esc(x.text)} (HTTP ${x.status})`));
         if(!j.ok) return say(false,'Anthropic refused every model. Key starts with '+esc(j.keyStart||'?')+'. Check Billing (credit) and that this is an API key from console.anthropic.com.');
       }catch(e){ return say(false, e.name==='AbortError'?'No answer in 30 seconds: the /api/ai function timed out on Vercel.':'Could not reach /api/ai: '+esc(e.message||e)); } }
+    if(window.ZINA){ try{ const h=await fetch('/api/speech').then(r=>r.json()); say(h.configured, h.configured?'Azure voice keys are set':'Azure voice is not set (optional): AZURE_SPEECH_KEY and AZURE_SPEECH_REGION');
+        if(h.configured){ const s=(await ZINA.sb.auth.getSession()).data.session; const r=await fetch('/api/speech?op=tts',{ method:'POST', headers:{'content-type':'application/json', Authorization:'Bearer '+(s&&s.access_token)}, body:JSON.stringify({ text:'Salom, men Zinaman. Bugun nimani o‘rganamiz?', lang:'uz-UZ' }) });
+          if(r.ok){ const b=await r.blob(); say(true,'Azure spoke Uzbek ('+Math.round(b.size/1024)+' KB of audio, playing now)'); try{ new Audio(URL.createObjectURL(b)).play(); }catch(e){} }
+          else { const j=await r.json().catch(()=>({})); say(false,'Azure voice failed: '+esc(j.detail||j.code||('HTTP '+r.status))+'. Check the key and that AZURE_SPEECH_REGION matches the resource region.'); } } }catch(e){} }
     if(!S.caps.sample) return say(false,'AI is not available on this page.');
     try{ const r=await S.caps.sample('Reply with just the word OK.',{ modelTier:'quick' }); say(true,'Zina answered: “'+esc(r.text.trim().slice(0,40))+'”'); }
     catch(e){ say(false,'Zina did not answer: '+esc(e.message||e.code||'unknown')+(/upstream/.test(e.message||'')?' (Anthropic refused: check the key and that the account has credit)':'')); } });

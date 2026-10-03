@@ -82,3 +82,14 @@ Vercel → **Settings → Domains** → domeningni qo'sh. Vercel ko'rsatgan DNS 
 ## Hozircha qurilma ichida saqlanadigan narsalar
 
 Student'ning shaxsiy progressi (javoblar tarixi, jadval, vocab, test natijalari) hozircha brauzerida saqlanadi. Boshqa qurilmadan kirsa, bu ma'lumotlar ko'rinmaydi. Keyingi bosqichda uni ham bazaga ulaymiz.
+
+
+## 7. Zina Voice — tabiiy ovoz (o'zbekcha ham), bepul
+
+1. https://portal.azure.com → **Create a resource** → **Speech** (Azure AI Speech) → Pricing tier: **Free F0** → Region: **West Europe**.
+2. Yaratilgach: **Keys and Endpoint** → **KEY 1** va **Location/Region** ni nusxala.
+3. Vercel → Settings → Environment Variables:
+   - `AZURE_SPEECH_KEY` = KEY 1
+   - `AZURE_SPEECH_REGION` = `westeurope`
+4. **Redeploy**. Shundan keyin Zina o'zbekcha, ruscha, inglizcha va boshqa tillarni yaxshi tushunadi va tabiiy ovozda gapiradi.
+Bepul tarif: oyiga 5 soat tinglash va 500 000 belgi gapirish. Kalit qo'yilmasa, Zina brauzer ovozidan foydalanadi.
