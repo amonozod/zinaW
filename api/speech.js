@@ -2,8 +2,21 @@
 // Free tier (F0) covers 5 hours of recognition and 0.5M characters of speech a month.
 // Env: AZURE_SPEECH_KEY, AZURE_SPEECH_REGION (e.g. "westeurope"), SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 export const config = { runtime: 'edge' };
-const env = (...names) => (names.map(n => process.env[n]).find(Boolean) || '').trim();
-const KEY = env('AZURE_SPEECH_KEY', 'SPEECH_KEY', 'AZURE_KEY'), REGION = env('AZURE_SPEECH_REGION', 'SPEECH_REGION', 'AZURE_REGION').toLowerCase().replace(/\s+/g, '');
+const vals = (...names) => [...new Set(names.map(n => (process.env[n] || '').trim()).filter(Boolean))];
+const KEYS = vals('AZURE_SPEECH_KEY', 'SPEECH_KEY', 'AZURE_KEY');
+const REGIONS = vals('AZURE_SPEECH_REGION', 'SPEECH_REGION', 'AZURE_REGION').map(r => r.toLowerCase().replace(/\s+/g, ''));
+const COMMON = ['northeurope', 'westeurope', 'eastus', 'eastus2', 'westus', 'westus2', 'centralindia', 'southeastasia', 'uksouth', 'francecentral', 'germanywestcentral', 'swedencentral', 'switzerlandnorth', 'uaenorth', 'japaneast', 'koreacentral', 'australiaeast', 'canadacentral', 'centralus', 'southcentralus', 'westcentralus', 'eastasia', 'brazilsouth', 'norwayeast', 'qatarcentral'];
+let KEY = KEYS[0] || '', REGION = REGIONS[0] || '', PAIR_OK = false;
+// find which key/region pair Azure accepts (a key only works in the region of its resource); remembered while the server is warm
+async function pickPair() {
+  if (PAIR_OK) return true;
+  const regions = [...new Set([...REGIONS, ...COMMON])];
+  for (const k of KEYS) for (const r of regions) {
+    try { const res = await fetch(`https://${r}.api.cognitive.microsoft.com/sts/v1.0/issueToken`, { method: 'POST', headers: { 'Ocp-Apim-Subscription-Key': k, 'Content-Length': '0' } });
+      if (res.ok) { KEY = k; REGION = r; PAIR_OK = true; return true; } } catch (_) {}
+  }
+  return false;
+}
 const SB = process.env.SUPABASE_URL, SRK = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'content-type': 'application/json' } });
 const VOICES = { 'uz-UZ': 'uz-UZ-MadinaNeural', 'ru-RU': 'ru-RU-SvetlanaNeural', 'en-US': 'en-US-JennyNeural', 'tr-TR': 'tr-TR-EmelNeural', 'kk-KZ': 'kk-KZ-AigulNeural',
@@ -16,8 +29,9 @@ async function authed(req) {
 }
 export default async function handler(req) {
   const url = new URL(req.url); const op = url.searchParams.get('op');
-  if (req.method === 'GET') return json({ configured: !!(KEY && REGION) });
-  if (!KEY || !REGION) return json({ code: 'not_configured' }, 500);
+  if (req.method === 'GET') return json({ configured: !!(KEYS.length && (REGIONS.length || true)) });
+  if (!KEYS.length) return json({ code: 'not_configured' }, 500);
+  if (!(await pickPair())) return json({ code: 'tts_failed', status: 401, detail: 'Azure rejected the key in every region. Copy KEY 1 again from the Speech resource (Keys and Endpoint) and redeploy.' }, 502);
   if (!(await authed(req))) return json({ code: 'unauthorized' }, 401);
   if (op === 'tts') {
     const { text = '', lang = 'en-US', emo = 'calm' } = await req.json().catch(() => ({}));
