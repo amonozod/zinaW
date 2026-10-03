@@ -2,7 +2,8 @@
 // Free tier (F0) covers 5 hours of recognition and 0.5M characters of speech a month.
 // Env: AZURE_SPEECH_KEY, AZURE_SPEECH_REGION (e.g. "westeurope"), SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 export const config = { runtime: 'edge' };
-const KEY = (process.env.AZURE_SPEECH_KEY || '').trim(), REGION = (process.env.AZURE_SPEECH_REGION || '').trim();
+const env = (...names) => (names.map(n => process.env[n]).find(Boolean) || '').trim();
+const KEY = env('AZURE_SPEECH_KEY', 'SPEECH_KEY', 'AZURE_KEY'), REGION = env('AZURE_SPEECH_REGION', 'SPEECH_REGION', 'AZURE_REGION').toLowerCase().replace(/\s+/g, '');
 const SB = process.env.SUPABASE_URL, SRK = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'content-type': 'application/json' } });
 const VOICES = { 'uz-UZ': 'uz-UZ-MadinaNeural', 'ru-RU': 'ru-RU-SvetlanaNeural', 'en-US': 'en-US-JennyNeural', 'tr-TR': 'tr-TR-EmelNeural', 'kk-KZ': 'kk-KZ-AigulNeural',
