@@ -1899,7 +1899,7 @@ function upgradeModal(reason){
 }
 /* ---------- payments: card transfer → owner approves → plan unlocks ---------- */
 const PAY_DEFAULT = { card:'', holder:'', bank:'Humo / Uzcard', support:'', prices:{ 'pro:m':139000, 'pro:q':355000, 'elite:m':239000, 'elite:q':549000 } };
-const ZINA_VERSION='8.1';
+const ZINA_VERSION='8.2';
 const money = n => (+n)%1===0 ? String(+n) : (+n).toFixed(2);
 const CARD_TYPES = ['Humo','Uzcard','Visa','Mastercard'];
 const paySet = () => { const p={ ...PAY_DEFAULT, ...(S.settings.pay||{}), prices:{ ...PAY_DEFAULT.prices, ...((S.settings.pay||{}).prices||{}) } };
@@ -3474,7 +3474,7 @@ async function vzListenCloud(){
     VZ.el?.querySelector('.capsule')?.classList.remove('hear');
     if(!spoke || !VZ.el){ if(VZ.el && !VZ.paused) setTimeout(vzListenCloud,200); return; }
     vzSet('thinking','thinking');
-    try{ const langs=[VZ.lastLang,'uz-UZ','en-US','ru-RU'].filter((v,i,a)=>v&&a.indexOf(v)===i).slice(0,3).join(',');
+    try{ const langs=[VZ.convLang,VZ.lastLang,'uz-UZ','en-US','ru-RU'].filter((v,i,a)=>v&&a.indexOf(v)===i).slice(0,3).join(',');
       const r=await fetch('/api/speech?op=stt&langs='+langs,{ method:'POST', headers:{ Authorization:await vzAuth() }, body:wavFrom(chunks,ac.sampleRate) }); const j=await r.json();
       if(j.text){ VZ.lastLang=j.lang; VZ.heard=j.text; vzAsk(j.text,j.lang); } else { vzSet('idle'); setTimeout(vzListenCloud,200); } }
     catch(e){ VZ.err='Could not reach the speech service.'; vzSet('idle'); setTimeout(vzListenCloud,1500); } };
@@ -3496,7 +3496,7 @@ async function vzSpeakCloud(text, emo){
 function openVoice(){
   if(planKey()!=='elite') return upgradeModal('Talk to Zina out loud. Only on Elite');
   if(VZ.el) return; VZ.el=document.createElement('div'); VZ.el.className='vz'; VZ.el.setAttribute('role','dialog'); VZ.el.setAttribute('aria-label','Talk to Zina');
-  document.body.appendChild(VZ.el); document.body.style.overflow='hidden'; VZ.said=''; VZ.heard=''; VZ.paused=false; VZ.err=''; VZ.emo='happy'; VZ.cloud=false; vzSet('idle');
+  document.body.appendChild(VZ.el); document.body.style.overflow='hidden'; VZ.said=''; VZ.heard=''; VZ.paused=false; VZ.err=''; VZ.emo='happy'; VZ.cloud=false; VZ.convLang=null; VZ.switchVotes=0; vzSet('idle');
   if(window.ZINA) fetch('/api/speech').then(r=>r.json()).then(j=>{ VZ.cloud=!!j.configured; }).catch(()=>{});
   const l2=VZ.lang.slice(0,2); const hi={uz:'Salom! Men Zinaman. Nima haqida gaplashamiz?',ru:'Привет! Я Зина. О чём поговорим?',tr:'Merhaba! Ben Zina. Ne konuşalım?',kk:'Сәлем! Мен Зинамын.'}[l2]||"Hi! I'm Zina. What do you want to work on?";
   setTimeout(()=>{ if(!VZ.el) return; VZ.said=hi; vzRender(); vzSpeak(hi,'happy'); },300);
@@ -3539,9 +3539,13 @@ async function vzAsk(text, heardLang){
   if(VZ.busy) return;
   const p=plan(); if(usage('ai','d')>=p.ai){ VZ.said='That’s all for today. Talk tomorrow!'; return vzSet('idle','concerned'); }
   const sample=S.caps.sample; if(!sample){ VZ.said='My voice connects on the live site.'; return vzSet('idle','calm'); }
-  VZ.lang=heardLang||langOf(text)||VZ.lang; VZ.replyLang=heardLang||langOf(text);
+  const spoken=heardLang||langOf(text)||VZ.lang;
+  if(!VZ.convLang){ VZ.convLang=spoken; VZ.switchVotes=0; }
+  else if(spoken!==VZ.convLang){ VZ.switchVotes=(VZ.switchVotes||0)+1; if(VZ.switchVotes>=2){ VZ.convLang=spoken; VZ.switchVotes=0; } }
+  else VZ.switchVotes=0;
+  VZ.lang=VZ.convLang; VZ.replyLang=VZ.convLang;
   VZ.busy=true; bump('ai','d'); vzSet('thinking','thinking');
-  const u=S.user; const sys=`You are Zina, a lively, funny, warm Digital SAT coach talking out loud with ${u.name||'a student'} (goal ${u.target||''}${u.examDate?', exam '+u.examDate:''}). Talk like a real human friend: short natural sentences, real feelings, under 60 words, no lists, no markdown, no emojis. ALWAYS reply in exactly the same language the student just used (if they speak Uzbek, answer in natural, correct Uzbek using Latin script). Begin with exactly one tag for how you feel, chosen honestly for the moment: [calm], [happy], [laughing], [excited], [encouraging], [love], [proud], [thinking], [surprised], [concerned], [sad], [crying], [angry], [scolding] or [sleepy]. Laugh at jokes, get sad or even cry (playfully) when they give up, get angry or scold them (kindly, never rude, no swearing) when they skip practice, show love and pride when they improve. Never invent official SAT questions.`;
+  const u=S.user; const sys=`You are Zina, a lively, funny, warm Digital SAT coach talking out loud with ${u.name||'a student'} (goal ${u.target||''}${u.examDate?', exam '+u.examDate:''}). Talk like a real human friend: short natural sentences, real feelings, under 60 words, no lists, no markdown, no emojis. Reply ONLY in ${({'uz-UZ':'Uzbek (Latin script)','ru-RU':'Russian','en-US':'English','tr-TR':'Turkish','kk-KZ':'Kazakh'})[VZ.convLang]||'the language the student uses'}, the whole answer in that one language. Never mix in words from another language: when speaking Uzbek or Russian, say SAT terms in that language too (for example "so'z boyligi" instead of "vocabulary"), and write numbers as words. Your words will be read aloud by a voice for that language, so keep sentences short and easy to pronounce. Begin with exactly one tag for how you feel, chosen honestly for the moment: [calm], [happy], [laughing], [excited], [encouraging], [love], [proud], [thinking], [surprised], [concerned], [sad], [crying], [angry], [scolding] or [sleepy]. Laugh at jokes, get sad or even cry (playfully) when they give up, get angry or scold them (kindly, never rude, no swearing) when they skip practice, show love and pride when they improve. Never invent official SAT questions.`;
   VZ.hist.push({ role:'user', content:text }); VZ.hist=VZ.hist.slice(-10);
   const turns=VZ.hist.map((m,i)=>({ role:m.role, content:i===0?sys+'\n\n'+m.content:m.content }));
   let out='';
