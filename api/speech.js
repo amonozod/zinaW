@@ -28,7 +28,16 @@ export default async function handler(req) {
     const inner = style ? `<mstts:express-as style="${style}">${body}</mstts:express-as>` : body;
     const ssml = `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="${lang}"><voice name="${voice}">${inner}</voice></speak>`;
     const r = await fetch(`https://${REGION}.tts.speech.microsoft.com/cognitiveservices/v1`, { method: 'POST', headers: { 'Ocp-Apim-Subscription-Key': KEY, 'Content-Type': 'application/ssml+xml', 'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3', 'User-Agent': 'zina' }, body: ssml });
-    if (!r.ok) return json({ code: 'tts_failed', status: r.status, detail: (await r.text()).slice(0, 200) }, 502);
+    if (!r.ok) {
+      const raw = (await r.text()).slice(0, 160);
+      const why = r.status === 401 ? 'the key does not match this region (HTTP 401). Use KEY 1 from the same Speech resource, and its Location as the region'
+        : r.status === 403 ? 'access denied (HTTP 403): the resource may be disabled or the key revoked'
+        : r.status === 404 ? `region "${REGION}" not found (HTTP 404): check the Location on the resource page`
+        : r.status === 429 ? 'the free monthly limit or rate limit was reached (HTTP 429)'
+        : r.status === 400 ? `the request was rejected (HTTP 400) ${raw}`
+        : `HTTP ${r.status} ${raw}`;
+      return json({ code: 'tts_failed', status: r.status, detail: why }, 502);
+    }
     return new Response(r.body, { headers: { 'content-type': 'audio/mpeg', 'cache-control': 'no-store' } });
   }
   if (op === 'stt') {
