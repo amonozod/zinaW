@@ -6,11 +6,16 @@ const vals = (...names) => [...new Set(names.map(n => (process.env[n] || '').tri
 const KEYS = vals('AZURE_SPEECH_KEY', 'SPEECH_KEY', 'AZURE_KEY');
 const REGIONS = vals('AZURE_SPEECH_REGION', 'SPEECH_REGION', 'AZURE_REGION').map(r => r.toLowerCase().replace(/\s+/g, ''));
 const COMMON = ['northeurope', 'westeurope', 'eastus', 'eastus2', 'westus', 'westus2', 'centralindia', 'southeastasia', 'uksouth', 'francecentral', 'germanywestcentral', 'swedencentral', 'switzerlandnorth', 'uaenorth', 'japaneast', 'koreacentral', 'australiaeast', 'canadacentral', 'centralus', 'southcentralus', 'westcentralus', 'eastasia', 'brazilsouth', 'norwayeast', 'qatarcentral'];
-let KEY = KEYS[0] || '', REGION = REGIONS[0] || '', PAIR_OK = false;
+let KEY = KEYS[0] || '', REGION = REGIONS[0] || '', PAIR_OK = false, BASE = '';
+const ENDPOINTS = vals('AZURE_SPEECH_ENDPOINT', 'SPEECH_ENDPOINT', 'AZURE_ENDPOINT').map(e => e.replace(/\/+$/, ''));
 // find which key/region pair Azure accepts (a key only works in the region of its resource); remembered while the server is warm
 async function pickPair() {
   if (PAIR_OK) return true;
   const regions = [...new Set([...REGIONS, ...COMMON])];
+  for (const k of KEYS) for (const e of ENDPOINTS) {                 // e.g. https://zina-speech.cognitiveservices.azure.com
+    try { const res = await fetch(`${e}/sts/v1.0/issueToken`, { method: 'POST', headers: { 'Ocp-Apim-Subscription-Key': k, 'Content-Length': '0' } });
+      if (res.ok) { KEY = k; BASE = e; PAIR_OK = true; return true; } } catch (_) {}
+  }
   for (const k of KEYS) for (const r of regions) {
     try { const res = await fetch(`https://${r}.api.cognitive.microsoft.com/sts/v1.0/issueToken`, { method: 'POST', headers: { 'Ocp-Apim-Subscription-Key': k, 'Content-Length': '0' } });
       if (res.ok) { KEY = k; REGION = r; PAIR_OK = true; return true; } } catch (_) {}
@@ -31,7 +36,7 @@ export default async function handler(req) {
   const url = new URL(req.url); const op = url.searchParams.get('op');
   if (req.method === 'GET') return json({ configured: !!(KEYS.length && (REGIONS.length || true)) });
   if (!KEYS.length) return json({ code: 'not_configured' }, 500);
-  if (!(await pickPair())) return json({ code: 'tts_failed', status: 401, detail: 'Azure rejected the key in every region. Copy KEY 1 again from the Speech resource (Keys and Endpoint) and redeploy.' }, 502);
+  if (!(await pickPair())) return json({ code: 'tts_failed', status: 401, detail: `Azure rejected the key. Your key is ${KEYS.map(k=>k.length+' characters, starting '+k.slice(0,4)).join(' / ')} (a real key is 32 or 84 characters). Copy KEY 1 from Keys and Endpoint again; if the page shows an Endpoint like https://NAME.cognitiveservices.azure.com, add it as AZURE_SPEECH_ENDPOINT, then redeploy.` }, 502);
   if (!(await authed(req))) return json({ code: 'unauthorized' }, 401);
   if (op === 'tts') {
     const { text = '', lang = 'en-US', emo = 'calm' } = await req.json().catch(() => ({}));
@@ -41,7 +46,7 @@ export default async function handler(req) {
     const style = lang === 'en-US' ? STYLE[emo] : null;
     const inner = style ? `<mstts:express-as style="${style}">${body}</mstts:express-as>` : body;
     const ssml = `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="${lang}"><voice name="${voice}">${inner}</voice></speak>`;
-    const r = await fetch(`https://${REGION}.tts.speech.microsoft.com/cognitiveservices/v1`, { method: 'POST', headers: { 'Ocp-Apim-Subscription-Key': KEY, 'Content-Type': 'application/ssml+xml', 'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3', 'User-Agent': 'zina' }, body: ssml });
+    const r = await fetch(BASE ? `${BASE}/tts/cognitiveservices/v1` : `https://${REGION}.tts.speech.microsoft.com/cognitiveservices/v1`, { method: 'POST', headers: { 'Ocp-Apim-Subscription-Key': KEY, 'Content-Type': 'application/ssml+xml', 'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3', 'User-Agent': 'zina' }, body: ssml });
     if (!r.ok) {
       const raw = (await r.text()).slice(0, 160);
       const why = r.status === 401 ? 'the key does not match this region (HTTP 401). Use KEY 1 from the same Speech resource, and its Location as the region'
@@ -60,7 +65,7 @@ export default async function handler(req) {
     // ask each candidate language at the same time and keep the most confident transcript
     const tries = await Promise.all(langs.map(async lang => {
       try {
-        const r = await fetch(`https://${REGION}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=${lang}&format=detailed`, { method: 'POST', headers: { 'Ocp-Apim-Subscription-Key': KEY, 'Content-Type': 'audio/wav; codecs=audio/pcm; samplerate=16000', 'Accept': 'application/json' }, body: audio });
+        const r = await fetch((BASE ? `${BASE}/stt/speech/recognition/conversation/cognitiveservices/v1` : `https://${REGION}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1`)+`?language=${lang}&format=detailed`, { method: 'POST', headers: { 'Ocp-Apim-Subscription-Key': KEY, 'Content-Type': 'audio/wav; codecs=audio/pcm; samplerate=16000', 'Accept': 'application/json' }, body: audio });
         if (!r.ok) return null; const j = await r.json(); const best = j.NBest && j.NBest[0];
         return j.RecognitionStatus === 'Success' && j.DisplayText ? { text: j.DisplayText, lang, confidence: best ? best.Confidence : 0.5 } : null;
       } catch { return null; }
