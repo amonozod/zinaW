@@ -1594,6 +1594,12 @@ s.was{font-size:.42em;font-weight:600;opacity:.45;margin-right:8px;letter-spacin
 .qb-size button.on{background:var(--ink);color:var(--card);border-color:var(--ink)}
 .qb-go{width:100%;height:50px;font-size:16px}
 .qb-none{font-size:13px;color:var(--rose);margin:10px 0 0}
+.qb-skills{display:flex;flex-direction:column;gap:12px;margin-bottom:22px}
+.qb-skg small{display:block;font-size:12px;font-weight:700;color:var(--ink-3);margin-bottom:6px}
+.qb-chips.tight{margin-bottom:0}
+.qb-chip.qsk{font-size:13px;padding:8px 13px}
+.qb-chip.qsk em{font-style:normal;font-weight:600;opacity:.6;margin-left:4px}
+.qb-chip:disabled{opacity:.4;cursor:not-allowed}
 </style>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect x=%271%27 y=%271%27 width=%2730%27 height=%2730%27 rx=%279%27 fill=%27%235B3DF5%27/%3E%3Cpath d=%27M8 9h15.5v4h-4.5v4h-4.5v4h-4.5v2.5H24%27 fill=%27none%27 stroke=%27%23fff%27 stroke-width=%272.6%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3Ccircle cx=%2723.6%27 cy=%278.9%27 r=%272.6%27 fill=%27%23FFB547%27/%3E%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1944,7 +1950,7 @@ function upgradeModal(reason){
 }
 /* ---------- payments: card transfer → owner approves → plan unlocks ---------- */
 const PAY_DEFAULT = { card:'', holder:'', bank:'Humo / Uzcard', support:'', prices:{ 'pro:m':139000, 'pro:q':355000, 'elite:m':239000, 'elite:q':549000 } };
-const ZINA_VERSION='8.4';
+const ZINA_VERSION='8.5';
 const money = n => (+n)%1===0 ? String(+n) : (+n).toFixed(2);
 const CARD_TYPES = ['Humo','Uzcard','Visa','Mastercard'];
 const paySet = () => { const p={ ...PAY_DEFAULT, ...(S.settings.pay||{}), prices:{ ...PAY_DEFAULT.prices, ...((S.settings.pay||{}).prices||{}) } };
@@ -2335,13 +2341,39 @@ function bindDashboard(){
 </script>
 <script>
 /* ================= QUESTION BANK ================= */
-let PF = { sec:'RW', doms:[], diffs:[], status:'all', size:10 };
+let PF = { sec:'RW', doms:[], skills:[], diffs:[], status:'all', size:10 };
+const SKILL_CACHE = new Map();
+function skillOf(q){
+  if(q.skill) return q.skill;
+  if(SKILL_CACHE.has(q.id)) return SKILL_CACHE.get(q.id);
+  const st=(q.stem||'').toLowerCase(), ps=(q.passage||'').toLowerCase(), all=st+' '+ps, ch=(q.choices||[]).join(' ').toLowerCase(); let s=null;
+  if(q.section!=='M'){
+    if(/precise word or phrase|most nearly mean/.test(st)) s='Words in Context';
+    else if(/main purpose|overall structure|function of the underlined|function of the/.test(st)) s='Text Structure and Purpose';
+    else if(/based on the texts|text 1/.test(all) && /text 2/.test(all)) s='Cross-Text Connections';
+    else if(/most logical transition/.test(st)) s='Transitions';
+    else if(/notes/.test(st+ps) && /the student wants/.test(st)) s='Rhetorical Synthesis';
+    else if(/conventions of standard english/.test(st)){ const strip=(q.choices||[]).map(c=>c.replace(/[^a-z0-9]/gi,'').toLowerCase()); s= new Set(strip).size===1 ? 'Boundaries' : 'Form, Structure, and Sense'; }
+    else if(/most logically completes/.test(st)) s='Inferences';
+    else if(/\|/.test(ps) || /graph|table|data from/.test(st) || q.image) s='Command of Evidence: Quantitative';
+    else if(/finding|quotation|support|weaken|illustrates/.test(st)) s='Command of Evidence: Textual';
+    else s='Central Ideas and Details';
+  } else {
+    const d=q.domain;
+    if(d==='Algebra') s=/system|\$\$[\s\S]*\$\$/.test(st)||/x \+ y =|and \$x - y/.test(st)?'Systems of linear equations':/inequalit|at least|at most|greatest|minimum number|maximum number|smallest integer/.test(st)?'Linear inequalities':/slope|intercept|line |f\(x\)|function|graph/.test(st)?'Linear functions':/y\b.*x\b|two variables/.test(st)&&/=.*y/.test(st)?'Linear equations in two variables':'Linear equations in one variable';
+    else if(d==='Advanced Math') s=/equivalent|expand|factor|written as/.test(st)?'Equivalent expressions':/solution|solve|root|=\s*0/.test(st)?'Nonlinear equations and systems':'Nonlinear functions';
+    else if(d==='Problem-Solving and Data Analysis') s=/margin of error|sample|survey/.test(st)?'Sample statistics and margin of error':/probabilit|at random|chosen/.test(st)?'Probability':/%|percent/.test(st+ch)?'Percentages':/mean|median|average|range|standard deviation/.test(st)?'One-variable data':/scatterplot|line of best fit|bar graph|table/.test(st)||q.image?'Two-variable data':'Ratios, rates and units';
+    else if(d==='Geometry and Trigonometry') s=/circle|radius|diameter|arc|circumference/.test(st)?'Circles':/sin|cos|tan|right triangle|hypotenuse/.test(st)?'Right triangles and trigonometry':/area|volume|perimeter|cylinder|cone|sphere|box|rectangle/.test(st)?'Area and volume':'Lines, angles and triangles';
+  }
+  SKILL_CACHE.set(q.id,s); return s;
+}
 function canUsePremium(){ return plan().bankDaily>0; }
 function premiumLeft(){ const p=plan(); return Math.max(0, Math.min(p.bankDaily-usage('bank','d'), p.bankMonthly-usage('bank','m'))); }
 function filteredQs(extra){
   return visibleQuestions().filter(q=>{
     if(PF.sec && q.section!==PF.sec) return false;
     if(PF.doms.length && !PF.doms.includes(q.domain)) return false;
+    if(PF.skills.length && !PF.skills.includes(skillOf(q))) return false;
     if(PF.diffs.length && !PF.diffs.includes(q.difficulty)) return false;
     const a=S.prog.answers[q.id];
     if(PF.status==='new' && a) return false;
@@ -2374,6 +2406,8 @@ function viewPractice(){
             <div class="qb-dom-t"><b>${d}</b><span>${n} question${n===1?'':'s'}${pc!=null?` · ${pc}% correct`:''}</span></div>
             ${pc!=null?`<div class="qb-meter"><i style="width:${pc}%"></i></div>`:''}
           </button>`; }).join('')}</div>
+        <div class="qb-h"><h3>Skills</h3>${PF.skills.length?'<button class="linkbtn" id="qbClrSk">Clear</button>':'<span class="qb-hint">All skills</span>'}</div>
+        <div class="qb-skills">${(PF.doms.length?PF.doms:DOMAINS[PF.sec]).map(d=>`<div class="qb-skg"><small>${esc(d)}</small><div class="qb-chips tight">${(SKILLS[d]||[]).map(s=>{ const n=inSec.filter(q=>q.domain===d && skillOf(q)===s && (!PF.diffs.length||PF.diffs.includes(q.difficulty))).length; return `<button class="qb-chip qsk ${PF.skills.includes(s)?'on':''}" data-skill="${esc(s)}" ${n?'':'disabled'}>${esc(s)} <em>${n}</em></button>`; }).join('')}</div></div>`).join('')}</div>
         <div class="qb-h"><h3>Difficulty</h3></div>
         <div class="qb-chips">${['Easy','Medium','Hard'].map(dv=>`<button class="qb-chip ${toggle(PF.diffs,dv)?'on':''} d-${dv.toLowerCase()}" data-diff="${dv}">${dv}</button>`).join('')}<span class="qb-hint">${PF.diffs.length?'':'Any difficulty'}</span></div>
         <div class="qb-h"><h3>Questions</h3></div>
@@ -2386,6 +2420,7 @@ function viewPractice(){
           <div class="qb-lines">
             <div><span>Section</span><b>${PF.sec==='M'?'Math':'Reading and Writing'}</b></div>
             <div><span>Domains</span><b>${PF.doms.length?PF.doms.length+' selected':'All'}</b></div>
+            <div><span>Skills</span><b>${PF.skills.length?(PF.skills.length===1?esc(PF.skills[0]):PF.skills.length+' selected'):'All'}</b></div>
             <div><span>Difficulty</span><b>${PF.diffs.length?PF.diffs.join(', '):'Any'}</b></div>
             <div><span>Available</span><b>${fq.length}</b></div>
           </div>
@@ -2399,9 +2434,11 @@ function viewPractice(){
 function bindPractice(){
   bindShell();
   $$('[data-unlock]').forEach(b=>b.onclick=()=>upgradeModal(b.dataset.unlock));
-  $$('[data-sec]').forEach(b=>b.onclick=()=>{ if(PF.sec!==b.dataset.sec){ PF.sec=b.dataset.sec; PF.doms=[]; } route(); });
-  $$('[data-dom]').forEach(b=>b.onclick=()=>{ const d=b.dataset.dom; PF.doms=PF.doms.includes(d)?PF.doms.filter(x=>x!==d):[...PF.doms,d]; route(); });
+  $$('[data-sec]').forEach(b=>b.onclick=()=>{ if(PF.sec!==b.dataset.sec){ PF.sec=b.dataset.sec; PF.doms=[]; PF.skills=[]; } route(); });
+  $$('[data-dom]').forEach(b=>b.onclick=()=>{ const d=b.dataset.dom; PF.doms=PF.doms.includes(d)?PF.doms.filter(x=>x!==d):[...PF.doms,d]; const ok=new Set((PF.doms.length?PF.doms:DOMAINS[PF.sec]).flatMap(x=>SKILLS[x]||[])); PF.skills=PF.skills.filter(s=>ok.has(s)); route(); });
   $('#qbAllDoms')?.addEventListener('click',()=>{ PF.doms=PF.doms.length?[]:[...DOMAINS[PF.sec]]; route(); });
+  $$('[data-skill]').forEach(b=>b.onclick=()=>{ const s=b.dataset.skill; PF.skills=PF.skills.includes(s)?PF.skills.filter(x=>x!==s):[...PF.skills,s]; route(); });
+  $('#qbClrSk')?.addEventListener('click',()=>{ PF.skills=[]; route(); });
   $$('[data-diff]').forEach(b=>b.onclick=()=>{ const d=b.dataset.diff; PF.diffs=PF.diffs.includes(d)?PF.diffs.filter(x=>x!==d):[...PF.diffs,d]; route(); });
   $$('[data-status]').forEach(b=>b.onclick=()=>{ PF.status=b.dataset.status; route(); });
   $$('[data-size]').forEach(b=>b.onclick=()=>{ PF.size=+b.dataset.size; route(); });
@@ -2411,7 +2448,7 @@ function bindPractice(){
     const fresh = shuffle(usable.filter(q=>!S.prog.answers[q.id])), old = shuffle(usable.filter(q=>S.prog.answers[q.id]));
     return [...fresh,...old].slice(0,PF.size);
   };
-  $('#startSet')?.addEventListener('click',()=>{ const s=build(filteredQs()); if(s) startPractice(s, PF.doms.length===1?PF.doms[0]:'Practice set'); });
+  $('#startSet')?.addEventListener('click',()=>{ const s=build(filteredQs()); if(s) startPractice(s, PF.skills.length===1?PF.skills[0]:PF.doms.length===1?PF.doms[0]:'Practice set'); });
   if(window.PENDING_DOM){ const d=window.PENDING_DOM; window.PENDING_DOM=null; const sec=DOMAINS.M.includes(d)?'M':'RW'; PF.sec=sec; PF.doms=[d]; const s=build(filteredQs()); if(s) startPractice(s,d); else toast('No questions for this skill yet'); }
 }
 
