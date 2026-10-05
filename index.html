@@ -1950,7 +1950,7 @@ function upgradeModal(reason){
 }
 /* ---------- payments: card transfer → owner approves → plan unlocks ---------- */
 const PAY_DEFAULT = { card:'', holder:'', bank:'Humo / Uzcard', support:'', prices:{ 'pro:m':139000, 'pro:q':355000, 'elite:m':239000, 'elite:q':549000 } };
-const ZINA_VERSION='8.5';
+const ZINA_VERSION='8.6';
 const money = n => (+n)%1===0 ? String(+n) : (+n).toFixed(2);
 const CARD_TYPES = ['Humo','Uzcard','Visa','Mastercard'];
 const paySet = () => { const p={ ...PAY_DEFAULT, ...(S.settings.pay||{}), prices:{ ...PAY_DEFAULT.prices, ...((S.settings.pay||{}).prices||{}) } };
@@ -4148,6 +4148,8 @@ function normalizeQ(o){
     type: choices.length?'mcq':'spr', passage:String(o.passage||'').trim(), stem:String(o.stem||o.question||o.q||'').trim(), choices, answer:String(o.answer||'').trim(), explanation:String(o.explanation||'').trim(), image:o.image||'', status:o.status||'visible', created:o.created||Date.now() };
   if(q.type==='mcq') q.answer=q.answer.toUpperCase().replace(/[^A-D]/g,'').slice(0,1);
   const errs=[]; if(!q.stem) errs.push('missing question text'); if(q.type==='mcq'&&q.choices.length!==4) errs.push(`needs 4 choices (found ${q.choices.length})`); if(!q.answer) errs.push('missing answer');
+  if(o.skill && typeof o.skill==='string') q.skill=o.skill.trim();          // keep the official skill, so bank filters are exact
+  if(o.image && !q.image) q.image=o.image;
   return { q, errs };
 }
 /* ---------- smart import: paste anything, Zina splits it ---------- */
