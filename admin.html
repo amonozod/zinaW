@@ -1553,6 +1553,47 @@ s.was{font-size:.42em;font-weight:600;opacity:.45;margin-right:8px;letter-spacin
 .capsule .tear{animation:none!important;opacity:0}
 .capsule[data-emo="crying"] .tear,.capsule[data-emo="sad"] .tear:not(.t2){opacity:1;animation:drip 1.4s ease-in infinite!important}
 .capsule[data-emo="crying"] .tear.t2{animation-delay:.7s!important}
+.ob-dates button small,.xpick-menu button small{display:block;font-size:11.5px;font-weight:600;opacity:.65;margin-top:2px}
+.ob-other,.xpick-other{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;font-size:13.5px;color:var(--ink-2)}
+.xpick-other{padding:10px 12px;border-top:1px solid var(--line);margin-top:4px}
+.ob-other input,.xpick-other input{height:36px;padding:0 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit}
+
+/* question bank builder */
+.qb{display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:start}
+@media (max-width:960px){.qb{grid-template-columns:1fr}}
+.qb-tabs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+.qb-tab{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:18px 20px;border-radius:16px;border:1.5px solid var(--line);background:var(--card);text-align:left;transition:.2s}
+.qb-tab b{font-size:17px}.qb-tab span{font-size:13px;color:var(--ink-3)}
+.qb-tab.on{border-color:var(--violet);background:color-mix(in srgb,var(--p) 10%,var(--card));box-shadow:0 10px 26px -18px color-mix(in srgb,var(--p) 80%,transparent)}
+.qb-h{display:flex;justify-content:space-between;align-items:center;margin:6px 0 10px}
+.qb-h h3{font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:0}
+.qb-doms{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:22px}
+.qb-dom{position:relative;display:flex;gap:12px;align-items:flex-start;padding:16px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);text-align:left;transition:.18s}
+.qb-dom:hover:not(:disabled){border-color:color-mix(in srgb,var(--p) 50%,var(--line));transform:translateY(-1px)}
+.qb-dom.on{border-color:var(--violet);background:color-mix(in srgb,var(--p) 9%,var(--card))}
+.qb-dom:disabled{opacity:.45;cursor:not-allowed}
+.qb-check{flex:none;width:22px;height:22px;border-radius:7px;border:1.5px solid var(--line);display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:800;color:#fff;margin-top:1px}
+.qb-dom.on .qb-check{background:var(--violet);border-color:var(--violet)}
+.qb-dom-t b{display:block;font-size:15px;color:var(--ink)}.qb-dom-t span{font-size:12.5px;color:var(--ink-3)}
+.qb-meter{position:absolute;left:16px;right:16px;bottom:8px;height:3px;border-radius:3px;background:var(--line-2)}.qb-meter i{display:block;height:100%;border-radius:3px;background:var(--mint)}
+.qb-chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:22px}
+.qb-chip{padding:9px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);font-weight:700;font-size:14px;color:var(--ink-2)}
+.qb-chip.on{background:var(--violet);border-color:var(--violet);color:#fff}
+.qb-chip.d-easy.on{background:var(--mint);border-color:var(--mint)}.qb-chip.d-hard.on{background:var(--rose);border-color:var(--rose)}
+.qb-hint{font-size:13px;color:var(--ink-3)}
+.qb-side{position:sticky;top:20px}
+.qb-sum{padding:22px;border-radius:20px;background:linear-gradient(160deg,color-mix(in srgb,var(--p) 18%,var(--card)),var(--card));border:1px solid var(--line);box-shadow:0 20px 40px -28px rgba(0,0,0,.45)}
+.qb-sum small{font-size:11.5px;font-weight:800;letter-spacing:.14em;color:var(--ink-3)}
+.qb-big{display:block;font-size:56px;font-weight:800;letter-spacing:-.04em;line-height:1;margin-top:6px}
+.qb-sum > span{color:var(--ink-3);font-weight:600}
+.qb-lines{margin:16px 0;border-top:1px solid var(--line)}
+.qb-lines div{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.qb-lines span{color:var(--ink-3)}.qb-lines b{text-align:right}
+.qb-size{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
+.qb-size button{height:38px;border-radius:10px;border:1.5px solid var(--line);font-weight:800;background:var(--card)}
+.qb-size button.on{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.qb-go{width:100%;height:50px;font-size:16px}
+.qb-none{font-size:13px;color:var(--rose);margin:10px 0 0}
 </style>
 <meta name="robots" content="noindex,nofollow">
 <script>window.ZINA_ADMIN=true</script>
@@ -1825,8 +1866,12 @@ function rerenderSoft(){ // re-render the current page when shared data arrives,
 }
 
 /* ================= OFFICIAL SAT DATES ================= */
-const SAT_DATES = ['2026-10-03','2026-11-07','2026-12-05','2027-03-06','2027-05-01','2027-06-05'];
-const upcomingSAT = () => SAT_DATES.filter(d => new Date(d+'T23:59') >= new Date());
+// College Board weekend SAT dates (the same for test centers in Uzbekistan and worldwide). 2027–28 dates are expected, not yet official.
+const SAT_DATES = ['2026-08-22','2026-09-12','2026-10-03','2026-11-07','2026-12-05','2027-03-06','2027-05-01','2027-06-05','2027-08-28','2027-09-18','2027-10-02','2027-11-06','2027-12-04'];
+const SAT_EXPECTED = new Set(['2027-08-28','2027-09-18','2027-10-02','2027-11-06','2027-12-04']);
+const satDeadline = d => { const x=new Date(d+'T12:00'); x.setDate(x.getDate()-15); return x.toLocaleDateString('en-US',{month:'short',day:'numeric'}); };   // registration closes 15 days before
+const satNote = d => SAT_EXPECTED.has(d) ? 'expected date' : (new Date(d+'T12:00')-Date.now()>15*864e5 ? 'register by '+satDeadline(d) : 'registration closed');
+const upcomingSAT = () => SAT_DATES.filter(d => new Date(d+'T23:59') >= new Date()).slice(0,8);
 const fmtSAT = (d, long) => new Date(d+'T12:00').toLocaleDateString('en-US', long?{day:'numeric',month:'long',year:'numeric'}:{month:'short',day:'numeric',year:'numeric'});
 
 /* ================= TAXONOMY ================= */
@@ -1901,7 +1946,7 @@ function upgradeModal(reason){
 }
 /* ---------- payments: card transfer → owner approves → plan unlocks ---------- */
 const PAY_DEFAULT = { card:'', holder:'', bank:'Humo / Uzcard', support:'', prices:{ 'pro:m':139000, 'pro:q':355000, 'elite:m':239000, 'elite:q':549000 } };
-const ZINA_VERSION='8.2';
+const ZINA_VERSION='8.4';
 const money = n => (+n)%1===0 ? String(+n) : (+n).toFixed(2);
 const CARD_TYPES = ['Humo','Uzcard','Visa','Mastercard'];
 const paySet = () => { const p={ ...PAY_DEFAULT, ...(S.settings.pay||{}), prices:{ ...PAY_DEFAULT.prices, ...((S.settings.pay||{}).prices||{}) } };
@@ -2085,10 +2130,12 @@ function onboardModal(){
   const draw=()=>{ const el=$('#ob',m); const dots=`<div class="ob-dots">${[0,1,2].map(i=>`<i class="${i<=step?'on':''}"></i>`).join('')}</div>`;
     if(step===0) el.innerHTML=`${dots}<h2 class="ob-h">Where are you now?</h2><p class="muted">Your latest SAT or practice score. A guess is fine.</p><div class="ob-big" id="obv">${cur}</div><input type="range" min="400" max="1580" step="10" value="${cur}" id="obr" class="ob-range"><div class="row" style="justify-content:space-between;margin-top:22px"><button class="linkbtn" id="obNone">Never taken it</button><button class="btn btn-primary" id="obNext">Next</button></div>`;
     if(step===1) el.innerHTML=`${dots}<h2 class="ob-h">What's your goal?</h2><p class="muted">We'll build your staircase from ${cur} to here.</p><div class="ob-big" id="obv">${tg}</div><input type="range" min="${cur+10}" max="1600" step="10" value="${tg}" id="obr" class="ob-range"><div class="ob-quick">${[1200,1300,1400,1500,1550,1600].filter(v=>v>cur).map(v=>`<button data-q="${v}" class="${v===tg?'on':''}">${v}</button>`).join('')}</div><div class="row" style="justify-content:space-between;margin-top:22px"><button class="linkbtn" id="obBack">Back</button><button class="btn btn-primary" id="obNext">Next</button></div>`;
-    if(step===2) el.innerHTML=`${dots}<h2 class="ob-h">When's your SAT?</h2><p class="muted">We'll count down and plan every day until then.</p><div class="ob-dates">${upcomingSAT().map(d=>`<button data-d="${d}" class="${d===ex?'on':''}">${fmtSAT(d)}</button>`).join('')}<button data-d="" class="${!ex?'on':''}">Not sure yet</button></div><div class="row" style="justify-content:space-between;margin-top:22px"><button class="linkbtn" id="obBack">Back</button><button class="btn btn-primary" id="obNext">Build my plan</button></div>`;
+    if(step===2) el.innerHTML=`${dots}<h2 class="ob-h">When's your SAT?</h2><p class="muted">We'll count down and plan every day until then.</p><div class="ob-dates">${upcomingSAT().map(d=>`<button data-d="${d}" class="${d===ex?'on':''}">${fmtSAT(d)}<small>${satNote(d)}</small></button>`).join('')}<button data-d="" class="${!ex?'on':''}">Not sure yet</button></div>
+      <label class="ob-other">Different date at your test center? <input type="date" id="obOther" min="${todayKey()}" value="${ex&&!SAT_DATES.includes(ex)?ex:''}"></label><div class="row" style="justify-content:space-between;margin-top:22px"><button class="linkbtn" id="obBack">Back</button><button class="btn btn-primary" id="obNext">Build my plan</button></div>`;
     const r=$('#obr',m); if(r) r.oninput=()=>{ const v=+r.value; if(step===0) cur=v; else tg=v; $('#obv',m).textContent=v; $$('[data-q]',m).forEach(b=>b.classList.toggle('on',+b.dataset.q===v)); };
     $$('[data-q]',m).forEach(b=>b.onclick=()=>{ tg=+b.dataset.q; draw(); });
     $$('[data-d]',m).forEach(b=>b.onclick=()=>{ ex=b.dataset.d; $$('[data-d]',m).forEach(x=>x.classList.toggle('on',x===b)); });
+    $('#obOther',m)?.addEventListener('change',e=>{ if(e.target.value){ ex=e.target.value; $$('[data-d]',m).forEach(x=>x.classList.remove('on')); } });
     $('#obNone',m)?.addEventListener('click',()=>{ cur=1000; step=1; tg=Math.max(tg,cur+300); draw(); });
     $('#obBack',m)?.addEventListener('click',()=>{ step--; draw(); });
     $('#obNext',m).onclick=()=>{ if(step===0 && tg<=cur) tg=Math.min(1600,cur+200); if(step<2){ step++; draw(); return; }
@@ -2249,7 +2296,8 @@ function viewDashboard(){
 function examPickerHTML(){
   const cur=S.user.examDate; const list=upcomingSAT();
   return `<div class="xpick"><button class="xpick-btn" id="xpickBtn" aria-haspopup="listbox">${I.cal}<span>${cur?'Exam date: '+fmtSAT(cur):'Choose your SAT date'}</span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M8 9l4-4 4 4M8 15l4 4 4-4"/></svg></button>
-    <div class="xpick-menu" id="xpickMenu" role="listbox">${list.map(d=>`<button role="option" data-sat="${d}" class="${d===cur?'on':''}"><span>${fmtSAT(d)}</span>${d===cur?'<b>✓</b>':''}</button>`).join('')}</div></div>`;
+    <div class="xpick-menu" id="xpickMenu" role="listbox">${list.map(d=>`<button role="option" data-sat="${d}" class="${d===cur?'on':''}"><span>${fmtSAT(d)}<small>${satNote(d)}</small></span>${d===cur?'<b>✓</b>':''}</button>`).join('')}
+      <label class="xpick-other">Other date <input type="date" id="xpickOther" min="${todayKey()}" value="${cur&&!SAT_DATES.includes(cur)?cur:''}"></label></div></div>`;
 }
 function bindExamPicker(){
   const btn=$('#xpickBtn'), menu=$('#xpickMenu'); if(!btn) return;
@@ -2257,6 +2305,7 @@ function bindExamPicker(){
   btn.onclick=e=>{ e.stopPropagation(); wrap.classList.toggle('open'); btn.setAttribute('aria-expanded',wrap.classList.contains('open')); };
   document.removeEventListener('click',window._xpClose); window._xpClose=()=>wrap.classList.remove('open'); document.addEventListener('click',window._xpClose);
   $$('[data-sat]',menu).forEach(o=>o.onclick=()=>{ S.user.examDate=o.dataset.sat; save('user'); route(); toast('Exam date set: '+fmtSAT(o.dataset.sat,true)); });
+  const oth=$('#xpickOther'); if(oth){ oth.onclick=e=>e.stopPropagation(); oth.onchange=()=>{ if(!oth.value) return; S.user.examDate=oth.value; save('user'); route(); toast('Exam date set: '+fmtSAT(oth.value,true)); }; }
 }
 function tickCountdown(){
   const el=$('#countdown'); if(!el) return;
@@ -2288,13 +2337,14 @@ function bindDashboard(){
 </script>
 <script>
 /* ================= QUESTION BANK ================= */
-let PF = { sec:'all', diff:'all', status:'all', size:10 };
+let PF = { sec:'RW', doms:[], diffs:[], status:'all', size:10 };
 function canUsePremium(){ return plan().bankDaily>0; }
 function premiumLeft(){ const p=plan(); return Math.max(0, Math.min(p.bankDaily-usage('bank','d'), p.bankMonthly-usage('bank','m'))); }
 function filteredQs(extra){
   return visibleQuestions().filter(q=>{
-    if(PF.sec!=='all' && q.section!==PF.sec) return false;
-    if(PF.diff!=='all' && q.difficulty!==PF.diff) return false;
+    if(PF.sec && q.section!==PF.sec) return false;
+    if(PF.doms.length && !PF.doms.includes(q.domain)) return false;
+    if(PF.diffs.length && !PF.diffs.includes(q.difficulty)) return false;
     const a=S.prog.answers[q.id];
     if(PF.status==='new' && a) return false;
     if(PF.status==='wrong' && (!a||a.c)) return false;
@@ -2303,38 +2353,68 @@ function filteredQs(extra){
     return true;
   });
 }
+/* build-your-own practice: pick a section, any mix of domains, difficulties and a size */
 function viewPractice(){
-  const qs=visibleQuestions(); const fq=filteredQs(); const by=skillStats();
-  const chips=(key,opts)=>opts.map(([v,l])=>`<button class="chip ${PF[key]===v?'on':''}" data-f="${key}" data-v="${v}">${l}</button>`).join('');
-  const secs = PF.sec==='all'?['RW','M']:[PF.sec];
-  const p=plan();
+  const all=visibleQuestions(); const by=skillStats(); const p=plan();
+  const inSec=all.filter(q=>q.section===PF.sec);
+  const fq=filteredQs();
+  const domCount=d=>inSec.filter(q=>q.domain===d && (!PF.diffs.length||PF.diffs.includes(q.difficulty))).length;
+  const toggle=(arr,v)=>arr.includes(v);
+  const sizes = PF.sec==='M' ? [5,10,15,22] : [5,10,20,27];
+  if(!sizes.includes(PF.size)) PF.size=10;
   return shell('practice', `
-    <div class="page-h"><div><h1>Question bank</h1><p>${qs.length} questions</p></div>
+    <div class="page-h"><div><h1>Question bank</h1><p>Choose exactly what you want to practice.</p></div>
       <div class="row">${p.bankDaily?`<span class="pill">${premiumLeft()} premium left today</span>`:`<span class="pill sun" style="cursor:pointer" data-unlock="Unlock the premium question bank">Premium bank locked</span>`}</div></div>
-    ${!qs.length?`<div class="card empty"><div class="ic">✎</div><h3>The bank is empty for now</h3><p>New questions are on the way.</p></div>`:`
-    <div class="filters" style="margin-bottom:12px">${chips('sec',[['all','All sections'],['RW','Reading and Writing'],['M','Math']])}</div>
-    <div class="filters" style="margin-bottom:24px">${chips('diff',[['all','Any difficulty'],['Easy','Easy'],['Medium','Medium'],['Hard','Hard']])}<span style="width:12px"></span>${chips('status',[['all','All'],['new','Not attempted'],['wrong','Missed'],['marked','Marked']])}</div>
-    ${secs.map(s=>`<h3 style="font-size:20px;margin:0 0 12px">${secName(s)}</h3><div class="domain-grid" style="margin-bottom:28px">${DOMAINS[s].map(d=>{ const n=fq.filter(q=>q.domain===d).length; const st=by[d]; const pc=st?Math.round(st.c/st.t*100):null; return `<button class="domain" data-dom="${esc(d)}" ${n?'':'disabled style="opacity:.5"'}><h4>${d}</h4><div class="row" style="justify-content:space-between;font-size:13px"><span class="faint">${n} question${n===1?'':'s'}</span><span class="${pc===null?'faint':''}" style="font-weight:600">${pc===null?'Not started':pc+'% correct'}</span></div><div class="bar" style="height:5px"><i style="width:${pc||0}%"></i></div></button>`; }).join('')}</div>`).join('')}
-    <div class="card">
-      <div class="row pad" style="justify-content:space-between;flex-wrap:wrap;padding-bottom:12px"><b>${fq.length} matching question${fq.length===1?'':'s'}</b>
-        <div class="row"><select class="select" id="setSize" style="width:auto;height:36px">${[5,10,20,27].map(n=>`<option ${PF.size===n?'selected':''} value="${n}">${n} questions</option>`).join('')}</select><button class="btn btn-primary btn-sm" id="startSet" ${fq.length?'':'disabled'}>Start practice set</button></div></div>
+    ${!all.length?`<div class="card empty"><div class="ic">✎</div><h3>The bank is empty for now</h3><p>New questions are on the way.</p></div>`:`
+    <div class="qb">
+      <div class="qb-main">
+        <div class="qb-tabs">${[['RW','Reading and Writing'],['M','Math']].map(([v,l])=>`<button class="qb-tab ${PF.sec===v?'on':''}" data-sec="${v}"><b>${l}</b><span>${all.filter(q=>q.section===v).length} questions</span></button>`).join('')}</div>
+        <div class="qb-h"><h3>Domains</h3><button class="linkbtn" id="qbAllDoms">${PF.doms.length?'Clear':'Select all'}</button></div>
+        <div class="qb-doms">${DOMAINS[PF.sec].map(d=>{ const n=domCount(d), st=by[d], pc=st&&st.t?Math.round(st.c/st.t*100):null, on=toggle(PF.doms,d);
+          return `<button class="qb-dom ${on?'on':''}" data-dom="${esc(d)}" ${n?'':'disabled'}>
+            <i class="qb-check">${on?'✓':''}</i>
+            <div class="qb-dom-t"><b>${d}</b><span>${n} question${n===1?'':'s'}${pc!=null?` · ${pc}% correct`:''}</span></div>
+            ${pc!=null?`<div class="qb-meter"><i style="width:${pc}%"></i></div>`:''}
+          </button>`; }).join('')}</div>
+        <div class="qb-h"><h3>Difficulty</h3></div>
+        <div class="qb-chips">${['Easy','Medium','Hard'].map(dv=>`<button class="qb-chip ${toggle(PF.diffs,dv)?'on':''} d-${dv.toLowerCase()}" data-diff="${dv}">${dv}</button>`).join('')}<span class="qb-hint">${PF.diffs.length?'':'Any difficulty'}</span></div>
+        <div class="qb-h"><h3>Questions</h3></div>
+        <div class="qb-chips">${[['all','All'],['new','Not attempted'],['wrong','Missed'],['marked','Marked for review']].map(([v,l])=>`<button class="qb-chip ${PF.status===v?'on':''}" data-status="${v}">${l}</button>`).join('')}</div>
+      </div>
+      <aside class="qb-side">
+        <div class="qb-sum">
+          <small>YOUR SET</small>
+          <b class="qb-big">${Math.min(PF.size,fq.length)}</b><span>questions</span>
+          <div class="qb-lines">
+            <div><span>Section</span><b>${PF.sec==='M'?'Math':'Reading and Writing'}</b></div>
+            <div><span>Domains</span><b>${PF.doms.length?PF.doms.length+' selected':'All'}</b></div>
+            <div><span>Difficulty</span><b>${PF.diffs.length?PF.diffs.join(', '):'Any'}</b></div>
+            <div><span>Available</span><b>${fq.length}</b></div>
+          </div>
+          <div class="qb-size">${sizes.map(n=>`<button class="${PF.size===n?'on':''}" data-size="${n}">${n}</button>`).join('')}</div>
+          <button class="btn btn-primary qb-go" id="startSet" ${fq.length?'':'disabled'}>Start practice →</button>
+          ${fq.length?'':'<p class="qb-none">No questions match. Try another mix.</p>'}
+        </div>
+      </aside>
     </div>`}`);
 }
 function bindPractice(){
   bindShell();
-  $$('[data-f]').forEach(b=>b.onclick=()=>{ PF[b.dataset.f]=b.dataset.v; route(); });
   $$('[data-unlock]').forEach(b=>b.onclick=()=>upgradeModal(b.dataset.unlock));
-  $('#setSize')?.addEventListener('change',e=>PF.size=+e.target.value);
+  $$('[data-sec]').forEach(b=>b.onclick=()=>{ if(PF.sec!==b.dataset.sec){ PF.sec=b.dataset.sec; PF.doms=[]; } route(); });
+  $$('[data-dom]').forEach(b=>b.onclick=()=>{ const d=b.dataset.dom; PF.doms=PF.doms.includes(d)?PF.doms.filter(x=>x!==d):[...PF.doms,d]; route(); });
+  $('#qbAllDoms')?.addEventListener('click',()=>{ PF.doms=PF.doms.length?[]:[...DOMAINS[PF.sec]]; route(); });
+  $$('[data-diff]').forEach(b=>b.onclick=()=>{ const d=b.dataset.diff; PF.diffs=PF.diffs.includes(d)?PF.diffs.filter(x=>x!==d):[...PF.diffs,d]; route(); });
+  $$('[data-status]').forEach(b=>b.onclick=()=>{ PF.status=b.dataset.status; route(); });
+  $$('[data-size]').forEach(b=>b.onclick=()=>{ PF.size=+b.dataset.size; route(); });
   const build = pool => {
     const usable = pool.filter(q=>q.tier!=='premium'||canUsePremium());
     if(!usable.length){ upgradeModal('These questions are in the premium bank'); return null; }
     const fresh = shuffle(usable.filter(q=>!S.prog.answers[q.id])), old = shuffle(usable.filter(q=>S.prog.answers[q.id]));
     return [...fresh,...old].slice(0,PF.size);
   };
-  $('#startSet')?.addEventListener('click',()=>{ const s=build(filteredQs()); if(s) startPractice(s,'Practice set'); });
-  $$('[data-dom]').forEach(b=>b.onclick=()=>{ const s=build(filteredQs(q=>q.domain===b.dataset.dom)); if(s) startPractice(s,b.dataset.dom); });
-  if(window.PENDING_DOM){ const d=window.PENDING_DOM; window.PENDING_DOM=null; const b=[...document.querySelectorAll('[data-dom]')].find(x=>x.dataset.dom===d); if(b) setTimeout(()=>b.click(),60); else toast('No questions for this skill yet'); }
-  $$('[data-q]').forEach(r=>r.onclick=()=>{ const q=S.questions.find(x=>x.id===r.dataset.q); if(q.tier==='premium'&&!canUsePremium()) return upgradeModal('This question is in the premium bank'); startPractice([q],'Single question'); });
+  $('#startSet')?.addEventListener('click',()=>{ const s=build(filteredQs()); if(s) startPractice(s, PF.doms.length===1?PF.doms[0]:'Practice set'); });
+  if(window.PENDING_DOM){ const d=window.PENDING_DOM; window.PENDING_DOM=null; const sec=DOMAINS.M.includes(d)?'M':'RW'; PF.sec=sec; PF.doms=[d]; const s=build(filteredQs()); if(s) startPractice(s,d); else toast('No questions for this skill yet'); }
 }
 
 /* ================= FULL-LENGTH TESTS ================= */
